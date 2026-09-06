@@ -1,0 +1,1337 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../labs/w1-intro/">
+      
+      
+        <link rel="next" href="setup/wsl/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+    
+    
+      
+        <title>主页 - 编译原理 实验文档</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6543a935.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href=".." title="编译原理 实验文档" class="md-header__button md-logo" aria-label="编译原理 实验文档" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            编译原理 实验文档
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              主页
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../en/env/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  主页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../labs/w1-intro/" class="md-tabs__link">
+          
+  
+  每周 Lab
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  环境配置
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="编译原理 实验文档" class="md-nav__button md-logo" aria-label="编译原理 实验文档" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    编译原理 实验文档
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    每周 Lab
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            每周 Lab
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../labs/w1-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 1 - Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    环境配置
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            环境配置
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      配置开发环境
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="配置开发环境">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用 VMware 虚拟机
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows-wsl2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Windows WSL2 配置
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macos" class="md-nav__link">
+    <span class="md-ellipsis">
+      macOS 原生开发环境配置
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      配置开发工具
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="配置开发工具">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vs-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用 VS Code 远程开发
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="使用 VS Code 远程开发">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vs-code-ssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      给 VS Code 安装 SSH 插件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ip" class="md-nav__link">
+    <span class="md-ellipsis">
+      获取虚拟机 IP 地址
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vs-code-remote-ssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      配置 VS Code Remote SSH
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      连接虚拟机
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#java" class="md-nav__link">
+    <span class="md-ellipsis">
+      安装 Java 开发插件
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      暂时使用本机完成前期实验
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="暂时使用本机完成前期实验">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      检查基础工具
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#java_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      安装 Java 开发插件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#java_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      配置课程 Java 项目
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#makefile" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用 Makefile
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows-makefile" class="md-nav__link">
+    <span class="md-ellipsis">
+      Windows 版本 Makefile
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Linux VM 搭建
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Linux VM 搭建
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="setup/wsl/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows WSL
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="setup/macos-native/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    macOS 原生环境
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      配置开发环境
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="配置开发环境">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用 VMware 虚拟机
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows-wsl2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Windows WSL2 配置
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macos" class="md-nav__link">
+    <span class="md-ellipsis">
+      macOS 原生开发环境配置
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      配置开发工具
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="配置开发工具">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vs-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用 VS Code 远程开发
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="使用 VS Code 远程开发">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vs-code-ssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      给 VS Code 安装 SSH 插件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ip" class="md-nav__link">
+    <span class="md-ellipsis">
+      获取虚拟机 IP 地址
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vs-code-remote-ssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      配置 VS Code Remote SSH
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      连接虚拟机
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#java" class="md-nav__link">
+    <span class="md-ellipsis">
+      安装 Java 开发插件
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      暂时使用本机完成前期实验
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="暂时使用本机完成前期实验">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      检查基础工具
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#java_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      安装 Java 开发插件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#java_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      配置课程 Java 项目
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#makefile" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用 Makefile
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows-makefile" class="md-nav__link">
+    <span class="md-ellipsis">
+      Windows 版本 Makefile
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="_1">开发环境配置<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>我们教学使用的参考环境为 GNU/Linux ，发行版为 Debian 13 trixie。</p>
+<p>如果你使用的是 GNU/Linux，不管是哪种发行版，我们相信你有足够的能力自己配好环境。</p>
+<p>对于 Windows / macOS (arm64, Apple Silicon) 用户，我们推荐你使用 VMware 配置虚拟机，配合 VSCode / IDEA IntelliJ 的 SSH 远程开发。</p>
+<p>此外，我们还提供了以下方案，这些方案不需要安装虚拟机，更加轻量级。但是，我们并不为这些情况提供排错与技术支持。</p>
+<ol>
+<li>使用 Windows WSL</li>
+<li>使用 macOS 的原生环境</li>
+</ol>
+<h2 id="_2">配置开发环境<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="vmware">使用 VMware 虚拟机<a class="headerlink" href="#vmware" title="Permanent link">&para;</a></h3>
+<p>我们推荐使用 VMware 作为虚拟机软件，VMWare 的安装文件已经放在 <a href="https://dl.cra.moe/CS323-Compilers-2025Fall/">https://dl.cra.moe/CS323-Compilers-2025Fall/</a> 下面。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>VMware Workstation (for Windows) 和 VMware Fusion (for macOS) 均已向个人用户免费授权，无需再使用所谓的破解版。</p>
+</div>
+<p>在安装完 VMware 后，你有两个选择：</p>
+<ol>
+<li>
+<p>你可以导入我们已经配置好的虚拟环境。</p>
+<p>Windows 用户请下载 OVF 文件，解压后将 .ovf 文件拖至 VMware 中即可。</p>
+<p>macOS 用户请选择包含 arm64 的压缩包，解压后将 .vmwarevm 拖入 VMware 的虚拟机列表中。你可以参照 <a href="https://yuk1i.github.io/os-next-docs/env/vm/macos/">https://yuk1i.github.io/os-next-docs/env/vm/macos/</a> 中的图片过程。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>预配置的 VMware 镜像中，root密码为 123456，普通用户 cs323 的密码为 123456。</p>
+</div>
+</li>
+<li>
+<p>你可以选择从零安装 Linux 虚拟机，请安装 Debian 13（安装镜像可从南科大镜像站上下载 <a href="https://mirrors.sustech.edu.cn/">https://mirrors.sustech.edu.cn/</a>）。并安装以下软件包：</p>
+</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$<span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>$<span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>openjdk-21-jdk<span class="w"> </span>llvm-19<span class="w"> </span>clang-19<span class="w"> </span>git<span class="w"> </span>make<span class="w"> </span>gzip<span class="w"> </span>flex<span class="w"> </span>bison
+</code></pre></div>
+<p>如果控制台显示 llvm-19 和 clang-19 找不到的错误，可以尝试以下命令：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>wget<span class="w"> </span>-O<span class="w"> </span>-<span class="w"> </span>https://apt.llvm.org/llvm-snapshot.gpg.key<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>apt-key<span class="w"> </span>add<span class="w"> </span>-
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>add-apt-repository<span class="w"> </span><span class="s2">"deb http://apt.llvm.org/</span><span class="k">$(</span>lsb_release<span class="w"> </span>-cs<span class="k">)</span><span class="s2">/ llvm-toolchain-</span><span class="k">$(</span>lsb_release<span class="w"> </span>-cs<span class="k">)</span><span class="s2">-19 main"</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>clang-19<span class="w"> </span>llvm-19
+</code></pre></div>
+<h3 id="windows-wsl2">Windows WSL2 配置<a class="headerlink" href="#windows-wsl2" title="Permanent link">&para;</a></h3>
+<p>参考 <a href="setup/wsl/">Windows WSL 配置</a></p>
+<h3 id="macos">macOS 原生开发环境配置<a class="headerlink" href="#macos" title="Permanent link">&para;</a></h3>
+<p>参考 <a href="setup/macos-native/">macOS 原生配置</a></p>
+<h2 id="_3">配置开发工具<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>我们建议大家提前配置好 <strong>VS Code / IntelliJ IDEA 的 SSH 远程开发环境</strong>，或者使用 WSL 进行开发。</p>
+<p>本节提供两种 VS Code 配置方式：</p>
+<ol>
+<li><strong>远程开发（推荐）</strong>：使用 VS Code Remote SSH 连接课程虚拟机，适合使用 VMware 的同学。</li>
+<li><strong>前期本地开发（临时方案）</strong>：如果暂时无法安装或启动虚拟机，可以先直接在 Windows 或 macOS 本机完成前期实验。</li>
+</ol>
+<p>前期实验只需要 Git、JDK 21 和 Make，不需要先配好完整的编译器开发环境。后续实验需要 LLVM 等工具时，仍建议迁移到课程虚拟机。</p>
+<h3 id="vs-code">使用 VS Code 远程开发<a class="headerlink" href="#vs-code" title="Permanent link">&para;</a></h3>
+<p>下面以 <strong>VS Code + Remote SSH</strong> 为例，带大家完成远程开发环境配置。</p>
+<hr />
+<h4 id="vs-code-ssh">给 VS Code 安装 SSH 插件<a class="headerlink" href="#vs-code-ssh" title="Permanent link">&para;</a></h4>
+<p><img alt="" src="../assets/env/ssh_plugin.png" /></p>
+<p>按照上图完成插件安装：</p>
+<ol>
+<li>点击左侧边栏的 <strong>Extensions（扩展）</strong> 按钮。</li>
+<li>在搜索栏中输入 <code>ssh</code>。</li>
+<li>找到微软官方的 <strong>Remote - SSH</strong> 插件。</li>
+<li>点击 <strong>Install</strong> 进行安装。</li>
+<li>安装完成后，左侧边栏中应该会出现图中 <strong>5</strong> 所示的远程连接图标。</li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">没有看到 Remote SSH 图标？</p>
+<p>如果安装完成后左侧边栏没有出现对应图标，可以尝试关闭 VS Code 后重新打开。</p>
+</div>
+<hr />
+<h4 id="ip">获取虚拟机 IP 地址<a class="headerlink" href="#ip" title="Permanent link">&para;</a></h4>
+<p>在配置 VS Code 之前，我们首先需要获取虚拟机的 IP 地址。</p>
+<p>重新进入虚拟机，并使用默认账户登录：</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户名</td>
+<td><code>cs323</code></td>
+</tr>
+<tr>
+<td>密码</td>
+<td><code>123456</code></td>
+</tr>
+</tbody>
+</table>
+<p>进入虚拟机桌面后，按照下图所示的方法打开终端：</p>
+<p><img alt="" src="../assets/env/ip_1.png" /></p>
+<p><img alt="" src="../assets/env/ip_2.png" /></p>
+<p>在终端中输入：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>hostname<span class="w"> </span>-I
+</code></pre></div>
+命令执行后，会输出当前虚拟机的 IP 地址，例如：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>192.168.159.125
+</code></pre></div>
+这个地址就是后面配置 VS Code 时需要使用的虚拟机 IP 地址。</p>
+<p><img alt="" src="../assets/env/ip_3.png" /></p>
+<div class="admonition warning">
+<p class="admonition-title">请记录你自己的 IP 地址</p>
+<p>每个人虚拟机的 IP 地址可能不同。</p>
+<p>后续配置中的 <code>HostName</code> 必须填写你自己通过 <code>hostname -I</code> 查询到的 IP 地址，不要直接复制教程中的示例地址。</p>
+</div>
+<hr />
+<h4 id="vs-code-remote-ssh">配置 VS Code Remote SSH<a class="headerlink" href="#vs-code-remote-ssh" title="Permanent link">&para;</a></h4>
+<p>获取虚拟机 IP 地址后，重新回到 VS Code。</p>
+<p>按照下图所示的步骤打开 SSH 配置文件：</p>
+<p><img alt="" src="../assets/env/ssh_plugin_2.png" /></p>
+<p>此时 VS Code 可能会弹出多个 SSH 配置文件供你选择，通常直接选择 <strong>第一个</strong> 即可。</p>
+<p>打开配置文件后，在其中加入：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Host cs323
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    HostName 192.168.159.125
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    User cs323
+</code></pre></div>
+其中：</p>
+<table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Host</code></td>
+<td>远程连接在 VS Code 中显示的名称</td>
+</tr>
+<tr>
+<td><code>HostName</code></td>
+<td>虚拟机的 IP 地址</td>
+</tr>
+<tr>
+<td><code>User</code></td>
+<td>登录虚拟机时使用的用户名</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition danger">
+<p class="admonition-title">不要直接复制示例 IP</p>
+<p>上面的：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>192.168.159.125
+</code></pre></div>
+<p>只是示例 IP 地址。</p>
+<p><strong>请将 <code>HostName</code> 修改为你自己的虚拟机 IP 地址。</strong></p>
+<p>例如，如果你前面通过 <code>hostname -I</code> 查询到的地址为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>192.168.159.130
+</code></pre></div>
+<p>那么配置应该写成：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Host cs323
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>HostName 192.168.159.130
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>User cs323
+</code></pre></div>
+</div>
+<hr />
+<h4 id="_4">连接虚拟机<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h4>
+<p>保存 SSH 配置文件后，回到 VS Code 的 <strong>Remote Explorer</strong> 。</p>
+<p>此时应该可以看到一个新的远程主机：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>cs323
+</code></pre></div>
+点击对应的连接按钮，即可连接虚拟机。</p>
+<p>第一次连接时，VS Code 可能会要求你选择远程服务器的操作系统类型，此时请选择：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Linux
+</code></pre></div>
+随后可能会要求输入 SSH 登录密码，默认密码为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>123456
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">第一次连接可能出现安全提示</p>
+</div>
+<p>第一次连接虚拟机时，SSH 可能会询问是否信任该主机。</p>
+<p>如果看到类似：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Are you sure you want to continue connecting?
+</code></pre></div>
+的提示，选择 <strong>Continue</strong> 即可。
+连接成功后，VS Code 左下角通常会显示类似：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>SSH: cs323
+</code></pre></div>
+这表示 VS Code 已经成功连接到虚拟机。</p>
+<div class="admonition success">
+<p class="admonition-title">连接成功</p>
+</div>
+<p>当 VS Code 左下角出现 <code>SSH: cs323</code> 后，就说明远程开发环境已经配置完成。</p>
+<div class="highlight"><pre><span></span><code>之后可以直接使用 VS Code 打开虚拟机中的代码目录，在虚拟机环境中进行代码编写、编译、运行和调试。
+</code></pre></div>
+<hr />
+<h4 id="java">安装 Java 开发插件<a class="headerlink" href="#java" title="Permanent link">&para;</a></h4>
+<p>由于后续实验将主要使用 <strong>Java</strong> 进行开发，因此还需要为 VS Code 安装 Java 开发相关插件。</p>
+<p>安装方法和前面安装 <strong>Remote - SSH</strong> 插件基本相同：</p>
+<ol>
+<li>首先确认当前 VS Code 已经连接到虚拟机，左下角应显示：</li>
+</ol>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>SSH: cs323
+</code></pre></div>
+2. 点击 VS Code 左侧边栏的 <strong>Extensions（扩展）</strong> 按钮。
+3. 在搜索栏中输入：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Extension Pack for Java
+</code></pre></div>
+4. 找到微软提供的 <strong>Extension Pack for Java</strong>。
+5. 点击 <strong>Install in SSH: cs323</strong>，将插件安装到远程虚拟机中。</p>
+<div class="admonition danger">
+<p class="admonition-title">必须安装在远程虚拟机中</p>
+</div>
+<p>这里需要特别注意：<strong>Java 插件必须安装在 <code>SSH: cs323</code> 远程环境中，而不是只安装在本地电脑中。</strong>
+后续实验中的 Java 项目、JDK 以及代码运行环境都位于虚拟机中，因此 Java 的代码补全、跳转、编译、运行、调试等功能也需要在远程环境中工作。</p>
+<p>安装时请确认按钮显示的是：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Install in SSH: cs323
+</code></pre></div>
+而不是普通的：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Install
+</code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">什么是 Extension Pack for Java？</p>
+</div>
+<p><strong>Extension Pack for Java</strong> 是一个 Java 开发插件集合。</p>
+<p>安装后，VS Code 会自动安装 Java 开发中常用的一系列插件，包括代码补全、代码跳转、运行、调试、测试以及 Maven 项目支持等功能。</p>
+<p>因此大家只需要安装这个插件集合，不需要逐个安装其中的插件。</p>
+<p>安装完成后，VS Code 就具备了在虚拟机中进行 Java 开发所需的基本功能。</p>
+<hr />
+<h3 id="_5">暂时使用本机完成前期实验<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<div class="admonition info">
+<p class="admonition-title">这是虚拟机不可用时的兜底方案</p>
+</div>
+<p>不需要为此安装 WSL，也不需要提前搭建完整的 Linux 环境。只要本机能够运行 Java 和 Make，就可以先完成课程前期内容。课程推荐环境仍然是虚拟机 + Remote SSH。</p>
+<h4 id="_6">检查基础工具<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h4>
+<p>在 VS Code 的终端中依次执行：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>git<span class="w"> </span>--version
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>java<span class="w"> </span>--version
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>make<span class="w"> </span>--version
+</code></pre></div>
+能够正常显示版本号后，再继续配置编辑器。Java 推荐使用 JDK 21。</p>
+<p>macOS 用户如果缺少 Git 或 Make，可以安装 Xcode 命令行工具：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>xcode-select<span class="w"> </span>--install
+</code></pre></div>
+Windows 用户可以直接安装 Git、JDK 21 和 Make。Make 可以通过 MinGW-w64 或 Chocolatey 安装；MinGW 提供的命令可能叫作 <code>mingw32-make</code>，后续命令中的 <code>make</code> 需要相应替换。</p>
+<h4 id="java_1">安装 Java 开发插件<a class="headerlink" href="#java_1" title="Permanent link">&para;</a></h4>
+<p>打开 VS Code 左侧的 <strong>Extensions（扩展）</strong> 面板，搜索并安装微软提供的 <strong>Extension Pack for Java</strong>。安装完成且 Java 语言服务启动后，VS Code 状态栏会显示 Java 已就绪。</p>
+<p><img alt="" src="../assets/env/local/java-extension-pack.png" /></p>
+<h4 id="java_2">配置课程 Java 项目<a class="headerlink" href="#java_2" title="Permanent link">&para;</a></h4>
+<p>课程项目通过 <code>libs</code> 目录提供 JAR 依赖。在项目根目录创建 <code>.vscode/settings.json</code>：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">{</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">    </span><span class="nt">"java.project.sourcePaths"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"src/main/java"</span><span class="p">],</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="nt">"java.project.referencedLibraries"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">        </span><span class="s2">"libs/**/*.jar"</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">    </span><span class="p">],</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span><span class="nt">"java.project.outputPath"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bin"</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="p">}</span>
+</code></pre></div>
+<p>再在命令面板输入并执行：<code>Debug: Add Configuration</code>，选择 Java，生成 <code>.vscode/launch.json</code>，替换为以下配置：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="p">{</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.2.0"</span><span class="p">,</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">    </span><span class="nt">"configurations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">        </span><span class="p">{</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">            </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"java"</span><span class="p">,</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">            </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Launch Current File"</span><span class="p">,</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">            </span><span class="nt">"request"</span><span class="p">:</span><span class="w"> </span><span class="s2">"launch"</span><span class="p">,</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">            </span><span class="nt">"mainClass"</span><span class="p">:</span><span class="w"> </span><span class="s2">"${file}"</span><span class="p">,</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">            </span><span class="nt">"classPaths"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">                </span><span class="s2">"libs/*"</span><span class="p">,</span>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="w">                </span><span class="s2">"bin"</span>
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="w">            </span><span class="p">]</span>
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="w">    </span><span class="p">]</span>
+<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a><span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><code>${file}</code>：内置变量，自动运行 <strong>当前编辑器打开的、带 main 方法的 Java 文件</strong> ，无需为每个文件单独配置</li>
+<li><code>classPaths</code>：运行时的类路径，包含依赖 Jar 包和编译输出目录</li>
+</ul>
+<p>这里可以直接创建这两个文件，在项目的根目录：</p>
+<p><img alt="" src="../assets/labs/w1-intro/vscode-config-files.png" /></p>
+<p>保存后，打开命令面板并执行 <strong>Developer: Reload Window</strong>。在 VS Code 的 <strong>JAVA PROJECTS</strong> 视图中看到 <code>Referenced Libraries</code>，说明 JAR 已被识别。</p>
+<p>Java 扩展可以直接运行当前打开的、包含 <code>main</code> 方法的类。只有需要固定主类、参数或环境变量时，才需要通过 <strong>Run and Debug: Add Configuration</strong> 创建 <code>.vscode/launch.json</code>。</p>
+<h4 id="makefile">使用 Makefile<a class="headerlink" href="#makefile" title="Permanent link">&para;</a></h4>
+<p>执行 Make 命令前，确认终端位于包含 <code>Makefile</code> 的项目根目录：</p>
+<p><img alt="" src="../assets/env/local/open-terminal.png" /></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># 清理旧的生成文件</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>make<span class="w"> </span>clean
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># 执行 Makefile 的默认目标</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>make
+</code></pre></div>
+具体可用目标以当前项目的 <code>Makefile</code> 为准。如果希望在 VS Code 中查看和执行 Makefile 目标，可以安装微软提供的 <strong>Makefile Tools</strong> 扩展。</p>
+<p><img alt="" src="../assets/env/local/makefile-tools.png" /></p>
+<h4 id="windows-makefile">Windows 版本 Makefile<a class="headerlink" href="#windows-makefile" title="Permanent link">&para;</a></h4>
+<p>在 Windows 中使用 Make 工具时候需要将项目根目录的 Makefile 改为下面的版本：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nv">ANTLR_JAR</span><span class="w">  </span><span class="o">:=</span><span class="w"> </span>libs/antlr-4.13.2-complete.jar
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="nv">OUTPUT_DIR</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>src/main/java/generated
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="nv">GRAMMARS</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">$(</span>basename<span class="w"> </span><span class="k">$(</span>wildcard<span class="w"> </span>*.g4<span class="k">))</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="nv">.DEFAULT_GOAL</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>all
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="nf">.PHONY</span><span class="o">:</span><span class="w"> </span><span class="n">all</span> <span class="n">clean</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="nf">all</span><span class="o">:</span><span class="w"> </span><span class="k">$(</span><span class="nv">GRAMMARS</span><span class="k">)</span>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="nf">$(GRAMMARS)</span><span class="o">:</span><span class="w"> </span>%: <span class="k">$(</span><span class="nv">OUTPUT_DIR</span><span class="k">)</span>/%<span class="n">Parser</span>.<span class="n">java</span>
+<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a>
+<a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a><span class="nf">$(OUTPUT_DIR)/%Parser.java</span><span class="o">:</span><span class="w"> </span>%.<span class="n">g</span>4
+<a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a><span class="w">    </span>@if<span class="w"> </span>not<span class="w"> </span>exist<span class="w"> </span><span class="s2">"</span><span class="k">$(</span>OUTPUT_DIR<span class="k">)</span><span class="s2">"</span><span class="w"> </span>mkdir<span class="w"> </span><span class="s2">"</span><span class="k">$(</span>OUTPUT_DIR<span class="k">)</span><span class="s2">"</span>
+<a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a><span class="w">    </span>@echo<span class="w"> </span>Building<span class="w"> </span><span class="k">$(</span>basename<span class="w"> </span>$&lt;<span class="k">)</span>
+<a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a><span class="w">    </span>java<span class="w"> </span>-jar<span class="w"> </span><span class="k">$(</span>ANTLR_JAR<span class="k">)</span><span class="w"> </span>-visitor<span class="w"> </span>-o<span class="w"> </span><span class="k">$(</span>OUTPUT_DIR<span class="k">)</span>/<span class="k">$(</span>basename<span class="w"> </span>$&lt;<span class="k">)</span><span class="w"> </span>-package<span class="w"> </span>generated.<span class="k">$(</span>basename<span class="w"> </span>$&lt;<span class="k">)</span><span class="w"> </span>$&lt;
+<a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a>
+<a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a><span class="nf">clean</span><span class="o">:</span>
+<a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a><span class="w">    </span>@if<span class="w"> </span>exist<span class="w"> </span><span class="s2">"</span><span class="k">$(</span>OUTPUT_DIR<span class="k">)</span><span class="s2">"</span><span class="w"> </span>rmdir<span class="w"> </span>/S<span class="w"> </span>/Q<span class="w"> </span><span class="s2">"</span><span class="k">$(</span>OUTPUT_DIR<span class="k">)</span><span class="s2">"</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">命令行必须以 Tab 开头</p>
+</div>
+<p><code>if</code>、<code>echo</code>、<code>java</code> 和 <code>rmdir</code> 四行前面必须是 <strong>Tab</strong>，不能用空格代替。这里使用 <code>.DEFAULT_GOAL := all</code> 指定默认目标；原来的 <code>.DEFAULT = all</code> 并不是 GNU Make 设置默认目标的正确写法。
+该版本不包含 Maven 的 <code>jar</code> 目标。编译与清理命令分别为：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">mingw32-make</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">mingw32-make</span> <span class="n">clean</span>
+</code></pre></div>
+如果安装后命令名就是 <code>make</code>，则直接使用 <code>make</code> 和 <code>make clean</code>。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-copyright">
+    <div class="md-copyright__highlight">
+        commit: 
+        <a href="/commit/888ad6aa, 2026-09-06 15:55:48+08:00" target="_blank" rel="noopener">
+            888ad6aa, 2026-09-06 15:55:48+08:00
+        </a>
+    </div>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.path", "navigation.tabs", "navigation.tabs.sticky"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>
