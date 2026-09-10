@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/</loc>
+        <lastmod>2026-09-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/"/>
+    </url>
+    <url>
+        <loc>https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/env/</loc>
+        <lastmod>2026-09-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/env/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/env/"/>
+    </url>
+    <url>
+        <loc>https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/env/setup/macos-native/</loc>
+        <lastmod>2026-09-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/env/setup/macos-native/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/env/setup/macos-native/"/>
+    </url>
+    <url>
+        <loc>https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/env/setup/wsl/</loc>
+        <lastmod>2026-09-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/env/setup/wsl/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/env/setup/wsl/"/>
+    </url>
+    <url>
+        <loc>https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/labs/w1-intro/</loc>
+        <lastmod>2026-09-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/labs/w1-intro/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/labs/w1-intro/"/>
+    </url>
+    <url>
+        <loc>https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/</loc>
+        <lastmod>2026-09-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/"/>
+    </url>
+    <url>
+        <loc>https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/env/</loc>
+        <lastmod>2026-09-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/env/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/env/"/>
+    </url>
+    <url>
+        <loc>https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/env/setup/macos-native/</loc>
+        <lastmod>2026-09-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/env/setup/macos-native/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/env/setup/macos-native/"/>
+    </url>
+    <url>
+        <loc>https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/env/setup/wsl/</loc>
+        <lastmod>2026-09-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/env/setup/wsl/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/env/setup/wsl/"/>
+    </url>
+    <url>
+        <loc>https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/labs/w1-intro/</loc>
+        <lastmod>2026-09-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/labs/w1-intro/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/labs/w1-intro/"/>
+    </url>
+</urlset>
