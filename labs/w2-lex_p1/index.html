@@ -1,0 +1,1031 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/labs/w2-lex_p1/">
+      
+      
+        <link rel="prev" href="../w1-intro/">
+      
+      
+        <link rel="next" href="../w3-lex_p2/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+    
+    
+      
+        <title>Week 2 - Lexer 1 - 编译原理 实验文档</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#week-2-lexer-1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="编译原理 实验文档" class="md-header__button md-logo" aria-label="编译原理 实验文档" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            编译原理 实验文档
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Week 2 - Lexer 1
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../en/labs/w2-lex_p1/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  主页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../w1-intro/" class="md-tabs__link">
+          
+  
+  每周 Lab
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../env/" class="md-tabs__link">
+          
+  
+  环境配置
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="编译原理 实验文档" class="md-nav__button md-logo" aria-label="编译原理 实验文档" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    编译原理 实验文档
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    每周 Lab
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            每周 Lab
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w1-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 1 - Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Week 2 - Lexer 1
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Week 2 - Lexer 1
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      编译器前端概览
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      制定词法规则
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="制定词法规则">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      正则表达式
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antlr" class="md-nav__link">
+    <span class="md-ellipsis">
+      在 ANTLR 中使用正则表达式
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antlr_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      ANTLR默认的错误处理机制
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      练习
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w3-lex_p2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 3 - Lexer 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    环境配置
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            环境配置
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Linux VM 搭建
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Linux VM 搭建
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/wsl/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows WSL
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/macos-native/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    macOS 原生环境
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      编译器前端概览
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      制定词法规则
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="制定词法规则">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      正则表达式
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antlr" class="md-nav__link">
+    <span class="md-ellipsis">
+      在 ANTLR 中使用正则表达式
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antlr_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      ANTLR默认的错误处理机制
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      练习
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="week-2-lexer-1">Week 2 - Lexer 1<a class="headerlink" href="#week-2-lexer-1" title="Permanent link">&para;</a></h1>
+<h2 id="_1">编译器前端概览<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>编译器前端的工作主要可以分为两个核心部分：<strong>词法分析器（Lexer）</strong> 和 <strong>语法分析器（Parser）</strong>。</p>
+<p>Lexer 的输入是一个超长的字符串（在编程场景下就是源代码）。它会将接收到的字符串分割成一个个有意义的（符合词法模式）、最小的词法单元（Token），并对其进行分类。如果用英语来类比，这就像是把一个英文句子拆分成一个个单词，并为每个单词标注词性。在这个过程中，如果 Lexer 无法将尚未处理的输入部分的前缀与任何一个预先定义好的词法模式匹配上，则会报词法错误（Lexical Error）。</p>
+<p>例如，在下图中，对于代码 <code>int x = 10;</code>：</p>
+<ul>
+<li><code>int</code> 被识别并归类为 <code>INT</code> 类型（关键字）</li>
+<li><code>x</code> 被识别并归类为 <code>IDENTIFIER</code> 类型（标识符）</li>
+<li>以此类推...</li>
+</ul>
+<p>经过词法分析器处理后，正常情况下，我们会得到一串带有类型的词法单元序列，例如 <code>INT</code>, <code>IDENTIFIER</code>, <code>EQ</code>, <code>NUMBER</code>, <code>SEMICOLON</code>...... 我们通常称之为 <strong>Token Stream（Token 流）</strong> 。</p>
+<p>接着，这个 Token 流会被交给 Parser。语法分析器会根据预设的语法规则，判断该 Token 流是否合法。如果合法，Token 流将被转换成一棵 <strong>Parse Tree（语法分析树）</strong> ；否则，语法分析器会报语法错误（Syntax Error）。在后续的步骤中，语法分析树会被进一步处理成 <strong>中间表示（Intermediate Representation）</strong> 。至此，编译器前端的工作就全部完成了，剩下的任务将交给编译器后端。</p>
+<p><img alt="" src="../../assets/labs/w2-lex/compile.png" /></p>
+<p>听上去，编译器前端的任务似乎相当复杂。的确，如果想从零开始完整地实现一个编译器前端，是一项极其困难的工作。但我们有 ANTLR 这个强大的工具，你可以利用它相对轻松地完成编译器前端的大部分工作。本周，我们将详细介绍如何使用 ANTLR 来完成词法分析。</p>
+<h2 id="_2">制定词法规则<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>我们已经知道，词法分析器的工作是将源代码（一个巨大的字符串）分解成一个个“单词”，并为它们“划分词性”。为了实现这一点，我们需要制定一系列的 <strong>词法规则</strong>（用来描述每类“单词”长什么样子），而这些规则通常是用 <strong>正则表达式</strong> 来定义的。词法分析器会根据这些规则，逐一检查输入字符串中的字符，尝试匹配这些规则。一旦成功匹配某条规则，词法分析器就会记录下这个词法单元（Token），然后从下一个字符开始继续分析。请注意，这里我们简化了很多细节，实际匹配的过程中词法分析器会有不少复杂的动作，比如回溯、错误恢复（比如丢掉一些非法字符让编译过程继续）等。</p>
+<h3 id="_3">正则表达式<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>正则表达式可被视为一种专门用来描述 <strong>字符串模式</strong> 的形式语言 (Formal Language)。所谓字符串模式，就是指符合某种特定规则的字符串。</p>
+<p>举个例子，假设我们希望匹配 <strong>“以至少一个小写字母开头，后跟至少一个数字的字符串”</strong> 。我们无法直接将上面这段自然语言描述交给 ANTLR，它无法理解。这时，我们就需要使用 ANTLR 能“听懂”的形式语言——正则表达式。上述需求用正则表达式可以表示为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>[a-z]+[0-9]+
+</code></pre></div>
+<p>简单解释一下：</p>
+<ul>
+<li><code>[]</code> 表示一个字符集合，匹配集合内的任意一个字符。<code>[a-z]</code> 就代表 a 到 z 之间的任意一个小写字母（等同于 <code>[abcdefg...z]</code>）。</li>
+<li><code>[0-9]</code> 代表 0 到 9 之间的任意一个数字。</li>
+<li><code>+</code> 是一个量词，表示匹配它前面的元素一次或多次（至少一次）。</li>
+<li>与 <code>+</code> 类似，<code>*</code> 表示匹配前面的元素零次或多次。</li>
+</ul>
+<p>正则表达式的表达能力非常强大。关于它的详细语法，你可以在教材中或网上轻易找到丰富的学习资料，这里我们不再赘述。</p>
+<h2 id="antlr">在 ANTLR 中使用正则表达式<a class="headerlink" href="#antlr" title="Permanent link">&para;</a></h2>
+<p>还记得我们在上一章提到的 <code>.g4</code> 文件吗？你需要在这个文件中定义所有的词法规则（以及后续章节将要介绍的语法规则）。</p>
+<p>那么，如何区分词法规则和语法规则呢？在<code>.g4</code>文件中，我们通过一个简单的约定来区分它们：<strong>以大写字母开头的规则是词法规则，而以小写字母开头的规则是语法规则</strong>。</p>
+<p>我们以第一章的 <code>Calc1.g4</code> 文件为例来解释：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">grammar</span><span class="w"> </span><span class="nc">Calc1</span><span class="p">;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">PLUS</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">DIV</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">PLUS</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">MINUS</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">factor</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">        </span><span class="p">;</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="nl">factor</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="no">INT</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="no">ID</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">        </span><span class="p">;</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="nl">INT</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="x">0-9</span><span class="p">]</span><span class="o">+</span><span class="w"> </span><span class="p">;</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="nl">PLUS</span><span class="p">:</span><span class="w"> </span><span class="s1">'+'</span><span class="p">;</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="nl">MINUS</span><span class="p">:</span><span class="w"> </span><span class="s1">'-'</span><span class="p">;</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="nl">MUL</span><span class="p">:</span><span class="w"> </span><span class="s1">'*'</span><span class="p">;</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="nl">DIV</span><span class="p">:</span><span class="w"> </span><span class="s1">'/'</span><span class="p">;</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="nl">ID</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="x">a-zA-Z</span><span class="p">]</span><span class="o">+</span><span class="w"> </span><span class="p">;</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="nl">WS</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="x"> \t\r\n</span><span class="p">]</span><span class="o">+</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nv">skip</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+<ul>
+<li>
+<p>第一行 <code>grammar Calc1;</code> 声明了该语法（也可以叫作文法）的名称。这个名称会影响 ANTLR 后续生成的 Java 文件（如词法分析器、语法分析器等）的命名。</p>
+</li>
+<li>
+<p>接下来以小写字母开头的这几行是 <strong>语法规则</strong>（也称为产生式），我们将在后面的章节详细介绍它们。
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">MUL</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">DIV</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">PLUS</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">MINUS</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">factor</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="p">;</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="nl">factor</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="no">INT</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="no">ID</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">        </span><span class="p">;</span>
+</code></pre></div></p>
+</li>
+<li>
+<p>后面以大写字母开头的几行，就是我们的 <strong>词法规则</strong>。它们的基本格式是：
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>词法规则名称: 对应的正则表达式 ;
+</code></pre></div>
+    这里的“词法规则名称”就相当于我们之前提到的“词性”。后续的语法分析器实际上就是以这些“词性”的序列作为输入进行分析，而非直接分析原始的文本。</p>
+</li>
+</ul>
+<p>现在，我们再回头看看上一章生成的 Java 文件。其中，<strong>Calc1Lexer.java</strong> 就是 ANTLR 自动生成的词法分析器。让我们稍微修改一下上一章的代码，来仔细观察它到底把我们的源码划分成了什么样。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">generated.Calc1.Calc1Lexer</span><span class="p">;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.antlr.v4.runtime.CharStream</span><span class="p">;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.antlr.v4.runtime.CharStreams</span><span class="p">;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.antlr.v4.runtime.CommonTokenStream</span><span class="p">;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.antlr.v4.runtime.Token</span><span class="p">;</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">        </span><span class="c1">// 从字符串获取字符流。若要从文件读取，可使用 CharStreams.fromFileName("文件路径")</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">        </span><span class="n">CharStream</span><span class="w"> </span><span class="n">charStream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CharStreams</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">"1 + 2"</span><span class="p">);</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">        </span><span class="n">Calc1Lexer</span><span class="w"> </span><span class="n">lexer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Calc1Lexer</span><span class="p">(</span><span class="n">charStream</span><span class="p">);</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">        </span><span class="c1">// 基于词法分析器实例，创建 Token 流</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">        </span><span class="n">CommonTokenStream</span><span class="w"> </span><span class="n">tokens</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CommonTokenStream</span><span class="p">(</span><span class="n">lexer</span><span class="p">);</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">        </span><span class="c1">// 调用 fill() 方法，让词法分析器开始工作，填充 Token 流</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">        </span><span class="n">tokens</span><span class="p">.</span><span class="na">fill</span><span class="p">();</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">        </span><span class="c1">// 打印 Token 流信息</span>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Token</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tokens</span><span class="p">.</span><span class="na">getTokens</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">token</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="p">}</span>
+</code></pre></div>
+<p>上面程序运行后，你将看到如下输出：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>[@0,0:0='1',&lt;1&gt;,1:0]
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>[@1,2:2='+',&lt;2&gt;,1:2]
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>[@2,4:4='2',&lt;1&gt;,1:4]
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>[@3,5:4='&lt;EOF&gt;',&lt;-1&gt;,1:5]
+</code></pre></div></p>
+<p>我们以第一行 <code>[@0,0:0='1',&lt;1&gt;,1:0]</code> 为例，解读其中每个部分的含义：</p>
+<ul>
+<li><code>@0</code>: Token 的索引，从 0 开始。</li>
+<li><code>0:0</code>: Token 在整个输入字符串中的起始和终止位置（下标）。</li>
+<li><code>'1'</code>: Token 匹配到的具体文本内容，也就是我们所说的“单词”。</li>
+<li><code>&lt;1&gt;</code>: Token 的类型。在这里的编号 <code>&lt;1&gt;</code> 对应 <code>INT</code>。你可以在 ANTLR 生成的 <code>.tokens</code> 文件中找到类型名称和编号的对应关系。</li>
+<li><code>1:0</code>: Token 所在的行号和列号。注意，行号从 1 开始，列号从 0 开始。</li>
+</ul>
+<p>注意，最后有一个 <strong>EOF</strong> (End Of File) 符号。它代表文件结束，是 ANTLR 自动添加的，你无需在规则中定义它。</p>
+<h2 id="antlr_1">ANTLR默认的错误处理机制<a class="headerlink" href="#antlr_1" title="Permanent link">&para;</a></h2>
+<p>假如我们的源代码中有一个子串，无法被任何一条词法规则匹配，会怎么样？</p>
+<p>举个例子，我们的词法规则只有一条 <code>ADD: '++'</code>，而输入的字符串是 <code>+&amp;++</code>。当词法分析器读到第一个 <code>+</code> 时，它期望下一个字符也是 <code>+</code>。但它实际读到的是 <code>&amp;</code>，此时 <code>+&amp;</code> 无法匹配任何规则。ANTLR 的词法分析器会报告一个  <strong>token recognition error</strong>，并消耗掉引发错误的那个字符（在我们的例子中是 <code>&amp;</code>），然后从下一个字符（第三个字符 <code>+</code>）开始重新尝试匹配。</p>
+<h2 id="_4">练习<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>写一个可以正常识别一个ipv4地址的ANTLR Lexer，识别下面三种Token</p>
+<ul>
+<li>
+<p>Dot："."</p>
+</li>
+<li>
+<p>Number: 由 1–3 位数字组成、数值不超过 255 的十进制非负整数。输入不足三位时，由程序在输出时补前导零至三位。</p>
+</li>
+<li>
+<p>ERROR: 数值大于 255，或位数超过三位的数字串。位数包含前导零；应将整个连续数字串识别为一个 ERROR Token，不得拆分为多个 Number Token。</p>
+</li>
+</ul>
+<p>例如，<code>16</code> 识别为 Number，输出为 <code>016</code>；<code>0016</code> 虽然数值不超过 255，但有四位，应识别为 ERROR。</p>
+<p>将你识别到的Token打印出来, 你可以将<code>Main.java</code>的改为下面这个程序：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">generated.IPV4.IPV4Lexer</span><span class="p">;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.antlr.v4.runtime.CharStream</span><span class="p">;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.antlr.v4.runtime.CharStreams</span><span class="p">;</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.antlr.v4.runtime.CommonTokenStream</span><span class="p">;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.antlr.v4.runtime.Token</span><span class="p">;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">        </span><span class="n">CharStream</span><span class="w"> </span><span class="n">charStream</span><span class="w"> </span><span class="o">=</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">                </span><span class="n">CharStreams</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">"257.016.299.233"</span><span class="p">);</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">        </span><span class="n">IPV4Lexer</span><span class="w"> </span><span class="n">lexer</span><span class="w"> </span><span class="o">=</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">IPV4Lexer</span><span class="p">(</span><span class="n">charStream</span><span class="p">);</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">        </span><span class="n">CommonTokenStream</span><span class="w"> </span><span class="n">tokens</span><span class="w"> </span><span class="o">=</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">CommonTokenStream</span><span class="p">(</span><span class="n">lexer</span><span class="p">);</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">        </span><span class="n">tokens</span><span class="p">.</span><span class="na">fill</span><span class="p">();</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Token</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">tokens</span><span class="p">.</span><span class="na">getTokens</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">            </span><span class="c1">// 不输出 EOF</span>
+<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">token</span><span class="p">.</span><span class="na">getType</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Token</span><span class="p">.</span><span class="na">EOF</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="w">                </span><span class="k">continue</span><span class="p">;</span>
+<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="w">            </span><span class="p">}</span>
+<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>
+<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">tokenType</span><span class="w"> </span><span class="o">=</span>
+<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="w">                    </span><span class="n">lexer</span><span class="p">.</span><span class="na">getVocabulary</span><span class="p">()</span>
+<a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a><span class="w">                            </span><span class="p">.</span><span class="na">getSymbolicName</span><span class="p">(</span><span class="n">token</span><span class="p">.</span><span class="na">getType</span><span class="p">());</span>
+<a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a>
+<a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span>
+<a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a><span class="w">                    </span><span class="s">"TokenType: %s, Lexeme: %s%n"</span><span class="p">,</span>
+<a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a><span class="w">                    </span><span class="n">tokenType</span><span class="p">,</span>
+<a id="__codelineno-6-33" name="__codelineno-6-33" href="#__codelineno-6-33"></a><span class="w">                    </span><span class="n">token</span><span class="p">.</span><span class="na">getText</span><span class="p">()</span>
+<a id="__codelineno-6-34" name="__codelineno-6-34" href="#__codelineno-6-34"></a><span class="w">            </span><span class="p">);</span>
+<a id="__codelineno-6-35" name="__codelineno-6-35" href="#__codelineno-6-35"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-6-36" name="__codelineno-6-36" href="#__codelineno-6-36"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-6-37" name="__codelineno-6-37" href="#__codelineno-6-37"></a><span class="p">}</span>
+</code></pre></div>
+样例输入1
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>010.016.124.233
+</code></pre></div>
+样例输出1
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>TokenType: Number, Lexeme: 010
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>TokenType: Dot, Lexeme: .
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>TokenType: Number, Lexeme: 016
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>TokenType: Dot, Lexeme: .
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>TokenType: Number, Lexeme: 124
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>TokenType: Dot, Lexeme: .
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>TokenType: Number, Lexeme: 233
+</code></pre></div></p>
+<p>样例输入2 (注意这是一个非法输入)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>257.016.003.233
+</code></pre></div>
+样例输出2
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>TokenType: ERROR, Lexeme: 257
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>TokenType: Dot, Lexeme: .
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>TokenType: Number, Lexeme: 016
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>TokenType: Dot, Lexeme: .
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>TokenType: Number, Lexeme: 003
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>TokenType: Dot, Lexeme: .
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>TokenType: Number, Lexeme: 233
+</code></pre></div></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-copyright">
+    <div class="md-copyright__highlight">
+        commit: 
+        <a href="/commit/3c557be3, 2026-09-20 21:27:44+08:00" target="_blank" rel="noopener">
+            3c557be3, 2026-09-20 21:27:44+08:00
+        </a>
+    </div>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.path", "navigation.tabs", "navigation.tabs.sticky"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>
