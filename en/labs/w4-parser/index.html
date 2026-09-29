@@ -1,0 +1,1496 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/labs/w4-parser/">
+      
+      
+        <link rel="prev" href="../w3-lex_p2/">
+      
+      
+        <link rel="next" href="../../env/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+    
+    
+      
+        <title>Week 4 - Parser 1 - Compiler Lab Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.6543a935.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#week-4-parser-1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../" title="Compiler Lab Documentation" class="md-header__button md-logo" aria-label="Compiler Lab Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Compiler Lab Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Week 4 - Parser 1
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../labs/w4-parser/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../" class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../w1-intro/" class="md-tabs__link">
+          
+  
+  Weekly Labs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../env/" class="md-tabs__link">
+          
+  
+  Environment Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="Compiler Lab Documentation" class="md-nav__button md-logo" aria-label="Compiler Lab Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    Compiler Lab Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Weekly Labs
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Weekly Labs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w1-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 1 - Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w2-lex_p1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 2 - Lexer 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w3-lex_p2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 3 - Lexer 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Week 4 - Parser 1
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Week 4 - Parser 1
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#recap-context-free-grammar-cfg" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recap: Context-Free Grammar (CFG)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recap: Context-Free Grammar (CFG)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#defining-a-cfg-in-antlr" class="md-nav__link">
+    <span class="md-ellipsis">
+      Defining a CFG in ANTLR
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parser-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parser Rule
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parser Rule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-elements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rule Elements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subrules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Subrules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Subrules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#subrule-example-for-zero-or-more-repetitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Subrule Example: (...)* for Zero or More Repetitions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Subrule Example: (...)* for Zero or More Repetitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#matching-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Matching Inputs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#non-matching-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      ❌ Non-Matching Inputs
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-an-antlr-parser" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using an ANTLR Parser
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using an ANTLR Parser">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#start-rules-and-eof" class="md-nav__link">
+    <span class="md-ellipsis">
+      Start Rules and EOF
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quickly-inspecting-a-parse-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quickly Inspecting a Parse Tree
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quickly Inspecting a Parse Tree">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-does-make-actually-do" class="md-nav__link">
+    <span class="md-ellipsis">
+      What Does make Actually Do?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#we-have-already-printed-a-parse-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      We Have Already Printed a Parse Tree
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-tree-to-inspect-a-parse-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using -tree to Inspect a Parse Tree
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-does-this-command-mean" class="md-nav__link">
+    <span class="md-ellipsis">
+      What Does This Command Mean?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viewing-a-graphical-parse-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      Viewing a Graphical Parse Tree
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exercise" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exercise
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Environment Setup
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Environment Setup
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Alternative Environments
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Alternative Environments
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/wsl/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows WSL
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/macos-native/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Native macOS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#recap-context-free-grammar-cfg" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recap: Context-Free Grammar (CFG)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recap: Context-Free Grammar (CFG)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#defining-a-cfg-in-antlr" class="md-nav__link">
+    <span class="md-ellipsis">
+      Defining a CFG in ANTLR
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parser-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parser Rule
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parser Rule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-elements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rule Elements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subrules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Subrules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Subrules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#subrule-example-for-zero-or-more-repetitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Subrule Example: (...)* for Zero or More Repetitions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Subrule Example: (...)* for Zero or More Repetitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#matching-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Matching Inputs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#non-matching-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      ❌ Non-Matching Inputs
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-an-antlr-parser" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using an ANTLR Parser
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using an ANTLR Parser">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#start-rules-and-eof" class="md-nav__link">
+    <span class="md-ellipsis">
+      Start Rules and EOF
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quickly-inspecting-a-parse-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quickly Inspecting a Parse Tree
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quickly Inspecting a Parse Tree">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-does-make-actually-do" class="md-nav__link">
+    <span class="md-ellipsis">
+      What Does make Actually Do?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#we-have-already-printed-a-parse-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      We Have Already Printed a Parse Tree
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-tree-to-inspect-a-parse-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using -tree to Inspect a Parse Tree
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-does-this-command-mean" class="md-nav__link">
+    <span class="md-ellipsis">
+      What Does This Command Mean?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viewing-a-graphical-parse-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      Viewing a Graphical Parse Tree
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exercise" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exercise
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="week-4-parser-1">Week 4 - Parser 1<a class="headerlink" href="#week-4-parser-1" title="Permanent link">&para;</a></h1>
+<p>In the previous chapter, we introduced the main components of a compiler's front end and explored lexical analysis. Next, we will turn to the <strong>parser</strong>. Before diving into the details, let us establish what a parser does: it takes the token stream produced by the lexer and applies a set of grammar rules to organize those tokens into a parse tree for further analysis. If the input cannot be parsed according to those rules, the program contains a syntax error.</p>
+<div class="admonition info">
+<p class="admonition-title">What is a parser?</p>
+<p>A <code>Parser</code> takes a token stream from a <code>Lexer</code> and turns it into a tree.</p>
+<p>This tree is called a <strong>parse tree</strong>, and the rules used to build it form the <strong>grammar</strong>.</p>
+</div>
+<h2 id="recap-context-free-grammar-cfg">Recap: Context-Free Grammar (CFG)<a class="headerlink" href="#recap-context-free-grammar-cfg" title="Permanent link">&para;</a></h2>
+<p>We use a <strong>context-free grammar (CFG)</strong> to describe syntax rules. In the context of formal languages and compiler design, a grammar specifies the syntax of a language.</p>
+<p>Like regular expressions, which we covered in the previous chapter, CFGs provide a formal way to describe a language. Regular expressions describe <strong>lexical rules</strong>: what individual tokens look like. CFGs describe <strong>syntax rules</strong> at a higher level: how those tokens fit together to form a structurally valid program. ANTLR uses context-free grammars to describe syntax.</p>
+<details class="note">
+<summary>Why are CFGs more expressive than regular expressions?</summary>
+<p>CFGs can describe structures that regular expressions cannot, including recursive and nested structures. A classic example is balanced parentheses: <code>()</code>.</p>
+<p>Languages described by CFGs, known as <strong>context-free languages</strong>, are generally recognized using a <strong>pushdown automaton</strong>. Unlike the <strong>finite automaton</strong> used to recognize regular languages, a pushdown automaton has a stack, allowing it to handle recursive and nested structures.</p>
+<p>A finite automaton can be viewed as a special case of a pushdown automaton. If you are interested, see <a href="https://en.wikipedia.org/wiki/Automata_theory">Wikipedia - Automata theory</a>.</p>
+</details>
+<p>Two essential components of a CFG are <strong>terminals</strong> and <strong>nonterminals</strong>.</p>
+<p>Simply put, terminals are the tokens handed to the parser by the lexer. They are the basic units of the grammar and cannot be broken down any further within it. Nonterminals represent structures that the parser recognizes by combining tokens from the input stream. The rules for forming these structures are called <strong>productions</strong>. A production describes how terminals and nonterminals can form a nonterminal. Viewed in the other direction, it tells us which sequence of terminals and nonterminals a nonterminal can produce—hence the name "production."</p>
+<div class="admonition note">
+<p class="admonition-title">Recap: Productions</p>
+<p>In the lectures, we write a production as <code>head -&gt; body</code>.</p>
+<p>The <code>head</code> must be a nonterminal, while the <code>body</code> contains zero or more terminals or nonterminals.</p>
+</div>
+<h3 id="defining-a-cfg-in-antlr">Defining a CFG in ANTLR<a class="headerlink" href="#defining-a-cfg-in-antlr" title="Permanent link">&para;</a></h3>
+<p>Let us start with a simple ANTLR grammar:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">grammar</span><span class="w"> </span><span class="nc">Calc1</span><span class="p">;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">ADD</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">SUB</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">factor</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="p">;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nl">factor</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="no">INT</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">        </span><span class="p">;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nl">INT</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="x">0-9</span><span class="p">]</span><span class="o">+</span><span class="w"> </span><span class="p">;</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nl">ADD</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s1">'+'</span><span class="w"> </span><span class="p">;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nl">SUB</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s1">'-'</span><span class="w"> </span><span class="p">;</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="nl">WS</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="x"> \t\r\n</span><span class="p">]</span><span class="o">+</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nv">skip</span><span class="w"> </span><span class="p">;</span><span class="w"> </span>
+</code></pre></div>
+<p>In ANTLR terminology, terminals are usually called <strong>tokens</strong>, and nonterminals are defined by <strong>rules</strong>.</p>
+<p>Both definitions follow the same basic format: a name, a colon, the rule body, and a final semicolon. A token or rule definition can contain multiple alternatives.</p>
+<p>ANTLR distinguishes lexer rules from parser rules by the first letter of their names: lexer rule names must begin with an uppercase letter, while parser rule names must begin with a lowercase letter. Lexer and parser rules can be mixed within the grammar; neither group has to come first.</p>
+<p>The <code>Calc1</code> grammar above contains:</p>
+<ul>
+<li>Four terminal definitions whose names <strong>begin with an uppercase letter</strong>.</li>
+<li>Two nonterminals whose names <strong>begin with a lowercase letter</strong>.</li>
+<li>Four productions, expressed as alternatives within the parser rules.</li>
+</ul>
+<h2 id="parser-rule">Parser Rule<a class="headerlink" href="#parser-rule" title="Permanent link">&para;</a></h2>
+<p>Here is a basic parser rule:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nl">factor</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="no">INT</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+<p>The general format is <code>ruleName : Alternatives ;</code>.</p>
+<p>A nonterminal can have multiple productions. Separate the alternatives with <code>|</code> and end the rule with <code>;</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">ADD</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">SUB</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">factor</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="p">;</span>
+</code></pre></div>
+<h3 id="rule-elements">Rule Elements<a class="headerlink" href="#rule-elements" title="Permanent link">&para;</a></h3>
+<p>Each alternative can contain token references (starting with an uppercase letter), rule references (starting with a lowercase letter), or string literals such as <code>'literal'</code>.</p>
+<p>We can use string literals directly in a parser rule. ANTLR automatically creates and references a corresponding lexer rule, which you can see in the generated <code>.tokens</code> file.</p>
+<p>For example, instead of defining <code>ADD: '+'</code>, we can write the literal <code>'+'</code> directly in the parser rule:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'+'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'-'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">        </span><span class="p">;</span>
+</code></pre></div>
+<h3 id="subrules">Subrules<a class="headerlink" href="#subrules" title="Permanent link">&para;</a></h3>
+<p>An alternative can itself contain a block of alternatives, called a <strong>subrule</strong>. You can think of a subrule as an anonymous rule defined in place.</p>
+<p>Subrules have four forms, with syntax much like regular expressions:</p>
+<ol>
+<li><code>(x | y | z)</code>: Match one of the alternatives exactly once.</li>
+<li><code>(x | y | z)?</code>: Match one of the alternatives once, or not at all.</li>
+<li><code>(x | y | z)*</code>: Match the block zero or more times, choosing an alternative each time.</li>
+<li><code>(x | y | z)+</code>: Match the block one or more times, choosing an alternative each time.</li>
+</ol>
+<h4 id="subrule-example-for-zero-or-more-repetitions">Subrule Example: <code>(...)*</code> for Zero or More Repetitions<a class="headerlink" href="#subrule-example-for-zero-or-more-repetitions" title="Permanent link">&para;</a></h4>
+<p>Consider this rule:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nl">expr</span><span class="p">:</span><span class="w"> </span><span class="no">NUMBER</span><span class="w"> </span><span class="o">(</span><span class="s1">'+'</span><span class="w"> </span><span class="no">NUMBER</span><span class="o">)*</span><span class="p">;</span>
+</code></pre></div>
+<p>Here, <code>('+' NUMBER)*</code> is a <strong>subrule</strong>. It means that the sequence <code>'+' NUMBER</code> can appear <strong>zero or more times</strong>.</p>
+<hr />
+<h5 id="matching-inputs">✅ Matching Inputs<a class="headerlink" href="#matching-inputs" title="Permanent link">&para;</a></h5>
+<ul>
+<li>
+<p><code>7</code></p>
+<ul>
+<li><em>Zero repetitions of <code>('+' NUMBER)</code>.</em></li>
+</ul>
+</li>
+<li>
+<p><code>7 + 2</code></p>
+<ul>
+<li><em>One repetition.</em></li>
+</ul>
+</li>
+<li>
+<p><code>7 + 2 + 5</code></p>
+<ul>
+<li><em>Two repetitions.</em></li>
+</ul>
+</li>
+<li>
+<p><code>7 + 2 + 5 + 8</code></p>
+<ul>
+<li><em>Three repetitions.</em></li>
+</ul>
+</li>
+</ul>
+<hr />
+<h5 id="non-matching-inputs">❌ Non-Matching Inputs<a class="headerlink" href="#non-matching-inputs" title="Permanent link">&para;</a></h5>
+<ul>
+<li>
+<p><code>+ 2</code></p>
+<ul>
+<li><em>The rule must begin with a <code>NUMBER</code>.</em></li>
+</ul>
+</li>
+<li>
+<p><code>7 +</code></p>
+<ul>
+<li><em>A <code>NUMBER</code> is missing after the <code>+</code>.</em></li>
+</ul>
+</li>
+</ul>
+<h2 id="using-an-antlr-parser">Using an ANTLR Parser<a class="headerlink" href="#using-an-antlr-parser" title="Permanent link">&para;</a></h2>
+<p>How do we use the parser generated by ANTLR? Let us revisit these lines from the example in <a href="../w1-intro/">Week 1 - Intro</a>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="w">    </span><span class="c1">// Give ANTLR the string we want to parse</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">CharStream</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CharStreams</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">"1 + 2"</span><span class="p">);</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="c1">// Create the lexer</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="n">Calc1Lexer</span><span class="w"> </span><span class="n">lexer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Calc1Lexer</span><span class="p">(</span><span class="n">input</span><span class="p">);</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="c1">// Create the token stream</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="n">CommonTokenStream</span><span class="w"> </span><span class="n">tokens</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CommonTokenStream</span><span class="p">(</span><span class="n">lexer</span><span class="p">);</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="c1">// Create the parser</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="n">Calc1Parser</span><span class="w"> </span><span class="n">parser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Calc1Parser</span><span class="p">(</span><span class="n">tokens</span><span class="p">);</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="c1">// Start parsing at the 'expr' rule</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="n">ParseTree</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parser</span><span class="p">.</span><span class="na">expr</span><span class="p">();</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="c1">// Print the tree</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">tree</span><span class="p">.</span><span class="na">toStringTree</span><span class="p">(</span><span class="n">parser</span><span class="p">));</span>
+</code></pre></div>
+<p>When we create the <code>Calc1Parser</code>, we pass it the <code>CommonTokenStream</code> produced in the previous step. Calling <code>parser.expr()</code> then asks the parser to <strong>build a parse tree rooted at <code>expr</code></strong> from that token stream.</p>
+<p>ANTLR generates a method for every parser rule, using the rule's name as the method name. Calling one of these methods starts parsing from that rule, which becomes the root of the resulting tree.</p>
+<h3 id="start-rules-and-eof">Start Rules and EOF<a class="headerlink" href="#start-rules-and-eof" title="Permanent link">&para;</a></h3>
+<p>The rule we choose when we first invoke the parser is called the <strong>start rule</strong>. In <code>ParseTree tree = parser.expr()</code>, the start rule is <code>expr</code>, which is also the nonterminal at the root of the tree we want to build. Keep in mind that a start rule does not necessarily consume every token in the stream: it consumes only the tokens needed to build that parse tree.</p>
+<p>This is why running the program above can produce the error <code>line 1:5 no viable alternative at input '&lt;EOF&gt;'</code>: after the parser consumes the input tokens, it encounters the special token <code>&lt;EOF&gt;</code>, which marks the end of the stream. If it cannot find a valid alternative at that point, it reports this error.</p>
+<p>Usually, we want the parser to process an entire source file. To do so, we can define a higher-level start rule that explicitly includes the end-of-file token:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nl">root</span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">EOF</span><span class="p">;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nl">expr</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="o">...</span><span class="w"> </span>
+</code></pre></div>
+<p>Then use <code>ParseTree tree = parser.root();</code> in Java to parse the entire token stream.</p>
+<h2 id="quickly-inspecting-a-parse-tree">Quickly Inspecting a Parse Tree<a class="headerlink" href="#quickly-inspecting-a-parse-tree" title="Permanent link">&para;</a></h2>
+<p>By now, this command should look familiar:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>make
+</code></pre></div>
+<p>We have been using it to generate lexers and parsers since the earlier labs.</p>
+<p>There is no ANTLR magic built into <code>make</code> itself, though. It simply runs the commands defined in the <code>Makefile</code> at the project root.</p>
+<h3 id="what-does-make-actually-do">What Does <code>make</code> Actually Do?<a class="headerlink" href="#what-does-make-actually-do" title="Permanent link">&para;</a></h3>
+<p>In the <code>Makefile</code> we have been using, this is the command that generates the ANTLR code:</p>
+<div class="highlight"><span class="filename">Makefile</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="err">java</span><span class="w"> </span><span class="err">-jar</span><span class="w"> </span><span class="k">$(</span><span class="nv">ANTLR_JAR</span><span class="k">)</span><span class="w"> </span><span class="err">\</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="err">-visitor</span><span class="w"> </span><span class="err">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="err">-o</span><span class="w"> </span><span class="k">$(</span><span class="nv">OUTPUT_DIR</span><span class="k">)</span><span class="err">/</span><span class="k">$(</span><span class="nv">basename</span> <span class="k">$</span>&lt;<span class="k">)</span><span class="w"> </span><span class="err">\</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="err">-package</span><span class="w"> </span><span class="err">generated.</span><span class="k">$(</span><span class="nv">basename</span> <span class="k">$</span>&lt;<span class="k">)</span><span class="w"> </span><span class="err">\</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="k">$&lt;</span>
+</code></pre></div>
+<p>We have already specified the location of ANTLR:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">ANTLR_JAR</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>libs/antlr-4.13.2-complete.jar
+</code></pre></div>
+<p>For a grammar named <code>Calc1.g4</code>, the Makefile rule therefore runs a command like this:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>java<span class="w"> </span>-jar<span class="w"> </span>libs/antlr-4.13.2-complete.jar<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span>-visitor<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span>-o<span class="w"> </span>src/main/java/generated/Calc1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span>-package<span class="w"> </span>generated.Calc1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span>Calc1.g4
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Think of <code>make</code> as a handy command runner</p>
+<p>It finds our <code>.g4</code> files and invokes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>antlr-4.13.2-complete.jar
+</code></pre></div>
+<p>to generate the corresponding Java lexer, parser, and visitor.</p>
+<p>ANTLR is doing the actual code generation.</p>
+</div>
+<hr />
+<h3 id="we-have-already-printed-a-parse-tree">We Have Already Printed a Parse Tree<a class="headerlink" href="#we-have-already-printed-a-parse-tree" title="Permanent link">&para;</a></h3>
+<p>In <a href="../w1-intro/">Week 1 - Intro</a>, we used this line to inspect the parse tree produced by the parser:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">tree</span><span class="p">.</span><span class="na">toStringTree</span><span class="p">(</span><span class="n">parser</span><span class="p">));</span>
+</code></pre></div>
+<p>Here, <code>tree</code> is the <code>ParseTree</code> obtained by parsing from a particular parser rule. The call:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">tree</span><span class="p">.</span><span class="na">toStringTree</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+</code></pre></div>
+<p>converts that tree into a parenthesized representation that is easy to display in a terminal.</p>
+<p>For example, given this input:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>1 + 2
+</code></pre></div>
+<p>we might get output like this:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>(expr (expr 1) + (expr 2))
+</code></pre></div>
+<p>Recall that producing this tree required us to set up the entire parsing pipeline ourselves:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Input
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>  ↓
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>CharStream
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>  ↓
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>Lexer
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>  ↓
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>Token Stream
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>  ↓
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>Parser
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>  ↓
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>ParseTree
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>  ↓
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>toStringTree(...)
+</code></pre></div>
+<p>In other words, we manually created the lexer, token stream, and parser in <code>Main.java</code>, then printed the resulting parse tree.</p>
+<p>The <code>antlr-4.13.2-complete.jar</code> file also includes a ready-made testing tool:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>org.antlr.v4.gui.TestRig
+</code></pre></div>
+<p>It provides a quick way to carry out much the same process.</p>
+<div class="admonition note">
+<p class="admonition-title">There is nothing mysterious about <code>TestRig</code></p>
+<p>Previously, we created the lexer, token stream, and parser ourselves in <code>Main.java</code>, then called:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">tree</span><span class="p">.</span><span class="na">toStringTree</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+</code></pre></div>
+<p><code>TestRig</code> packages that testing workflow into a tool we can run directly.</p>
+<p>If we just want to see how a grammar parses a piece of input, there is no need to edit <code>Main.java</code> every time.</p>
+</div>
+<hr />
+<h3 id="using-tree-to-inspect-a-parse-tree">Using <code>-tree</code> to Inspect a Parse Tree<a class="headerlink" href="#using-tree-to-inspect-a-parse-tree" title="Permanent link">&para;</a></h3>
+<p>Suppose we have a grammar file named:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>Calc1.g4
+</code></pre></div>
+<p>with generated Java classes in the package:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>generated.Calc1
+</code></pre></div>
+<p>and we want to start parsing from this rule:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nl">expr</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="o">...</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">    </span><span class="p">;</span>
+</code></pre></div>
+<p>First, run the usual command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>make
+</code></pre></div>
+<p>and make sure the generated Java source files have been compiled.</p>
+<p>Then run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">'1 + 2 * 3'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>java<span class="w"> </span>-cp<span class="w"> </span><span class="s2">"bin:libs/antlr-4.13.2-complete.jar"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">    </span>org.antlr.v4.gui.TestRig<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">    </span>generated.Calc1.Calc1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">    </span>expr<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="w">    </span>-tree
+</code></pre></div>
+<p>ANTLR will print the parse tree directly in the terminal. For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>(expr (expr 1) + (expr 2) * (expr 3))
+</code></pre></div>
+<p>The exact structure depends on your grammar.</p>
+<p>Although this representation does not look like a tree drawn on paper, the parentheses show how the nodes are nested.</p>
+<p>For example, we can take:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>(expr (expr 1) + (expr (expr 2) * (expr 3)))
+</code></pre></div>
+<p>and expand it over multiple lines:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>(expr
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>    (expr 1)
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>    +
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>    (expr
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>        (expr 2)
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>        *
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a>        (expr 3)
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>    )
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a>)
+</code></pre></div>
+<p>This makes the parent-child relationships easier to see.</p>
+<hr />
+<h3 id="what-does-this-command-mean">What Does This Command Mean?<a class="headerlink" href="#what-does-this-command-mean" title="Permanent link">&para;</a></h3>
+<p>The command may look long, but there are only a few parts to focus on:</p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bin:libs/antlr-4.13.2-complete.jar</code></td>
+<td>Where the Java runtime looks for compiled <code>.class</code> files and ANTLR classes</td>
+</tr>
+<tr>
+<td><code>org.antlr.v4.gui.TestRig</code></td>
+<td>The grammar testing tool bundled with ANTLR</td>
+</tr>
+<tr>
+<td><code>generated.Calc1.Calc1</code></td>
+<td>The grammar to use</td>
+</tr>
+<tr>
+<td><code>expr</code></td>
+<td>The parser rule to start from</td>
+</tr>
+<tr>
+<td><code>-tree</code></td>
+<td>Print the parse tree in the terminal</td>
+</tr>
+</tbody>
+</table>
+<p>The parts you will change most often are:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>generated.Calc1.Calc1
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>expr
+</code></pre></div>
+<p>For example, if your grammar is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">grammar</span><span class="w"> </span><span class="nc">SPL</span><span class="p">;</span>
+</code></pre></div>
+<p>its generated Java package is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>generated.SPL
+</code></pre></div>
+<p>and its entry rule is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nl">compUnit</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="o">...</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="p">;</span>
+</code></pre></div>
+<p>then you can use:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">'...'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>java<span class="w"> </span>-cp<span class="w"> </span><span class="s2">"bin:libs/antlr-4.13.2-complete.jar"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">    </span>org.antlr.v4.gui.TestRig<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">    </span>generated.SPL.SPL<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="w">    </span>compUnit<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="w">    </span>-tree
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Look at the tree when debugging your parser</p>
+<p>When you are unsure whether your grammar behaves as intended, <code>-tree</code> is a useful debugging tool.</p>
+<p>It is especially helpful for checking:</p>
+<ul>
+<li>Whether a piece of input was parsed correctly.</li>
+<li>What structure a particular parser rule matched.</li>
+<li>Whether operator precedence and associativity work as expected.</li>
+<li>Why an expression was parsed differently from what you had in mind.</li>
+<li>How a grammar change affects the parse tree.</li>
+</ul>
+<p>Looking at the tree ANTLR actually produces can be much more helpful than repeatedly trying to work it out from the <code>.g4</code> file alone.</p>
+</div>
+<hr />
+<h3 id="viewing-a-graphical-parse-tree">Viewing a Graphical Parse Tree<a class="headerlink" href="#viewing-a-graphical-parse-tree" title="Permanent link">&para;</a></h3>
+<p><code>TestRig</code> also provides the option:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>-gui
+</code></pre></div>
+<p>which displays the parse tree graphically.</p>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">'1 + 2 * 3'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>java<span class="w"> </span>-cp<span class="w"> </span><span class="s2">"bin:libs/antlr-4.13.2-complete.jar"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">    </span>org.antlr.v4.gui.TestRig<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">    </span>generated.Calc1.Calc1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">    </span>expr<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="w">    </span>-gui
+</code></pre></div>
+<p>If a graphical display is available and configured correctly, ANTLR opens a window showing the tree.</p>
+<p>However, we usually develop on a virtual machine through <strong>SSH or VS Code Remote-SSH</strong>.</p>
+<p>In that setup, ANTLR runs on the remote virtual machine. The remote terminal may not have access to a graphical display by default, so <code>-gui</code> may not be able to open a window directly.</p>
+<div class="admonition info">
+<p class="admonition-title">Explore this further if you are interested</p>
+<p>It is possible to display GUI applications from a remote Linux environment.</p>
+<p>If you would like to learn more, look into:</p>
+<ul>
+<li>X11 forwarding.</li>
+<li>The <code>DISPLAY</code> environment variable.</li>
+<li>How remote Linux applications display their windows on a local computer.</li>
+</ul>
+<p>These topics are outside the course requirements, and you do not need them to complete the projects.</p>
+<p>For everyday parser debugging in this course, using:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>-tree
+</code></pre></div>
+<p>is sufficient.</p>
+</div>
+<hr />
+<div class="admonition warning">
+<p class="admonition-title">First, you need a tree to inspect</p>
+<p>Both <code>-tree</code> and <code>-gui</code> display a <strong>parse tree</strong>, so you need a parser before you can use them for this purpose.</p>
+<p>If your <code>.g4</code> file begins with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">lexer</span><span class="w"> </span><span class="k">grammar</span><span class="w"> </span><span class="nc">ExampleLexer</span><span class="p">;</span>
+</code></pre></div>
+<p>then you currently have only a <strong>lexer</strong>. It produces a token stream, not a parse tree.</p>
+<p><strong>Without a parser, there is no parse tree to display.</strong></p>
+</div>
+<h2 id="exercise">Exercise<a class="headerlink" href="#exercise" title="Permanent link">&para;</a></h2>
+<p>Extend the <code>Calc1</code> grammar introduced above to support multiplication, division, and parentheses in addition to addition and subtraction. Then write a small program to test it with the following input:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>(1 + 2 * 2 / 3)
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-copyright">
+    <div class="md-copyright__highlight">
+        commit: 
+        <a href="/commit/30df9b5a, 2026-09-29 22:06:10+08:00" target="_blank" rel="noopener">
+            30df9b5a, 2026-09-29 22:06:10+08:00
+        </a>
+    </div>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.path", "navigation.tabs", "navigation.tabs.sticky"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>

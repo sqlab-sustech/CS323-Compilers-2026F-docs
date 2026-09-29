@@ -1,0 +1,1496 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/labs/w4-parser/">
+      
+      
+        <link rel="prev" href="../w3-lex_p2/">
+      
+      
+        <link rel="next" href="../../env/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+    
+    
+      
+        <title>Week 4 - Parser 1 - 编译原理 实验文档</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#week-4-parser-1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="编译原理 实验文档" class="md-header__button md-logo" aria-label="编译原理 实验文档" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            编译原理 实验文档
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Week 4 - Parser 1
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../en/labs/w4-parser/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  主页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../w1-intro/" class="md-tabs__link">
+          
+  
+  每周 Lab
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../env/" class="md-tabs__link">
+          
+  
+  环境配置
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="编译原理 实验文档" class="md-nav__button md-logo" aria-label="编译原理 实验文档" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    编译原理 实验文档
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    每周 Lab
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            每周 Lab
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w1-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 1 - Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w2-lex_p1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 2 - Lexer 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w3-lex_p2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 3 - Lexer 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Week 4 - Parser 1
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Week 4 - Parser 1
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#recap-context-free-grammar-cfg" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recap: Context-Free Grammar (CFG)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recap: Context-Free Grammar (CFG)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#antlr-cfg" class="md-nav__link">
+    <span class="md-ellipsis">
+      在 ANTLR 中定义 CFG
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parser-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parser Rule
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parser Rule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-elements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rule Elements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subrules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Subrules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Subrules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#subrule" class="md-nav__link">
+    <span class="md-ellipsis">
+      Subrule 示例：(...)* 零次或更多次
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Subrule 示例：(...)* 零次或更多次">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ 匹配示例
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      ❌ 不匹配示例
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antlr-parser" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用 ANTLR Parser
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="使用 ANTLR Parser">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#start-rule-eof" class="md-nav__link">
+    <span class="md-ellipsis">
+      Start Rule 和 EOF
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      快速查看语法树
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="快速查看语法树">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#make" class="md-nav__link">
+    <span class="md-ellipsis">
+      make 到底做了什么？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      其实我们之前已经打印过语法树了
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-tree-parse-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用 -tree 快速查看 Parse Tree
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      这条命令到底是什么意思？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      如果想看真正“画出来”的语法树
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      练习
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    环境配置
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            环境配置
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Linux VM 搭建
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Linux VM 搭建
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/wsl/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows WSL
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/macos-native/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    macOS 原生环境
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#recap-context-free-grammar-cfg" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recap: Context-Free Grammar (CFG)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recap: Context-Free Grammar (CFG)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#antlr-cfg" class="md-nav__link">
+    <span class="md-ellipsis">
+      在 ANTLR 中定义 CFG
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parser-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parser Rule
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parser Rule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-elements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rule Elements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subrules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Subrules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Subrules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#subrule" class="md-nav__link">
+    <span class="md-ellipsis">
+      Subrule 示例：(...)* 零次或更多次
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Subrule 示例：(...)* 零次或更多次">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ 匹配示例
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      ❌ 不匹配示例
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antlr-parser" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用 ANTLR Parser
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="使用 ANTLR Parser">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#start-rule-eof" class="md-nav__link">
+    <span class="md-ellipsis">
+      Start Rule 和 EOF
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      快速查看语法树
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="快速查看语法树">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#make" class="md-nav__link">
+    <span class="md-ellipsis">
+      make 到底做了什么？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      其实我们之前已经打印过语法树了
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-tree-parse-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用 -tree 快速查看 Parse Tree
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      这条命令到底是什么意思？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      如果想看真正“画出来”的语法树
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      练习
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="week-4-parser-1">Week 4 - Parser 1<a class="headerlink" href="#week-4-parser-1" title="Permanent link">&para;</a></h1>
+<p>我们在前面一章知道了编译器前端的大致组成部分，并且学习了词法分析器的相关内容，我们接下来将学习语法分析器（Parser）相关的内容。首先，我们要有一个大致的印象，语法分析器到底是用来干嘛的。语法分析器会接收词法分析器传进来的词法符号流 (Token Stream)，然后按照预先设定好的语法规则将一连串的词法符号解析成有结构的语法树（如果无法解析成功，就意味着输入程序不符合语法规则，存在语法错误），以便后续的分析。</p>
+<div class="admonition info">
+<p class="admonition-title">什么是 Parser</p>
+<p><code>Parser</code> 接受来自 <code>Lexer</code> 的 Token Stream，并把它转化成一个树。</p>
+<p>这个树叫作 Parse Tree，"转化" 的规则就是 <strong>语法 "Grammar"</strong>。</p>
+</div>
+<h2 id="recap-context-free-grammar-cfg">Recap: Context-Free Grammar (CFG)<a class="headerlink" href="#recap-context-free-grammar-cfg" title="Permanent link">&para;</a></h2>
+<p>我们用上下文无关文法 (Context-Free Grammar) 来描述语法规则（请注意，在形式语言和编译技术的上下文中，语法和文法两个词是同一个意思）。</p>
+<p>CFG 是一种用以描述结构化语言语法的形式语言。它和我们上一章说的正则表达式类似（都是形式语言）：正则表达式是用来描述 <strong>词法规则</strong> 的语言（程序中的词法单元应该长什么样子），上下文无关文法是用来描述更高一级的 <strong>语法规则</strong> 的（具有合法结构的程序应该长什么样子）。ANTLR 在描述语法规则的时候用的就是上下文无关文法。</p>
+<details class="note">
+<summary>为什么说 CFG 比 Regular Expression 更高级</summary>
+<p>CFG 能够描述 Regular Expression 所不能描述的一些情形，例如递归、嵌套结构。经典的例子为：成对括号 <code>()</code>。</p>
+<p>解析 CFG 表示的语言（我们称之为上下文无关语言）一般使用的是 Pushdown Automaton (下推自动机)，它比解析 Regular Expression 表示的正则语言所使用的 Finite Automaton 多了一个栈，所以它能有效处理递归嵌套等结构。</p>
+<p>实际上，Finite Automaton 是 Pushdown Automaton 的一个子集, 感兴趣的可以看：<a href="https://en.wikipedia.org/wiki/Automata_theory">Wikipedia - Automata theory</a>。</p>
+</details>
+<p>CFG 有两个重要的组成部分： <strong>终结符(Terminal)</strong> 和 <strong>非终结符(Nonterminal)</strong>。</p>
+<p>简单来说，Terminal 是 Lexer 直接"递上来"的东西，是上下文无关文法中的最基础单元，它没有办法再被分割；而 Nonterminal 则是 "Parser 通过分析 Lexer 传递的词法符号流合成出来" 的东西。Parser 所遵从的 "合成规则" 即是 <strong>Productions</strong> (产生式)，它描述了如何从 Terminals/Nonterminals 合成一个 Nonterminal。或者，反过来说，一条产生式描述一个 Nonterminal 能够产生哪些 Terminals/Nonterminals（所以这些合成规则被叫做“产生”式）。</p>
+<div class="admonition note">
+<p class="admonition-title">Recap: Productions</p>
+<p>在理论课上，我们使用如下格式来描述一个 Production: <code>head -&gt; body</code>。</p>
+<p>其中，<code>head</code> 一定是 Nonterminal；<code>body</code> 包含 0 或更多个 Nonterminal/Terminal。</p>
+</div>
+<h3 id="antlr-cfg">在 ANTLR 中定义 CFG<a class="headerlink" href="#antlr-cfg" title="Permanent link">&para;</a></h3>
+<p>我们可以开始在 ANTLR 中定义语法：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">grammar</span><span class="w"> </span><span class="nc">Calc1</span><span class="p">;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">ADD</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">SUB</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">factor</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="p">;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nl">factor</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="no">INT</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">        </span><span class="p">;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nl">INT</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="x">0-9</span><span class="p">]</span><span class="o">+</span><span class="w"> </span><span class="p">;</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nl">ADD</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s1">'+'</span><span class="w"> </span><span class="p">;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nl">SUB</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s1">'-'</span><span class="w"> </span><span class="p">;</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="nl">WS</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="x"> \t\r\n</span><span class="p">]</span><span class="o">+</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nv">skip</span><span class="w"> </span><span class="p">;</span><span class="w"> </span>
+</code></pre></div>
+<p>在 ANTLR 中，我们习惯将 Terminal 称为 <code>Token</code>，将 Nonterminal 称为 <code>Rule</code>。</p>
+<p>它们都遵循一个相同的格式：名字、冒号、其内容规则、最后以分号结束；一个 <code>Token</code>/<code>Rule</code> 可以拥有许多条具体的规则。</p>
+<p>在 ANTLR 中，我们用首字母是否大小写来区分 <code>Token</code> 和 <code>Rule</code>，前者要求首字母必须大写，后者要求首字母必须小写。额外的，ANTLR 不要求 Parser Rules 一定先于/后于 Lexer Rules，它们可以混合在一起。</p>
+<p>上述的 Calc1 语法定义包括：</p>
+<ul>
+<li><strong>由大写字母开头</strong> 的 4 种 Terminals</li>
+<li><strong>由小写字母开头</strong> 的 2 种 Nonterminals</li>
+<li>4 条 Productions，ANTLR 称之为 <code>Parser Rule</code></li>
+</ul>
+<h2 id="parser-rule">Parser Rule<a class="headerlink" href="#parser-rule" title="Permanent link">&para;</a></h2>
+<p>一条最基本的 Parser Rule 长这样：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nl">factor</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="no">INT</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+<p>格式为：<code>ruleName : Alternatives ;</code>。</p>
+<p>一个 Nonterminal 可以有多条 Productions，它们使用 <code>|</code> 分隔，使用 <code>;</code> 标记结束：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">ADD</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">SUB</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">factor</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="p">;</span>
+</code></pre></div>
+<h3 id="rule-elements">Rule Elements<a class="headerlink" href="#rule-elements" title="Permanent link">&para;</a></h3>
+<p>在每条 Alternative 中，可以包含 <code>Token</code> (大写字母开头)、<code>rule</code> (小写字母开头)、或者是 <code>'literal'</code></p>
+<p>在 <code>Parser Rule</code> 中，我们可以直接使用字符串常量。ANTLR 会自动创建一条 <code>Lexer Rule</code> 并引用它（你可以在 <code>.tokens</code> 文件中看到它）。</p>
+<p>例如，我们可以省略 <code>ADD: '+'</code>，而直接在 <code>Parser Rule</code> 中写改字符串常量 <code>'+'</code> ：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'+'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'-'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">        </span><span class="p">;</span>
+</code></pre></div>
+<h3 id="subrules">Subrules<a class="headerlink" href="#subrules" title="Permanent link">&para;</a></h3>
+<p>一条 Alternative 里面可以包含一个 Alternative block，这种情况称之为 Subrules。Subrules 就类似于单独创建了一条匿名的 Rule。</p>
+<p>Subrules 有四种语法，非常类似正则表达式：</p>
+<ol>
+<li><code>(x | y | z)</code> : 匹配任意 Alternative 一次。</li>
+<li><code>(x | y | z)?</code> : 匹配任意 Alternative 一次或零次。</li>
+<li><code>(x | y | z)*</code> : 匹配任意 Alternative 零次或更多次。</li>
+<li><code>(x | y | z)+</code> : 匹配任意 Alternative 一次或更多次。</li>
+</ol>
+<h4 id="subrule">Subrule 示例：<code>(...)*</code> 零次或更多次<a class="headerlink" href="#subrule" title="Permanent link">&para;</a></h4>
+<p>例如下面这条规则定义：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nl">expr</span><span class="p">:</span><span class="w"> </span><span class="no">NUMBER</span><span class="w"> </span><span class="o">(</span><span class="s1">'+'</span><span class="w"> </span><span class="no">NUMBER</span><span class="o">)*</span><span class="p">;</span>
+</code></pre></div>
+<p>这里的 <code>('+' NUMBER)*</code> 就是一个 <strong>Subrule</strong>。它表示 <code>' + ' NUMBER</code> 这个整体可以连续出现 <strong>0 次或更多次</strong>。</p>
+<hr />
+<h5 id="_1">✅ 匹配示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h5>
+<ul>
+<li>
+<p><code>7</code></p>
+<ul>
+<li><em>(匹配 0 次 <code>('+' NUMBER)</code>)</em></li>
+</ul>
+</li>
+<li>
+<p><code>7 + 2</code></p>
+<ul>
+<li><em>(匹配 1 次)</em></li>
+</ul>
+</li>
+<li>
+<p><code>7 + 2 + 5</code></p>
+<ul>
+<li><em>(匹配 2 次)</em></li>
+</ul>
+</li>
+<li>
+<p><code>7 + 2 + 5 + 8</code></p>
+<ul>
+<li><em>(匹配 3 次)</em></li>
+</ul>
+</li>
+</ul>
+<hr />
+<h5 id="_2">❌ 不匹配示例<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h5>
+<ul>
+<li>
+<p><code>+ 2</code></p>
+<ul>
+<li><em>(因为规则必须以 <code>NUMBER</code> 开头)</em></li>
+</ul>
+</li>
+<li>
+<p><code>7 +</code></p>
+<ul>
+<li><em>(因为 <code>+</code> 后面缺少 <code>NUMBER</code>)</em></li>
+</ul>
+</li>
+</ul>
+<h2 id="antlr-parser">使用 ANTLR Parser<a class="headerlink" href="#antlr-parser" title="Permanent link">&para;</a></h2>
+<p>我们如何使用ANTLR生成的语法分析器呢，我们可以简单回顾一下 <a href="../w1-intro/">Week 1 - Intro</a> 给出的示例程序的这几行：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="w">    </span><span class="c1">// 把要解析的字符串喂给 ANTLR</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">CharStream</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CharStreams</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">"1 + 2"</span><span class="p">);</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="c1">// 词法分析器</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="n">Calc1Lexer</span><span class="w"> </span><span class="n">lexer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Calc1Lexer</span><span class="p">(</span><span class="n">input</span><span class="p">);</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="c1">// Token 流</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="n">CommonTokenStream</span><span class="w"> </span><span class="n">tokens</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CommonTokenStream</span><span class="p">(</span><span class="n">lexer</span><span class="p">);</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="c1">// 语法分析器</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="n">Calc1Parser</span><span class="w"> </span><span class="n">parser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Calc1Parser</span><span class="p">(</span><span class="n">tokens</span><span class="p">);</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="c1">// 从规则 'expression' 开始解析</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="n">ParseTree</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parser</span><span class="p">.</span><span class="na">expr</span><span class="p">();</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="c1">// 把树打印出来看看</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">tree</span><span class="p">.</span><span class="na">toStringTree</span><span class="p">(</span><span class="n">parser</span><span class="p">));</span>
+</code></pre></div>
+<p>我们在新建 <code>Calc1Parser</code> 对象时，把前面的 <code>CommonTokenStream</code> 给传进去；然后调用 <code>parser.expr()</code> 方法，这表示令 Parser 从 Token Stream 中为我们 <strong>构建一棵根节点为 expr 的 ParseTree</strong>。</p>
+<p>ANTLR 创建出来的 <code>Parser</code> 会给每一个 Parser Rule 都生成一个对应的方法，方法名称就是对应的语法规则的名称。调用这个方法表示就从这条语法规则作为根节点开始解析。</p>
+<h3 id="start-rule-eof">Start Rule 和 EOF<a class="headerlink" href="#start-rule-eof" title="Permanent link">&para;</a></h3>
+<p>我们将第一次调用 ANTLR 时指定的 Rule 称为 Start Rule，即 <code>ParseTree tree = parser.expr()</code> 中的 <code>expr</code>。<code>expr</code> 这个 Nonterminal 也是我们希望构建的 Parse Tree 的根节点。但是请注意：Start Rule 并不会消耗掉 TokenStream 中所有的 Token，它只会消耗掉构建这颗 Parse Tree 所需要的所有 Token。</p>
+<p>这就是为什么我们运行上述程序的时候会报错：<code>line 1:5 no viable alternative at input '&lt;EOF&gt;'</code>：因为 Parser 在消耗完所有 Token 后，Token Stream 中还剩下一个特殊的 Token <code>&lt;EOF&gt;</code>，它表示 Token Stream 的结束；Parser 发现没有任何一条 Rule 适用于 <code>&lt;EOF&gt;</code> 这个 Token，所以会提示以上的报错。</p>
+<p>通常来说，我们希望 Parser 完整地处理整个源文件，这时候我们就可以定义一个更高级的 Start Rule，并包含 <code>&lt;EOF&gt;</code> 这个 Token：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nl">root</span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="err">&lt;</span><span class="no">EOF</span><span class="err">&gt;</span><span class="p">;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nl">expr</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="o">...</span><span class="w"> </span>
+</code></pre></div>
+<p>然后，在 Java 中使用 <code>ParseTree tree = parser.root();</code> 解析完整个 TokenStream.</p>
+<h2 id="_3">快速查看语法树<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>大家应该已经对下面这个命令非常熟悉了：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>make
+</code></pre></div>
+<p>毕竟从前面的 Lab 开始，我们就一直在用它生成 Lexer 和 Parser。</p>
+<p>但 <code>make</code> 本身其实并不会什么 ANTLR 魔法。它只是按照项目根目录中的 <code>Makefile</code>，帮我们执行一些已经写好的命令。</p>
+<h3 id="make"><code>make</code> 到底做了什么？<a class="headerlink" href="#make" title="Permanent link">&para;</a></h3>
+<p>我们一直在使用的 <code>Makefile</code> 中，真正负责生成 ANTLR 代码的核心其实是：</p>
+<div class="highlight"><span class="filename">Makefile</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="err">java</span><span class="w"> </span><span class="err">-jar</span><span class="w"> </span><span class="k">$(</span><span class="nv">ANTLR_JAR</span><span class="k">)</span><span class="w"> </span><span class="err">\</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="err">-visitor</span><span class="w"> </span><span class="err">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="err">-o</span><span class="w"> </span><span class="k">$(</span><span class="nv">OUTPUT_DIR</span><span class="k">)</span><span class="err">/</span><span class="k">$(</span><span class="nv">basename</span> <span class="k">$</span>&lt;<span class="k">)</span><span class="w"> </span><span class="err">\</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="err">-package</span><span class="w"> </span><span class="err">generated.</span><span class="k">$(</span><span class="nv">basename</span> <span class="k">$</span>&lt;<span class="k">)</span><span class="w"> </span><span class="err">\</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="k">$&lt;</span>
+</code></pre></div>
+<p>其中，我们已经指定了 ANTLR 的位置：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">ANTLR_JAR</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>libs/antlr-4.13.2-complete.jar
+</code></pre></div>
+<p>所以，对于一个名为 <code>Calc1.g4</code> 的 Grammar，上面的 Makefile 规则最终执行的其实就是类似这样的命令：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>java<span class="w"> </span>-jar<span class="w"> </span>libs/antlr-4.13.2-complete.jar<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span>-visitor<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span>-o<span class="w"> </span>src/main/java/generated/Calc1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span>-package<span class="w"> </span>generated.Calc1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span>Calc1.g4
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">所以，<code>make</code> 其实只是一个很勤快的「命令代跑员」</p>
+<p>它负责找到我们的 <code>.g4</code> 文件，然后帮我们调用：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>antlr-4.13.2-complete.jar
+</code></pre></div>
+<p>来生成对应的 Java Lexer、Parser 和 Visitor。</p>
+<p>真正干活的，其实一直都是 ANTLR。</p>
+</div>
+<hr />
+<h3 id="_4">其实我们之前已经打印过语法树了<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>在前面的 <a href="../w1-intro/">Week 1 - Intro</a> 中，我们已经使用过下面这行代码来查看 Parser 生成的 Parse Tree：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">tree</span><span class="p">.</span><span class="na">toStringTree</span><span class="p">(</span><span class="n">parser</span><span class="p">));</span>
+</code></pre></div>
+<p>其中，<code>tree</code> 是从某条 Parser Rule 开始解析后得到的 <code>ParseTree</code>，而：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">tree</span><span class="p">.</span><span class="na">toStringTree</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+</code></pre></div>
+<p>会将这棵 Parse Tree 转换成一种便于在终端中查看的括号表示形式。</p>
+<p>例如，对于输入：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>1 + 2
+</code></pre></div>
+<p>可能得到类似下面的输出：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>(expr (expr 1) + (expr 2))
+</code></pre></div>
+<p>回顾一下，当时为了得到这棵树，我们实际上需要自己完成整个解析流程：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Input
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>  ↓
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>CharStream
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>  ↓
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>Lexer
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>  ↓
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>Token Stream
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>  ↓
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>Parser
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>  ↓
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>ParseTree
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>  ↓
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>toStringTree(...)
+</code></pre></div>
+<p>也就是说，我们之前是在 <code>Main.java</code> 中手动创建 Lexer、Token Stream 和 Parser，最后再把得到的 Parse Tree 打印出来。</p>
+<p>而 <code>antlr-4.13.2-complete.jar</code> 中其实已经帮我们准备好了一个现成的测试工具：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>org.antlr.v4.gui.TestRig
+</code></pre></div>
+<p>它可以帮我们快速完成类似的工作。</p>
+<div class="admonition note">
+<p class="admonition-title"><code>TestRig</code> 并没有什么神秘的地方</p>
+<p>我们之前是在 <code>Main.java</code> 中自己创建 Lexer、Token Stream 和 Parser，然后调用：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">tree</span><span class="p">.</span><span class="na">toStringTree</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+</code></pre></div>
+<p>而 <code>TestRig</code> 只是把这套测试流程提前帮我们写好了。</p>
+<p>所以如果只是想快速看看 Grammar 把一段输入解析成了什么结构，就没有必要每次都专门修改 <code>Main.java</code>。</p>
+</div>
+<hr />
+<h3 id="-tree-parse-tree">使用 <code>-tree</code> 快速查看 Parse Tree<a class="headerlink" href="#-tree-parse-tree" title="Permanent link">&para;</a></h3>
+<p>假设我们现在有一个：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>Calc1.g4
+</code></pre></div>
+<p>它生成的 Java package 为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>generated.Calc1
+</code></pre></div>
+<p>并且我们希望从下面这条 Parser Rule 开始解析：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nl">expr</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="o">...</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">    </span><span class="p">;</span>
+</code></pre></div>
+<p>首先像往常一样运行：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>make
+</code></pre></div>
+<p>并完成 Java 源码的编译。</p>
+<p>随后可以直接执行：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">'1 + 2 * 3'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>java<span class="w"> </span>-cp<span class="w"> </span><span class="s2">"bin:libs/antlr-4.13.2-complete.jar"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">    </span>org.antlr.v4.gui.TestRig<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">    </span>generated.Calc1.Calc1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">    </span>expr<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="w">    </span>-tree
+</code></pre></div>
+<p>ANTLR 会直接在终端中打印 Parse Tree，例如：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>(expr (expr 1) + (expr 2) * (expr 3))
+</code></pre></div>
+<p>具体输出的树结构取决于你所编写的 Grammar。</p>
+<p>虽然这种形式看起来不像我们平时画在纸上的树，但括号本身就在表达节点之间的层次关系。</p>
+<p>例如，可以把：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>(expr (expr 1) + (expr (expr 2) * (expr 3)))
+</code></pre></div>
+<p>稍微展开来看：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>(expr
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>    (expr 1)
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>    +
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>    (expr
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>        (expr 2)
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>        *
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a>        (expr 3)
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>    )
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a>)
+</code></pre></div>
+<p>这样就比较容易观察各个节点之间的父子关系了。</p>
+<hr />
+<h3 id="_5">这条命令到底是什么意思？<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>看起来很长，但真正需要关注的其实只有几个部分：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bin:libs/antlr-4.13.2-complete.jar</code></td>
+<td>Java 运行时搜索 <code>.class</code> 文件和 ANTLR 相关类的位置</td>
+</tr>
+<tr>
+<td><code>org.antlr.v4.gui.TestRig</code></td>
+<td>ANTLR 自带的 Grammar 测试工具</td>
+</tr>
+<tr>
+<td><code>generated.Calc1.Calc1</code></td>
+<td>要使用的 Grammar</td>
+</tr>
+<tr>
+<td><code>expr</code></td>
+<td>从哪一条 Parser Rule 开始解析</td>
+</tr>
+<tr>
+<td><code>-tree</code></td>
+<td>在终端中打印 Parse Tree</td>
+</tr>
+</tbody>
+</table>
+<p>其中最经常需要修改的其实就是：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>generated.Calc1.Calc1
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>expr
+</code></pre></div>
+<p>例如，如果你的 Grammar 为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">grammar</span><span class="w"> </span><span class="nc">SPL</span><span class="p">;</span>
+</code></pre></div>
+<p>生成的 Java package 为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>generated.SPL
+</code></pre></div>
+<p>并且入口 Parser Rule 为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nl">compUnit</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="o">...</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="p">;</span>
+</code></pre></div>
+<p>那么就可以使用：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">'...'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>java<span class="w"> </span>-cp<span class="w"> </span><span class="s2">"bin:libs/antlr-4.13.2-complete.jar"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">    </span>org.antlr.v4.gui.TestRig<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">    </span>generated.SPL.SPL<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="w">    </span>compUnit<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="w">    </span>-tree
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">调 Parser 时，多看看树</p>
+<p>当你不确定自己的 Grammar 是否按照预期工作时，<code>-tree</code> 往往是一个非常方便的调试手段。</p>
+<p>特别是遇到下面这些情况时：</p>
+<ul>
+<li>一段输入到底有没有被正确解析；</li>
+<li>某条 Parser Rule 最终匹配成了什么结构；</li>
+<li>运算符的优先级和结合性是否符合预期；</li>
+<li>为什么一个表达式的解析结果和自己想象的不一样；</li>
+<li>修改 Grammar 前后的 Parse Tree 有什么变化。</li>
+</ul>
+<p>与其盯着 <code>.g4</code> 文件反复脑补，不如直接看看 ANTLR 实际生成的 Parse Tree。</p>
+</div>
+<hr />
+<h3 id="_6">如果想看真正“画出来”的语法树<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p><code>TestRig</code> 还提供了：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>-gui
+</code></pre></div>
+<p>选项，可以使用图形界面的方式直接查看 Parse Tree。</p>
+<p>例如：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">'1 + 2 * 3'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>java<span class="w"> </span>-cp<span class="w"> </span><span class="s2">"bin:libs/antlr-4.13.2-complete.jar"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">    </span>org.antlr.v4.gui.TestRig<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">    </span>generated.Calc1.Calc1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">    </span>expr<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="w">    </span>-gui
+</code></pre></div>
+<p>如果图形环境配置正确，ANTLR 会弹出一个窗口，将 Parse Tree 直接画出来。</p>
+<p>不过，我们通常是通过 <strong>SSH 或 VS Code Remote-SSH</strong> 连接到虚拟机进行开发的。</p>
+<p>此时 ANTLR 实际运行在远程虚拟机中，而远程终端默认情况下不一定具备可用的图形显示环境，因此 <code>-gui</code> 可能无法直接弹出窗口。</p>
+<div class="admonition info">
+<p class="admonition-title">感兴趣的话，可以自己探索一下</p>
+<p>远程 Linux 环境并不是完全不能显示 GUI。</p>
+<p>如果感兴趣，可以进一步了解：</p>
+<ul>
+<li>X11 Forwarding</li>
+<li><code>DISPLAY</code> 环境变量</li>
+<li>远程 Linux 图形程序如何将窗口显示到本地计算机</li>
+</ul>
+<p>这些内容并不是本课程的要求，也不会影响 Project 的完成。</p>
+<p>在本课程中，直接使用：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>-tree
+</code></pre></div>
+<p>就已经足够完成日常的 Parser 调试工作。</p>
+</div>
+<hr />
+<div class="admonition warning">
+<p class="admonition-title">但是，首先你得有一棵树</p>
+<p><code>-tree</code> 和 <code>-gui</code> 展示的都是 <strong>Parse Tree</strong>，因此首先需要有 Parser。</p>
+<p>如果你的 <code>.g4</code> 文件是：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">lexer</span><span class="w"> </span><span class="k">grammar</span><span class="w"> </span><span class="nc">ExampleLexer</span><span class="p">;</span>
+</code></pre></div>
+<p>也就是说目前只有 <strong>Lexer</strong>，那么它只能产生 Token Stream，并不会产生 Parse Tree。</p>
+<p><strong>没有 Parser，自然也就没有语法树可以看。</strong></p>
+</div>
+<h2 id="_7">练习<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p>你需要扩展我们上述提到的 <code>Calc1</code> 语法，使其除了加减运算之外，还能支持乘除运算，以及小括号，同时自己写一个小程序测试一下下面这个输出。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>(1 + 2 * 2 / 3)
+</code></pre></div></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-copyright">
+    <div class="md-copyright__highlight">
+        commit: 
+        <a href="/commit/30df9b5a, 2026-09-29 22:06:10+08:00" target="_blank" rel="noopener">
+            30df9b5a, 2026-09-29 22:06:10+08:00
+        </a>
+    </div>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.path", "navigation.tabs", "navigation.tabs.sticky"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>
