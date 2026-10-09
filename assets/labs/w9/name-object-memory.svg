@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="244" viewBox="0 0 1050 244"><defs>
+ <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.2" markerHeight="5.2" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#657483"/></marker>
+ <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.2" markerHeight="5.2" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#356C92"/></marker>
+ <marker id="arrO" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.2" markerHeight="5.2" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#AB6D2B"/></marker>
+ </defs><style>text{font-family:"Noto Sans CJK SC","Microsoft YaHei",Arial,sans-serif;fill:#27313c}.small{font-size:18px}.medium{font-size:22px}.tiny{font-size:15px}.monospace{font-family:"DejaVu Sans Mono",monospace}</style>
+<rect width="1050" height="244" fill="white"/>
+<text x="90" y="36" class="small" font-weight="600">编译时</text>
+<text x="650" y="36" class="small" font-weight="600">运行时（示意）</text>
+<line x1="522" y1="30" x2="522" y2="215" stroke="#dde1e5" stroke-dasharray="5,5" stroke-width="1.5"/>
+<rect x="38" y="90" width="113" height="69" rx="3" fill="#f9fafb" stroke="#aab2bc" stroke-width="1.5"/>
+<text x="95" y="116" class="tiny" text-anchor="middle" fill="#55616e">Identifier</text>
+<text x="95" y="145" class="medium monospace" font-weight="600" text-anchor="middle">y</text>
+<path d="M 158 124 H 219" stroke="#657483" stroke-width="1.8" marker-end="url(#arr)" fill="none"/>
+<text x="188" y="111" class="tiny" text-anchor="middle" fill="#55616e">resolve</text>
+<rect x="231" y="76" width="247" height="103" rx="3" fill="#f9fafb" stroke="#aab2bc" stroke-width="1.5"/>
+<text x="355" y="106" class="medium" font-weight="600" text-anchor="middle">VariableSymbol</text>
+<text x="253" y="140" class="small monospace">name: y</text>
+<text x="253" y="166" class="small monospace">type: int</text>
+<text x="632" y="111" class="medium monospace" text-anchor="middle">y</text>
+<path d="M 649 103 H 726" stroke="#657483" stroke-width="1.9" marker-end="url(#arr)" fill="none"/>
+<text x="760" y="67" class="tiny" text-anchor="middle" fill="#586473">0x1000</text>
+<rect x="752" y="90" width="110" height="72" rx="2" fill="#f0f5f8" stroke="#356C92" stroke-width="1.8"/>
+<text x="807" y="137" font-size="30" text-anchor="middle" font-weight="600">3</text>
+<path d="M 870 125 H 900" stroke="#9da8b1" stroke-width="1.4" fill="none"/>
+<text x="915" y="133" class="small">int 对象</text>
+<text x="807" y="192" class="tiny" text-anchor="middle" fill="#697781">存储区域</text>
+</svg>
