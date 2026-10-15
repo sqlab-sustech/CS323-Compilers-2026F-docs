@@ -1,0 +1,1408 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/labs/w5-parser/">
+      
+      
+        <link rel="prev" href="../w4-parser/">
+      
+      
+        <link rel="next" href="../../env/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+    
+    
+      
+        <title>Week 5 - Parser 2 - Compiler Lab Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.6543a935.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#week-5-parser-2" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../" title="Compiler Lab Documentation" class="md-header__button md-logo" aria-label="Compiler Lab Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Compiler Lab Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Week 5 - Parser 2
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../labs/w5-parser/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../" class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../w1-intro/" class="md-tabs__link">
+          
+  
+  Weekly Labs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../env/" class="md-tabs__link">
+          
+  
+  Environment Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="Compiler Lab Documentation" class="md-nav__button md-logo" aria-label="Compiler Lab Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    Compiler Lab Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Weekly Labs
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Weekly Labs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w1-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 1 - Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w2-lex_p1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 2 - Lexer 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w3-lex_p2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 3 - Lexer 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w4-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 4 - Parser 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Week 5 - Parser 2
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Week 5 - Parser 2
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ambiguity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ambiguity
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ambiguity">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#operator-associativity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Operator Associativity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operator-precedence" class="md-nav__link">
+    <span class="md-ellipsis">
+      Operator Precedence
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resolving-grammar-ambiguity-in-antlr" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resolving Grammar Ambiguity in ANTLR
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resolving Grammar Ambiguity in ANTLR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#precedence" class="md-nav__link">
+    <span class="md-ellipsis">
+      Precedence
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#associativity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Associativity
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antlrs-default-error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      ANTLR's Default Error Handling
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ANTLR's Default Error Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-token-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Single-Token Errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errors-that-require-broader-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      Errors That Require Broader Recovery
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customizing-error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customizing Error Handling
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Customizing Error Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-error-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Error Messages
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#semantic-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Semantic Actions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#separating-semantic-actions-from-the-grammar-with-listeners-and-visitors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Separating Semantic Actions from the Grammar with Listeners and Visitors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Separating Semantic Actions from the Grammar with Listeners and Visitors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#labeling-alternatives-for-finer-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      Labeling Alternatives for Finer Control
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exercise" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exercise
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Environment Setup
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Environment Setup
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Alternative Environments
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Alternative Environments
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/wsl/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows WSL
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/macos-native/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Native macOS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ambiguity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ambiguity
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ambiguity">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#operator-associativity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Operator Associativity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operator-precedence" class="md-nav__link">
+    <span class="md-ellipsis">
+      Operator Precedence
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resolving-grammar-ambiguity-in-antlr" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resolving Grammar Ambiguity in ANTLR
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resolving Grammar Ambiguity in ANTLR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#precedence" class="md-nav__link">
+    <span class="md-ellipsis">
+      Precedence
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#associativity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Associativity
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antlrs-default-error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      ANTLR's Default Error Handling
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ANTLR's Default Error Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-token-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Single-Token Errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errors-that-require-broader-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      Errors That Require Broader Recovery
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customizing-error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customizing Error Handling
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Customizing Error Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-error-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Error Messages
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#semantic-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Semantic Actions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#separating-semantic-actions-from-the-grammar-with-listeners-and-visitors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Separating Semantic Actions from the Grammar with Listeners and Visitors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Separating Semantic Actions from the Grammar with Listeners and Visitors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#labeling-alternatives-for-finer-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      Labeling Alternatives for Finer Control
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exercise" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exercise
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="week-5-parser-2">Week 5 - Parser 2<a class="headerlink" href="#week-5-parser-2" title="Permanent link">&para;</a></h1>
+<h2 id="ambiguity">Ambiguity<a class="headerlink" href="#ambiguity" title="Permanent link">&para;</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Recap: Ambiguity</p>
+<p>A grammar is <strong>ambiguous</strong> if at least one sentence in the language has more than one <strong>parse tree</strong>.</p>
+</div>
+<p>Consider the <code>Calc1</code> grammar:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">grammar</span><span class="w"> </span><span class="nc">Calc1</span><span class="p">;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'+'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'-'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">factor</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="p">;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nl">factor</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="no">INT</span><span class="w"> </span><span class="p">;</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nl">INT</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="x">0-9</span><span class="p">]</span><span class="o">+</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+<p>This grammar accepts <code>9-5+2</code>, but the expression has two possible parse trees:</p>
+<p><img alt="Two possible parse trees for 9-5+2" src="../../../assets/labs/w5-parser/ambiguity.png" width="100%" /></p>
+<p>Using parentheses to show how the operands are grouped, the two interpretations are <code>(9-5)+2</code> and <code>9-(5+2)</code>. This is an example of <strong>ambiguity</strong>.</p>
+<p>The second interpretation does not match the usual arithmetic convention. Similarly, we want our parser to give an input a consistent interpretation rather than leave it with multiple possible parse trees.</p>
+<h3 id="operator-associativity">Operator Associativity<a class="headerlink" href="#operator-associativity" title="Permanent link">&para;</a></h3>
+<p>When an operand appears between two operators, we need a rule for deciding which operator it groups with first.</p>
+<p>The <code>+</code> and <code>-</code> operators are <strong>left-associative</strong>: when they occur at the same precedence level, we group operations from left to right. For example, in <code>9-5+2</code>, the operand <code>5</code> groups with the <code>-</code> on its left, giving <code>(9-5)+2</code>.</p>
+<p>The assignment operator <code>=</code> in C is <strong>right-associative</strong>. Thus, <code>a=b=c</code> is interpreted as <code>a=(b=c)</code>: the middle operand <code>b</code> groups with the <code>=</code> on its right.</p>
+<h3 id="operator-precedence">Operator Precedence<a class="headerlink" href="#operator-precedence" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">grammar</span><span class="w"> </span><span class="nc">Calc2</span><span class="p">;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'+'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'-'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'*'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">factor</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">        </span><span class="p">;</span>
+</code></pre></div>
+<p>With this grammar, <code>9+5*2</code> can have two parse trees, corresponding to <code>(9+5)*2</code> and <code>9+(5*2)</code>. Declaring all four operators left-associative does not fully resolve the ambiguity: associativity determines grouping among operators <strong>at the same precedence level</strong>. When an expression contains operators at different levels, we also need to define their <strong>precedence</strong>.</p>
+<p>Saying that <code>*</code> has higher precedence than <code>+</code> means that operands group with multiplication before addition. In both <code>9+5*2</code> and <code>9*5+2</code>, the operand <code>5</code> participates in multiplication first. These expressions therefore mean <code>9+(5*2)</code> and <code>(9*5)+2</code>, respectively.</p>
+<h2 id="resolving-grammar-ambiguity-in-antlr">Resolving Grammar Ambiguity in ANTLR<a class="headerlink" href="#resolving-grammar-ambiguity-in-antlr" title="Permanent link">&para;</a></h2>
+<h3 id="precedence">Precedence<a class="headerlink" href="#precedence" title="Permanent link">&para;</a></h3>
+<p>To give <code>*</code> higher precedence than <code>+</code> in <code>Calc2</code>, place the <code>expr '*' expr</code> alternative before <code>expr '+' expr</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">grammar</span><span class="w"> </span><span class="nc">Calc2</span><span class="p">;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'*'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'/'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'+'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'-'</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">factor</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">        </span><span class="p">;</span>
+</code></pre></div>
+<p>For these left-recursive operator alternatives, ANTLR assigns higher precedence to alternatives that appear earlier. Multiplication therefore binds more tightly than addition.</p>
+<p>However, this version also gives <code>*</code> higher precedence than <code>/</code>. ANTLR would parse <code>1 * 2 / 3</code> as <code>(1*2)/3</code>, but <code>1 / 2 * 3</code> as <code>1/(2*3)</code>.</p>
+<p>To give operators the same precedence, group them in a <strong>subrule</strong> within a single alternative:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">grammar</span><span class="w"> </span><span class="nc">Calc2</span><span class="p">;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="o">(</span><span class="s1">'*'</span><span class="o">|</span><span class="s1">'/'</span><span class="o">)</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="o">(</span><span class="s1">'+'</span><span class="o">|</span><span class="s1">'-'</span><span class="o">)</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">factor</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">        </span><span class="p">;</span>
+</code></pre></div>
+<h3 id="associativity">Associativity<a class="headerlink" href="#associativity" title="Permanent link">&para;</a></h3>
+<p>ANTLR treats these operators as left-associative by default. To make an alternative right-associative, add <code>&lt;assoc=right&gt;</code> at its beginning:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">grammar</span><span class="w"> </span><span class="nc">Calc2</span><span class="p">;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="o">(</span><span class="s1">'*'</span><span class="o">|</span><span class="s1">'/'</span><span class="o">)</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="o">(</span><span class="s1">'+'</span><span class="o">|</span><span class="s1">'-'</span><span class="o">)</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="err">&lt;</span><span class="nv">assoc</span><span class="o">=</span><span class="nv">right</span><span class="err">&gt;</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'='</span><span class="w"> </span><span class="nv">expr</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="nv">factor</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">        </span><span class="p">;</span>
+</code></pre></div>
+<h2 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
+<p>A useful compiler should provide informative diagnostics for invalid programs, including the location and nature of each error. Here, we focus on <strong>syntax errors</strong>, such as a missing semicolon or parenthesis. These differ from semantic problems, such as referencing an undefined variable or accessing an array outside its bounds.</p>
+<p>One of ANTLR's strengths is its built-in support for error reporting and recovery. Recovery allows the parser to resume processing the remaining input after an error, rather than stop at the first syntax error.</p>
+<p>The following sections briefly introduce ANTLR's default error reporting and recovery, which work without additional implementation on your part. We will then use semantic actions to handle specific error patterns.</p>
+<h2 id="antlrs-default-error-handling">ANTLR's Default Error Handling<a class="headerlink" href="#antlrs-default-error-handling" title="Permanent link">&para;</a></h2>
+<h3 id="single-token-errors">Single-Token Errors<a class="headerlink" href="#single-token-errors" title="Permanent link">&para;</a></h3>
+<p>Matching tokens is a routine part of parsing. Consider this rule:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nl">stmt</span><span class="p">:</span><span class="w"> </span><span class="s1">'if'</span><span class="w"> </span><span class="s1">'('</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="s1">')'</span><span class="w"> </span><span class="nv">stmt</span><span class="p">;</span>
+</code></pre></div>
+<p>The parser matches <code>if</code>, then <code>(</code>, then recursively matches <code>exp</code>, and so on. The following statement is valid: each token and each subrule matches the expected structure.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+</code></pre></div>
+<p>Now consider a statement with a missing opening parenthesis:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">if</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+</code></pre></div>
+<p>After <code>if</code>, the parser expects <code>(</code> but encounters <code>x</code>. ANTLR can recover by <strong>inserting a missing token</strong> if the current input is valid immediately after that token. Here, <code>x</code> can begin <code>exp</code>, so treating <code>(</code> as missing allows parsing to continue. ANTLR reports the missing token and proceeds with the rest of the statement.</p>
+<p>A related recovery technique is <strong>deleting an unwanted token</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">if</span><span class="w"> </span><span class="n">xyz</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+</code></pre></div>
+<p>Here, skipping <code>xyz</code> exposes the expected <code>(</code>. ANTLR reports the unwanted token and continues parsing.</p>
+<h3 id="errors-that-require-broader-recovery">Errors That Require Broader Recovery<a class="headerlink" href="#errors-that-require-broader-recovery" title="Permanent link">&para;</a></h3>
+<p>Some errors cannot be repaired by inserting or deleting a single token. In these cases, the parser discards input tokens until it reaches a token that allows parsing to resume. Such tokens belong to a <strong>recovery set</strong>, derived from the tokens that can follow the surrounding rules.</p>
+<p>Consider the same rule:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nl">stmt</span><span class="p">:</span><span class="w"> </span><span class="s1">'if'</span><span class="w"> </span><span class="s1">'('</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="s1">')'</span><span class="w"> </span><span class="nv">stmt</span><span class="p">;</span>
+</code></pre></div>
+<p>and this input:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">qwe</span><span class="w"> </span><span class="n">nnn</span><span class="w"> </span><span class="n">nnns</span><span class="w"> </span><span class="n">jasj</span><span class="w"> </span><span class="n">sjs</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="p">)</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+</code></pre></div>
+<p>The parser matches <code>if</code> and <code>(</code> successfully, but the contents do not form a valid <code>exp</code>. A single-token insertion or deletion cannot repair the expression. The parser can instead consume tokens until it reaches <code>)</code>, which follows <code>exp</code> in this rule. It then resumes parsing the rest of the statement as though it had finished processing the expression.</p>
+<p>ANTLR tracks the possible following tokens as it enters rules and uses that information to recover from errors.</p>
+<h2 id="customizing-error-handling">Customizing Error Handling<a class="headerlink" href="#customizing-error-handling" title="Permanent link">&para;</a></h2>
+<h3 id="custom-error-messages">Custom Error Messages<a class="headerlink" href="#custom-error-messages" title="Permanent link">&para;</a></h3>
+<p>To customize the format and content of diagnostics, extend <code>BaseErrorListener</code> and override <code>syntaxError</code>. Its parameters provide the information available for constructing your message:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.antlr.v4.runtime.BaseErrorListener</span><span class="p">;</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.antlr.v4.runtime.RecognitionException</span><span class="p">;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.antlr.v4.runtime.Recognizer</span><span class="p">;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="c1">// recognizer: the parser or lexer that reported the error</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="c1">// offendingSymbol: the input symbol that caused the error, usually a Token</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="c1">// line: the line number where the error occurred</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="c1">// charPositionInLine: the character position within that line</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="c1">// msg: ANTLR's description of the error</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="c1">// e: an exception containing further details about the recognition error</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">MyErrorListener</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BaseErrorListener</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">    </span><span class="nd">@Override</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">syntaxError</span><span class="p">(</span><span class="n">Recognizer</span><span class="o">&lt;?</span><span class="p">,</span><span class="w"> </span><span class="o">?&gt;</span><span class="w"> </span><span class="n">recognizer</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">offendingSymbol</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">line</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">charPositionInLine</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">msg</span><span class="p">,</span><span class="w"> </span><span class="n">RecognitionException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="p">}</span>
+</code></pre></div>
+<p>Remove the default error listeners before adding your own to avoid duplicate diagnostics:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">CalculatorParser</span><span class="w"> </span><span class="n">calculatorParser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CalculatorParser</span><span class="p">(</span><span class="n">tokens</span><span class="p">);</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">calculatorParser</span><span class="p">.</span><span class="na">removeErrorListeners</span><span class="p">();</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">calculatorParser</span><span class="p">.</span><span class="na">addErrorListener</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">MyErrorListener</span><span class="p">());</span>
+</code></pre></div>
+<h3 id="semantic-actions">Semantic Actions<a class="headerlink" href="#semantic-actions" title="Permanent link">&para;</a></h3>
+<p>A <strong>semantic action</strong> is a snippet of code embedded in an ANTLR grammar and written in the target language—in our case, Java.</p>
+<p>Actions execute when the parser reaches their position in a rule. They let you define <strong>custom behavior during parsing</strong>: whenever the parser recognizes a particular structure, it can run the Java code you provide.</p>
+<p>To add an action, place the code inside braces at the desired position in a rule. ANTLR includes it in the generated parser. An action placed at the end of an alternative appears after the code that matches that alternative.</p>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nl">stmt</span><span class="p">:</span><span class="w"> </span><span class="s1">'if'</span><span class="w"> </span><span class="s1">'('</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="s1">')'</span><span class="w"> </span><span class="nv">stmt</span><span class="w"> </span><span class="p">{</span><span class="x"> System.out.println("hello"); </span><span class="p">};</span>
+</code></pre></div>
+<p>When this rule matches an input such as:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+</code></pre></div>
+<p>it prints <strong>hello</strong>.</p>
+<p>Semantic actions can also provide diagnostics for specific error patterns. Add an alternative that explicitly recognizes a common mistake, then report the error when that alternative matches:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nl">stmt</span><span class="p">:</span><span class="w"> </span><span class="s1">'if'</span><span class="w"> </span><span class="s1">'('</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="s1">')'</span><span class="w"> </span><span class="nv">stmt</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="s1">'if'</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="s1">')'</span><span class="w"> </span><span class="nv">stmt</span><span class="w"> </span><span class="p">{</span><span class="x">this.notifyErrorListeners("Missing opening parenthesis");</span><span class="p">}</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="p">;</span>
+</code></pre></div>
+<p>The second alternative recognizes an <code>if</code> statement with a missing <code>(</code>. The method <code>this.notifyErrorListeners</code> is available in the generated parser. Because the action is embedded directly in that parser, it can call this method and supply the diagnostic message.</p>
+<p>To retrieve the starting line of the current rule, use:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">$ctx</span><span class="p">.</span><span class="na">start</span><span class="p">.</span><span class="na">getLine</span><span class="p">();</span>
+</code></pre></div>
+<p>Here, <strong><code>$ctx</code></strong> refers to the context object for the current rule. It contains information such as the starting and ending tokens, from which you can obtain source locations and construct your own diagnostics.</p>
+<h2 id="separating-semantic-actions-from-the-grammar-with-listeners-and-visitors">Separating Semantic Actions from the Grammar with Listeners and Visitors<a class="headerlink" href="#separating-semantic-actions-from-the-grammar-with-listeners-and-visitors" title="Permanent link">&para;</a></h2>
+<p>Semantic actions let a parser run code as soon as it recognizes a particular syntactic structure. Beyond custom error handling, they can support semantic processing.</p>
+<p>For example, when the parser recognizes a variable declaration, an action can <strong>record</strong> the variable in a symbol table. When it later encounters an assignment, another action can check whether the variable has been declared. In principle, this kind of processing can be implemented with actions during parsing.</p>
+<p>However, a real language may require a large amount of processing logic. Embedding all of it in the grammar mixes syntax definitions with implementation code, making the file harder to read and maintain. It also makes the grammar harder to reuse for other tasks, because the embedded actions are tied to one particular use.</p>
+<p>ANTLR offers two convenient ways to keep this logic separate: <strong>listeners</strong> and <strong>visitors</strong>. For a grammar named <code>Spl</code>, the generated Java files include <code>SplVisitor</code>, <code>SplListener</code>, <code>SplBaseVisitor</code>, and <code>SplBaseListener</code>. The first two are interfaces; the latter two are classes that implement those interfaces.</p>
+<p>Let us start with <code>SplListener</code>. It defines methods named <code>enterXXX</code> and <code>exitXXX</code>, where <code>XXX</code> corresponds to a rule in the <code>.g4</code> file. Each rule has an entry callback and an exit callback. During a parse-tree walk, <code>enter</code> runs when the walker reaches the rule's node, and <code>exit</code> runs after it has visited that node's children. Thus, by the time <code>exit</code> runs, the callbacks for all child rules have already run.</p>
+<p>For the following grammar:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nl">stmt</span><span class="p">:</span><span class="w"> </span><span class="nv">assign</span><span class="p">;</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nl">assign</span><span class="p">:</span><span class="w"> </span><span class="no">INT</span><span class="w"> </span><span class="no">INDENTIFIER</span><span class="w"> </span><span class="no">EQ</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">SEMICOLON</span><span class="p">;</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="nl">expr</span><span class="p">:</span><span class="w"> </span><span class="no">NUMBER</span><span class="p">;</span>
+</code></pre></div>
+<p>the diagram shows the order of these callbacks:</p>
+<p><img alt="Order of listener entry and exit callbacks" src="../../../assets/labs/w5-parser/lis.png" /></p>
+<p>Both callbacks receive the same <code>ctx</code> object, which contains the rule's context, including the matched tokens and its child rules.</p>
+<p>You might expect more information to be available on exit than on entry, since the child rules must have been processed by then. The key distinction is <strong>when the tree is built</strong>. Embedded grammar actions run while the parser is building the parse tree. In the listener and visitor workflow described here, processing happens <strong>after the parse tree has been built</strong>.</p>
+<p>By the time we walk the tree, the source has already been parsed, and every rule's children are available—even in an <code>enter</code> callback. In contrast, an action embedded at the beginning of a grammar rule runs before the parser has matched that rule's children, so their contents are not yet known.</p>
+<p>Now consider <code>SplVisitor</code>. It provides one <code>visitXXX</code> method per rule, rather than separate entry and exit callbacks. Why is there no need to distinguish between entering and leaving a rule?</p>
+<p>The answer lies in who controls the traversal. With a listener and the standard tree walker, callbacks run in a fixed depth-first order: an entry callback before the children and an exit callback afterward. Put an action in <code>enter</code> if it should run before the child actions, or in <code>exit</code> if it should run after them.</p>
+<p>Suppose, however, that you want to run a custom operation <strong>after processing the first child but before processing the second</strong>. The parent rule's entry and exit callbacks do not provide a place to intervene between these child visits or control their order. A visitor gives you that control: within a parent's <code>visit</code> method, you decide which children to visit and when.</p>
+<ol>
+<li>Call <code>visit</code> on the first child.</li>
+<li>Run your custom operation.</li>
+<li>Call <code>visit</code> on the second child.</li>
+</ol>
+<p><img alt="Visitor traversal structure" src="../../../assets/labs/w5-parser/Visitor-structure.jpg" /></p>
+<p>A single visitor method therefore gives you control over operations before, between, and after child visits. Separate <code>enter</code> and <code>exit</code> methods are unnecessary because all of those decisions can be made within the same method.</p>
+<p>Another difference is that a visitor has a <strong>generic type parameter</strong>: its <code>visit</code> methods can return values of that type. Listener callbacks return no value. This distinction can help you choose between the two approaches.</p>
+<p>A listener is often convenient for static analysis, such as adding declarations to a symbol table and looking up variables in assignments, when you do not need fine control over traversal. A visitor is useful for tasks such as <strong>code translation</strong>, where each rule may return a result that its parent combines into a larger result.</p>
+<p>ANTLR provides default implementations in <code>SplBaseListener</code> and <code>SplBaseVisitor</code>. The base listener's callbacks do nothing, while the base visitor visits child nodes. To add custom behavior, extend the appropriate base class and override only the methods you need.</p>
+<p>For operations that apply to every rule, listeners also provide the convenient callbacks <strong><code>enterEveryRule</code></strong> and <strong><code>exitEveryRule</code></strong>.</p>
+<div class="admonition info">
+<p class="admonition-title">Building a Visitor or Listener Quickly</p>
+<p>Extend the generated <code>XXXBaseVisitor</code> or <code>XXXBaseListener</code> class. These classes already implement the corresponding <code>XXXVisitor</code> and <code>XXXListener</code> interfaces with useful default behavior:</p>
+<ul>
+<li>In <code>XXXBaseVisitor</code>, each <code>visit</code> method recursively visits the rule's children by default.</li>
+<li>In <code>XXXBaseListener</code>, each <code>enterXXX</code> and <code>exitXXX</code> method does nothing by default.</li>
+</ul>
+<p>Use Java's <strong>override</strong> mechanism to replace only the methods relevant to your task.</p>
+<p>To visit a child rule from a visitor method, use a call such as:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">this</span><span class="p">.</span><span class="na">visit</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">childRule</span><span class="p">());</span>
+</code></pre></div>
+<p>Replace <code>childRule</code> with the child rule's name. The general-purpose <code>visit</code> method dispatches to the appropriate visitor method based on the actual type of the context object passed to it.</p>
+<p>ANTLR generates accessors in a parent rule's context class for the child rules and tokens it contains. Rule accessors return rule contexts; token accessors return terminal nodes. <strong>When a rule contains multiple occurrences of the same child rule</strong>, as in a left-recursive expression or a repeated structure, ANTLR provides both a list accessor and an indexed accessor:</p>
+<ul>
+<li><code>ctx.expr()</code> returns a list of all <code>expr</code> child contexts.</li>
+<li><code>ctx.expr(i)</code> returns the <code>i</code>th <code>expr</code> child context, using a zero-based index and preserving their order in the rule.</li>
+</ul>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nl">stmt</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">'+'</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="s1">';'</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+<p>The generated accessors let you distinguish the two operands:</p>
+<ul>
+<li><code>ctx.expr(0)</code> refers to the <code>expr</code> on the left of <code>+</code>.</li>
+<li><code>ctx.expr(1)</code> refers to the <code>expr</code> on the right of <code>+</code>.</li>
+</ul>
+<p>Use an explicit index when you need a particular occurrence of a child rule.</p>
+</div>
+<h3 id="labeling-alternatives-for-finer-control">Labeling Alternatives for Finer Control<a class="headerlink" href="#labeling-alternatives-for-finer-control" title="Permanent link">&para;</a></h3>
+<p>So far, we have described listener and visitor methods generated for individual rules. Sometimes that level of detail is insufficient because a rule has several alternatives that need different processing.</p>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nl">exp</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="no">CHAR</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">FLOAT</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">INT</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">ID</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">ID</span><span class="w"> </span><span class="no">DOT</span><span class="w"> </span><span class="no">ID</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="no">LB</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="no">RB</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">ID</span><span class="w"> </span><span class="no">LP</span><span class="w"> </span><span class="no">RP</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">ID</span><span class="w"> </span><span class="no">LP</span><span class="w"> </span><span class="nv">args</span><span class="w"> </span><span class="no">RP</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">LP</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="no">RP</span>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">MINUS</span><span class="w"> </span><span class="nv">exp</span>
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="o">(</span><span class="no">MUL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">DIV</span><span class="o">)</span><span class="w"> </span><span class="nv">exp</span>
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="o">(</span><span class="no">PLUS</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">MINUS</span><span class="o">)</span><span class="w"> </span><span class="nv">exp</span>
+<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="o">(</span><span class="no">OR</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">EQ</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">LT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">LE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">GT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">GE</span><span class="o">)</span><span class="w"> </span><span class="nv">exp</span>
+<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="no">AND</span><span class="w"> </span><span class="nv">exp</span>
+<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NOT</span><span class="w"> </span><span class="nv">exp</span>
+<a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="no">ASSIGN</span><span class="w"> </span><span class="nv">exp</span><span class="p">;</span>
+</code></pre></div>
+<p>To attach different behavior to different alternatives, add an <strong>alternative label</strong> at the end of each one:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="err">#</span><span class="w"> </span><span class="nl">AlternativeName</span>
+</code></pre></div>
+<p>ANTLR then generates separate listener and visitor methods for the labeled alternatives, giving you finer control:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nl">exp</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="no">CHAR</span><span class="w">                                   </span><span class="o">#</span><span class="w"> </span><span class="no">CharLiteral</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">FLOAT</span><span class="w">                                  </span><span class="o">#</span><span class="w"> </span><span class="no">FloatLiteral</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">INT</span><span class="w">                                    </span><span class="o">#</span><span class="w"> </span><span class="no">IntLiteral</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">ID</span><span class="w">                                     </span><span class="o">#</span><span class="w"> </span><span class="no">IdExp</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">ID</span><span class="w"> </span><span class="no">DOT</span><span class="w"> </span><span class="no">ID</span><span class="w">                              </span><span class="o">#</span><span class="w"> </span><span class="no">StructMemberAccessExp</span>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="no">LB</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="no">RB</span><span class="w">                          </span><span class="o">#</span><span class="w"> </span><span class="no">ArrayAccessExp</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">ID</span><span class="w"> </span><span class="no">LP</span><span class="w"> </span><span class="no">RP</span><span class="w">                               </span><span class="o">#</span><span class="w"> </span><span class="no">CallExpNoArgs</span>
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">ID</span><span class="w"> </span><span class="no">LP</span><span class="w"> </span><span class="nv">args</span><span class="w"> </span><span class="no">RP</span><span class="w">                          </span><span class="o">#</span><span class="w"> </span><span class="no">CallExpWithArgs</span>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">LP</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="no">RP</span><span class="w">                              </span><span class="o">#</span><span class="w"> </span><span class="no">ParenExp</span>
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">MINUS</span><span class="w"> </span><span class="nv">exp</span><span class="w">                              </span><span class="o">#</span><span class="w"> </span><span class="no">UnaryMinusExp</span>
+<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="o">(</span><span class="no">MUL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">DIV</span><span class="o">)</span><span class="w"> </span><span class="nv">exp</span><span class="w">                     </span><span class="o">#</span><span class="w"> </span><span class="no">MulDivExp</span>
+<a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="o">(</span><span class="no">PLUS</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">MINUS</span><span class="o">)</span><span class="w"> </span><span class="nv">exp</span><span class="w">                  </span><span class="o">#</span><span class="w"> </span><span class="no">PlusMinusExp</span>
+<a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="o">(</span><span class="no">OR</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">EQ</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">NE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">LT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">LE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">GT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">GE</span><span class="o">)</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="o">#</span><span class="w"> </span><span class="no">CompareExp</span>
+<a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="no">AND</span><span class="w"> </span><span class="nv">exp</span><span class="w">                            </span><span class="o">#</span><span class="w"> </span><span class="no">AndExp</span>
+<a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="no">NOT</span><span class="w"> </span><span class="nv">exp</span><span class="w">                                </span><span class="o">#</span><span class="w"> </span><span class="no">NotExp</span>
+<a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="nv">exp</span><span class="w"> </span><span class="no">ASSIGN</span><span class="w"> </span><span class="nv">exp</span><span class="w">                         </span><span class="o">#</span><span class="w"> </span><span class="no">AssignExp</span>
+<a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a><span class="w">    </span><span class="p">;</span>
+</code></pre></div>
+<h2 id="exercise">Exercise<a class="headerlink" href="#exercise" title="Permanent link">&para;</a></h2>
+<p>Extend <code>Calc1</code> to support multiplication, division, and parentheses in addition to addition and subtraction. Then write a small program that evaluates the sample expressions and produces the output below.</p>
+<ol>
+<li>Complete <strong>CalcLab5Visitor.java</strong>.</li>
+<li>Consider how you would implement the same functionality with a listener.</li>
+</ol>
+<p><strong>Calc1.g4:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">grammar</span><span class="w"> </span><span class="nc">Calc1</span><span class="p">;</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="nl">root</span><span class="p">:</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="no">EOF</span><span class="p">;</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="nl">expr</span><span class="w">    </span><span class="p">:</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">          </span><span class="no">LPAREN</span><span class="w"> </span><span class="nv">expr</span><span class="w"> </span><span class="no">RPAREN</span><span class="w">     </span><span class="o">#</span><span class="w"> </span><span class="nv">aren</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">       </span><span class="o">|</span><span class="w">  </span><span class="nv">expr</span><span class="w"> </span><span class="o">(</span><span class="no">MUL</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">DIV</span><span class="o">)</span><span class="w"> </span><span class="nv">expr</span><span class="w">  </span><span class="o">#</span><span class="w"> </span><span class="nv">mulDiv</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="w">       </span><span class="o">|</span><span class="w">  </span><span class="nv">expr</span><span class="w"> </span><span class="o">(</span><span class="no">ADD</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="no">SUB</span><span class="o">)</span><span class="w"> </span><span class="nv">expr</span><span class="w">  </span><span class="o">#</span><span class="w"> </span><span class="nv">addSub</span>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="w">       </span><span class="o">|</span><span class="w">  </span><span class="nv">factor</span><span class="w">                 </span><span class="o">#</span><span class="w"> </span><span class="nv">goFactor</span>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="w">       </span><span class="p">;</span>
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="nl">factor</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="no">INT</span><span class="p">;</span>
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a>
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="nl">INT</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s1">'0'</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="p">[</span><span class="x">1-9</span><span class="p">][</span><span class="x">0-9</span><span class="p">]</span><span class="o">*</span><span class="p">;</span>
+<a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="nl">ADD</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s1">'+'</span><span class="w"> </span><span class="p">;</span>
+<a id="__codelineno-23-14" name="__codelineno-23-14" href="#__codelineno-23-14"></a><span class="nl">SUB</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s1">'-'</span><span class="w"> </span><span class="p">;</span>
+<a id="__codelineno-23-15" name="__codelineno-23-15" href="#__codelineno-23-15"></a><span class="nl">MUL</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s1">'*'</span><span class="p">;</span>
+<a id="__codelineno-23-16" name="__codelineno-23-16" href="#__codelineno-23-16"></a><span class="nl">DIV</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s1">'/'</span><span class="p">;</span>
+<a id="__codelineno-23-17" name="__codelineno-23-17" href="#__codelineno-23-17"></a><span class="nl">LPAREN</span><span class="p">:</span><span class="w"> </span><span class="s1">'('</span><span class="p">;</span>
+<a id="__codelineno-23-18" name="__codelineno-23-18" href="#__codelineno-23-18"></a><span class="nl">RPAREN</span><span class="p">:</span><span class="w"> </span><span class="s1">')'</span><span class="p">;</span>
+<a id="__codelineno-23-19" name="__codelineno-23-19" href="#__codelineno-23-19"></a><span class="nl">WS</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="x"> \t\r\n</span><span class="p">]</span><span class="o">+</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nv">skip</span><span class="w"> </span><span class="p">;</span>
+</code></pre></div>
+<p>Create <strong>CalcLab5Visitor.java</strong> in the same directory:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CalcLab5Visitor</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Calc1BaseVisitor</span><span class="o">&lt;</span><span class="n">Double</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Main.java:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">generated.Calc1.Calc1Lexer</span><span class="p">;</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">generated.Calc1.Calc1Parser</span><span class="p">;</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.antlr.v4.runtime.*</span><span class="p">;</span>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">        </span><span class="c1">// Create a character stream from a string. To read a file, use CharStreams.fromFileName("path/to/file").</span>
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="w">        </span><span class="c1">// Supply the input to ANTLR.</span>
+<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="w">        </span><span class="n">CharStream</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CharStreams</span><span class="p">.</span><span class="na">fromString</span><span class="p">(</span><span class="s">"2 + 3 * (5 - 4) / 2\n 3-4/2\n20 /4 -3\n((1+2)*3-5)/2 "</span><span class="p">);</span>
+<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="w">        </span><span class="c1">// Create the lexer.</span>
+<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="w">        </span><span class="n">Calc1Lexer</span><span class="w"> </span><span class="n">lexer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Calc1Lexer</span><span class="p">(</span><span class="n">input</span><span class="p">);</span>
+<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="w">        </span><span class="c1">// Create the token stream.</span>
+<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="w">        </span><span class="n">CommonTokenStream</span><span class="w"> </span><span class="n">tokens</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CommonTokenStream</span><span class="p">(</span><span class="n">lexer</span><span class="p">);</span>
+<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a><span class="w">        </span><span class="c1">// Create the parser.</span>
+<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="w">        </span><span class="n">Calc1Parser</span><span class="w"> </span><span class="n">parser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Calc1Parser</span><span class="p">(</span><span class="n">tokens</span><span class="p">);</span>
+<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a><span class="w">        </span><span class="c1">// Parse from the root rule to obtain the visitor's starting context.</span>
+<a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a><span class="w">        </span><span class="n">Calc1Parser</span><span class="p">.</span><span class="na">RootContext</span><span class="w"> </span><span class="n">context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parser</span><span class="p">.</span><span class="na">root</span><span class="p">();</span>
+<a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a><span class="w">        </span><span class="n">CalcLab5Visitor</span><span class="w"> </span><span class="n">visitor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CalcLab5Visitor</span><span class="p">();</span>
+<a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Calc1Parser</span><span class="p">.</span><span class="na">ExprContext</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">context</span><span class="p">.</span><span class="na">expr</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">"%s = %s\n"</span><span class="p">,</span><span class="w"> </span><span class="n">expr</span><span class="p">.</span><span class="na">getText</span><span class="p">(),</span><span class="w"> </span><span class="n">visitor</span><span class="p">.</span><span class="na">visit</span><span class="p">(</span><span class="n">expr</span><span class="p">));</span>
+<a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a><span class="p">}</span>
+</code></pre></div>
+<p>Expected output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>2+3*(5-4)/2 = 3.5
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>3-4/2 = 1.0
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>20/4-3 = 2.0
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>((1+2)*3-5)/2 = 2.0
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-copyright">
+    <div class="md-copyright__highlight">
+        commit: 
+        <a href="/commit/f823300f, 2026-10-15 17:00:46+08:00" target="_blank" rel="noopener">
+            f823300f, 2026-10-15 17:00:46+08:00
+        </a>
+    </div>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.path", "navigation.tabs", "navigation.tabs.sticky"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>
