@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="325" viewBox="0 0 900 325">
+  <title>指针字段需要 Load</title>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#536579"/></marker>
+    <marker id="greenArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#16845b"/></marker>
+    <style>
+      text { font-family: "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", sans-serif; fill: #172b4d; }
+      .title { font-size: 23px; font-weight: 700; }
+      .label { font-size: 18px; font-weight: 600; }
+      .small { font-size: 14px; fill: #536579; }
+      .tiny { font-size: 12px; fill: #536579; }
+      .blue { fill: #e7f0ff; stroke: #4c78b8; stroke-width: 2; }
+      .green { fill: #e4f5ec; stroke: #16845b; stroke-width: 3; }
+      .orange { fill: #fff0d8; stroke: #c58a25; stroke-width: 2; }
+      .purple { fill: #f1e9f8; stroke: #8b6aa7; stroke-width: 2; }
+      .gray { fill: #f1f4f7; stroke: #8795a5; stroke-width: 2; }
+      .line { stroke: #536579; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .gline { stroke: #16845b; stroke-width: 3; fill: none; marker-end: url(#greenArrow); }
+      .dashed { stroke-dasharray: 7 6; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="898" height="323" rx="14" fill="#ffffff" stroke="#d6dee8" stroke-width="2"/>
+  
+<text x="30" y="42" class="title">结构体保存指针：必须 Load 后再继续</text>
+<rect x="55" y="90" width="250" height="105" rx="10" class="purple"/>
+<text x="180" y="120" text-anchor="middle" class="label">struct Data</text>
+<rect x="90" y="140" width="180" height="38" rx="6" class="orange"/>
+<text x="180" y="165" text-anchor="middle" class="small">values: ptr</text>
+<path d="M305 158 L405 158" class="line"/>
+<rect x="405" y="112" width="155" height="92" rx="10" class="green"/>
+<text x="482" y="145" text-anchor="middle" class="label">Load</text>
+<text x="482" y="173" text-anchor="middle" class="small">取出指针值</text>
+<path d="M560 158 L660 158" class="line"/>
+<rect x="660" y="90" width="190" height="105" rx="10" class="blue"/>
+<text x="755" y="125" text-anchor="middle" class="label">int array</text>
+<text x="755" y="155" text-anchor="middle" class="small">values[0..]</text>
+<text x="755" y="178" text-anchor="middle" class="tiny">另一块内存</text>
+<text x="450" y="260" text-anchor="middle" class="label">GEP → Load → GEP → Store</text>
+<text x="450" y="292" text-anchor="middle" class="small">先算出指针字段的地址，再读取其中保存的指针，才能继续计算元素地址。</text>
+
+</svg>
