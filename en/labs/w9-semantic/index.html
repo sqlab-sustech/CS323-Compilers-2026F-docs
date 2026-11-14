@@ -1,0 +1,1248 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/labs/w9-semantic/">
+      
+      
+        <link rel="prev" href="../w7-semantic/">
+      
+      
+        <link rel="next" href="../../env/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+    
+    
+      
+        <title>Week 9 - Semantic Part 3 - Expression - Compiler Lab Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.6543a935.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#from-semantics-to-execution-what-does-an-expression-actually-do" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../" title="Compiler Lab Documentation" class="md-header__button md-logo" aria-label="Compiler Lab Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Compiler Lab Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Week 9 - Semantic Part 3 - Expression
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../labs/w9-semantic/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../" class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../w1-intro/" class="md-tabs__link">
+          
+  
+  Weekly Labs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../env/" class="md-tabs__link">
+          
+  
+  Environment Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="Compiler Lab Documentation" class="md-nav__button md-logo" aria-label="Compiler Lab Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    Compiler Lab Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Weekly Labs
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Weekly Labs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w1-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 1 - Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w2-lex_p1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 2 - Lexer 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w3-lex_p2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 3 - Lexer 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w4-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 4 - Parser 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w5-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 5 - Parser 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w6-symbol/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 7 - Semantic Part 1 - Symbol Table
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w7-semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 8 - Semantic Part 2 - Type Checking
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Week 9 - Semantic Part 3 - Expression
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Week 9 - Semantic Part 3 - Expression
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#from-names-to-objects-to-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      From Names to Objects to Values
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-does-an-expression-need-an-object-and-when-does-it-need-a-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      When Does an Expression Need an Object, and When Does It Need a Value?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When Does an Expression Need an Object, and When Does It Need a Value?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reading-a-value-from-an-object-lvalue-conversion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reading a Value from an Object: Lvalue Conversion
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#beyond-simple-variables-arrays-and-structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Beyond Simple Variables: Arrays and Structures
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#beyond-the-result-side-effects-and-evaluation-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      Beyond the Result: Side Effects and Evaluation Order
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-can-we-represent-these-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Can We Represent These Operations?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-class-exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      In-Class Exercises
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Environment Setup
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Environment Setup
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Alternative Environments
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Alternative Environments
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/wsl/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows WSL
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/macos-native/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Native macOS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#from-names-to-objects-to-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      From Names to Objects to Values
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-does-an-expression-need-an-object-and-when-does-it-need-a-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      When Does an Expression Need an Object, and When Does It Need a Value?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When Does an Expression Need an Object, and When Does It Need a Value?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reading-a-value-from-an-object-lvalue-conversion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reading a Value from an Object: Lvalue Conversion
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#beyond-simple-variables-arrays-and-structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Beyond Simple Variables: Arrays and Structures
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#beyond-the-result-side-effects-and-evaluation-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      Beyond the Result: Side Effects and Evaluation Order
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-can-we-represent-these-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Can We Represent These Operations?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-class-exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      In-Class Exercises
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="from-semantics-to-execution-what-does-an-expression-actually-do">From Semantics to Execution: What Does an Expression Actually Do?<a class="headerlink" href="#from-semantics-to-execution-what-does-an-expression-actually-do" title="Permanent link">&para;</a></h1>
+<p>In previous labs, we studied symbol tables, scopes, and semantic analysis. For the program below, our compiler can now resolve <code>x</code> and <code>y</code> to their declarations, determine that both have type <code>int</code>, and check whether the addition and assignment are semantically valid.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Knowing that a program is valid does not yet tell us how to execute it.</strong> Before introducing any new terminology, let us break down what happens in <code>x = y + 1;</code>:</p>
+<ol>
+<li>Read the value currently stored in <code>y</code>: <code>3</code>.</li>
+<li>Add the constant <code>1</code> to <code>3</code>, producing <code>4</code>.</li>
+<li>Write the result, <code>4</code>, into <code>x</code>.</li>
+</ol>
+<p>This process <strong>reads <code>y</code>, but never reads the old contents of <code>x</code></strong>. Both <code>x</code> and <code>y</code> are variable names, so why do we sometimes need the number a variable holds, and sometimes need a location we can write to?</p>
+<p>That question is the focus of this lab and a necessary step toward code generation. The previous two labs established <strong>which variable a name refers to, what type an expression has, and whether the program is valid</strong>. To generate code, the compiler must also determine <strong>what to read, what to compute, and what to write at runtime</strong>. We will first explain these operations, then learn how to express them in LLVM IR in the next lab.</p>
+<h2 id="from-names-to-objects-to-values">From Names to Objects to Values<a class="headerlink" href="#from-names-to-objects-to-values" title="Permanent link">&para;</a></h2>
+<p>Start with <code>y = 3;</code>. During <strong>name resolution</strong>, the <code>y</code> in the source code is an <strong>identifier</strong>. The compiler uses the symbol table to find its declaration and records information such as its name and type in a structure like <code>VariableSymbol</code>. <strong>A <code>VariableSymbol</code> is a data structure used by the compiler at compile time; it is not where the running program stores the integer <code>3</code>.</strong></p>
+<p>To describe execution, we need the concept of an <strong>object</strong>. Here, “object” does not mean an instance of a class in an object-oriented language such as Java. For the simple variables we are discussing, think of an object as <strong>a unit of storage that exists at runtime, has an identity and a type, and can hold data</strong>. For example, <code>int y;</code> declares a variable object of type <code>int</code>. Executing <code>y = 3;</code> makes that object hold the value <code>3</code>. If we later modify <code>y</code>, its stored value changes, but it is still the same variable object.</p>
+<p>For now, we can understand a simple object in terms of three things: <strong>its identity, its type, and its current value</strong>. In a memory-based implementation, an object occupies a region of storage that we can locate using an address. However, <strong>an object is not the same thing as its address</strong>: the address locates the storage, while the object is the runtime entity that occupies it.</p>
+<p><img alt="Compile-time symbols and runtime objects" src="../../assets/labs/w9/name-object-memory.svg" /></p>
+<p><em>Figure 1: At compile time, an identifier is resolved to symbol information. At runtime, a storage location gives access to the <code>int</code> object named <code>y</code>. The address is illustrative.</em></p>
+<p>This diagram uses a simple memory model to make the idea concrete. It does not imply that every source-language variable must occupy a separate physical memory location after optimization. We will first focus on the behavior required by the source program, then consider how the compiler represents it.</p>
+<p>What does an object actually hold? This brings us to a <strong>value</strong>. After <code>y = 3;</code>, the object named <code>y</code> holds the value <code>3</code>. Values do not always have to be read from variable objects, though: in <code>y + 1</code>, the <strong>integer constant</strong> <code>1</code> appears directly in the source code, and the addition produces a new value, <code>4</code>.</p>
+<p>Thus, <strong>an object is an entity that holds a value; a value is data that a computation can read, use, pass along, or produce</strong>. This explains the difference between <code>y</code> and <code>3</code>: <code>y</code> can designate an object whose contents may change, whereas <code>3</code> directly represents an integer value.</p>
+<p>One question remains: how does the compiler know what the data in an object means and which operations are valid on it? The answer is its <strong>type</strong>.</p>
+<p>We encountered type checking in W6/W7. Now consider it from the perspective of execution. A declaration such as <code>int y;</code> tells us that <code>y</code> is an integer object, so an integer value read from it can be added to another integer. By contrast, <code>p</code> below is a structure object:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Point</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">};</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">Point</span><span class="w"> </span><span class="n">p</span><span class="p">;</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="n">p</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="n">p</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">y</span><span class="p">;</span><span class="w">  </span><span class="c1">// Valid: adding two int members.</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="c1">// p + 1;             // Invalid: a Point is not an integer.</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">sum</span><span class="p">;</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="p">}</span>
+</code></pre></div>
+<p>The type <code>struct Point</code> tells the compiler that <code>p</code> contains two <code>int</code> members. The expression <code>p.x</code> designates one of those integer members, and <code>p.x + p.y</code> performs integer addition. Having integers inside <code>p</code> does not make the whole structure an integer that can be added to <code>1</code>.</p>
+<p>These examples show that <strong>a type determines how to interpret an object's data and which operations are permitted on it</strong>. For composite types such as arrays and structures, it also describes the object's components. The checks we performed during semantic analysis therefore have a concrete purpose: they ensure that runtime operations make sense under the language's rules.</p>
+<details class="info">
+<summary>Further Reading: How Can the Same Bits Have Different Meanings?</summary>
+<p>Computers ultimately store information as binary data made up of <code>0</code>s and <code>1</code>s. Suppose a storage unit contains the eight bits <code>01000001</code>. Interpreted as an unsigned integer, they represent the decimal number <code>65</code>. Interpreted using ASCII, the same bits represent the character <code>'A'</code>.</p>
+<p><strong>The bits have not changed; the rules for interpreting them have.</strong> A sequence of bits alone is therefore not enough: we also need to know the type and representation rules used to interpret it.</p>
+<p>This example borrows character notation from C. The current SPL language does not include <code>char</code>, and you do not need to learn the language rules for character types here.</p>
+</details>
+<p>We can now connect objects, values, and types: <code>y</code> designates an object of type <code>int</code>; that object currently holds the integer value <code>3</code>; and <code>y + 1</code> reads that value and performs integer addition. Yet in the full assignment <code>x = y + 1;</code>, the right side needs <strong>the value of <code>y</code></strong>, while the left side needs <strong>a destination for writing to <code>x</code></strong>. Knowing that both <code>x</code> and <code>y + 1</code> have type <code>int</code> still does not explain this distinction.</p>
+<h2 id="when-does-an-expression-need-an-object-and-when-does-it-need-a-value">When Does an Expression Need an Object, and When Does It Need a Value?<a class="headerlink" href="#when-does-an-expression-need-an-object-and-when-does-it-need-a-value" title="Permanent link">&para;</a></h2>
+<p>We often think of “evaluating an expression” as calculating a number. Expressions can do more than that: <code>y + 1</code> computes an integer value, <code>y</code> designates a variable object, and <code>x = y + 1</code> changes the contents of <code>x</code>. This also matches the C standard's description of an expression: it can compute a value, designate an object or function, or produce side effects.</p>
+<p>Compare <code>y</code> with <code>y + 1</code>. If <code>y</code> has type <code>int</code>, both expressions have type <code>int</code>, but only <code>y</code> designates a particular object. In other words, <strong>a type tells us what kind of data an expression involves, but does not tell us whether the expression designates an object or simply produces a result</strong>. To describe that distinction, we need a <strong>value category</strong>.</p>
+<p>In C, <strong>an expression that designates an object is called an lvalue expression</strong>. The name has a historical connection to the left side of assignment, which usually needs a target that can accept a write. However, an expression's category does not depend on <em>which side it happens to appear on</em>. For example, <code>y</code> is still an lvalue expression on the right side of <code>x = y;</code>. Other typical lvalues include <code>a[i]</code>, which designates an array element, and <code>p.x</code>, which designates a member of the structure object <code>p</code>.</p>
+<p>By contrast, an integer constant such as <code>3</code> or an arithmetic expression such as <code>y + 1</code> <strong>provides a value without designating such an object</strong>. These are commonly called <strong>rvalue expressions</strong>.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Expression</th>
+<th style="text-align: left;">Value category</th>
+<th style="text-align: left;">Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>y</code>, <code>(y)</code></td>
+<td style="text-align: left;">Lvalue</td>
+<td style="text-align: left;">Designates the object named <code>y</code>; parentheses do not change the category.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>a[i]</code>, <code>p.x</code></td>
+<td style="text-align: left;">Lvalue</td>
+<td style="text-align: left;">Designates an array element or a structure member.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>3</code></td>
+<td style="text-align: left;">Rvalue</td>
+<td style="text-align: left;">Directly provides an integer value.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>y + 1</code>, <code>y &lt; 10</code></td>
+<td style="text-align: left;">Rvalue</td>
+<td style="text-align: left;">Produces a computed result rather than designating an object to write to.</td>
+</tr>
+</tbody>
+</table>
+<p>In our simple memory model, <strong>determining which object an lvalue designates</strong> can often be understood as finding its storage location. An lvalue is nevertheless <strong>a semantic category of an expression</strong>, not a numerical memory address.</p>
+<h3 id="reading-a-value-from-an-object-lvalue-conversion">Reading a Value from an Object: Lvalue Conversion<a class="headerlink" href="#reading-a-value-from-an-object-lvalue-conversion" title="Permanent link">&para;</a></h3>
+<p>The expression <code>y</code> designates an object, but the addition in <code>y + 1</code> needs an integer value. How do we bridge that gap? We <strong>read the value currently stored in the object designated by <code>y</code></strong>.</p>
+<p>In C, for ordinary non-array lvalues, this process is called <strong>lvalue conversion</strong>. When a context needs a value, the lvalue is converted to the value stored in the object it designates. <strong>The result of the conversion is no longer an lvalue; it is a value available for further computation, which we can think of as an rvalue.</strong> For example, evaluating <code>y + 1</code> after <code>y = 3;</code> first reads <code>3</code> from <code>y</code>, then adds the constant <code>1</code>.</p>
+<p>The distinction to keep in mind is that <strong>the expression <code>y</code> itself is an lvalue</strong>. Appearing on the right side of an assignment does not reclassify it. Lvalue conversion takes place because the addition needs its stored value. On the left side, <code>x</code> supplies the assignment's destination, so there is no need to read its old value first.</p>
+<p>The following two examples illustrate how context determines what is needed.</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1: <code>x = x + 1</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>In the last line, <code>x</code> appears twice. <strong>Both occurrences are lvalue expressions</strong>, and both designate the same variable object.</p>
+<p>Their contexts, however, require different things.</p>
+<p>The <code>x</code> on the right is an operand of <code>x + 1</code>. Addition needs an integer <strong>value</strong>, so we read the current value, <code>3</code>, from the object it designates:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>x
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>↓
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Designate object x
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>↓
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>Lvalue conversion
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>↓
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>Read value 3
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>↓
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>3 + 1
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>↓
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>Produce value 4
+</code></pre></div>
+<p>The <code>x</code> on the left is the assignment target. It must continue to designate the object so that the result, <code>4</code>, can be written there. <strong>Its old value does not need to be read first.</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>x = x + 1
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>↑   ↑
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>│   └── Read the old value from the object
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>│
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>└────── Write the new value back to the same object
+</code></pre></div>
+<p><strong>The read and the write access the same object, not two different objects named <code>x</code>.</strong></p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2: <code>return x</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+</code></pre></div>
+<p>The <code>return</code> statement needs an <strong>integer value</strong> to pass back to the caller. Even though there is no assignment operator here, <code>x</code> still needs to yield the value currently stored in its object: <code>3</code>.</p>
+<p>This also requires <strong>lvalue conversion</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>x
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>↓
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>Designate object x
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>↓
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>Lvalue conversion
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>↓
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>Read value 3
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>↓
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>return 3
+</code></pre></div>
+<p><strong>Lvalue conversion depends on whether the context needs an object or a value, not on whether the expression appears to the left or right of an assignment operator.</strong></p>
+</div>
+<p>The name <strong>lvalue conversion</strong> describes the shift in what we need from an expression. An lvalue expression <strong>designates an object</strong>. When its context needs the stored value, the conversion <strong>reads that value</strong>. Our focus shifts from <strong>which object this is</strong> to <strong>what value it currently holds</strong>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Lvalue: designate an object
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>        ↓
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Lvalue conversion
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        ↓
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>Value: read the object's stored value
+</code></pre></div>
+<p>This is often described as a shift from “lvalue semantics” to “rvalue semantics.” More precisely, <strong>the lvalue is converted to the value stored in its designated object, and the conversion result no longer has the original lvalue property</strong>. The essential operation is obtaining the stored value, rather than simply attaching a different category label to the expression.</p>
+<p>This distinction also explains why the following assignment is invalid:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+</code></pre></div>
+<p>The expression <code>x + 1</code> computes an integer value, but that result does not designate an object that can receive a write. It therefore cannot be the left operand of assignment.</p>
+<p>We need one further distinction: <strong>designating an object does not necessarily mean that the object can be modified through that expression</strong>. C therefore defines the concept of a <strong>modifiable lvalue</strong>.</p>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+</code></pre></div>
+<p>Here, <code>x</code> is both an lvalue and a modifiable lvalue, so it can be an assignment target.</p>
+<p>Now consider a variable qualified with <code>const</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">  </span><span class="c1">// Error</span>
+</code></pre></div>
+<p>The expression <code>x</code> still designates a particular object, so it is still an <strong>lvalue</strong>. However, the object cannot be modified through this expression, so <code>x</code> is <strong>not a modifiable lvalue</strong>.</p>
+<p>Arrays provide another example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w">  </span><span class="c1">// Error</span>
+</code></pre></div>
+<p>The array expression <code>a</code> designates an array object and is an lvalue. In C, however, arrays are not modifiable lvalues: an ordinary assignment operator cannot assign an entire array.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Expression</th>
+<th style="text-align: center;">Lvalue?</th>
+<th style="text-align: center;">Modifiable lvalue?</th>
+<th style="text-align: center;">Valid target of ordinary assignment?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">An ordinary variable <code>x</code></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>x</code> declared as <code>const int x</code></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+</tr>
+<tr>
+<td style="text-align: left;">An array <code>a</code></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>x + 1</code></td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">What About SPL?</p>
+<p>The current SPL language <strong>does not have a <code>const</code> qualifier</strong>, so it has no lvalues that become non-modifiable specifically because of <code>const</code>.</p>
+<p>The distinction between an <strong>lvalue</strong> and a <strong>modifiable lvalue</strong> is still useful. Whether an expression can serve as an assignment target ultimately depends on the language's assignment rules for that expression and its type.</p>
+</div>
+<h3 id="beyond-simple-variables-arrays-and-structures">Beyond Simple Variables: Arrays and Structures<a class="headerlink" href="#beyond-simple-variables-arrays-and-structures" title="Permanent link">&para;</a></h3>
+<p>Locating the object designated by a simple variable such as <code>x</code> is easy to picture. With <code>a[i]</code> or <code>p.x</code>, we must also determine <strong>which part of the larger object we want to access</strong>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>In the last line, <code>a[1]</code> on the right first designates the element at index 1. We then read its current value, <code>3</code>, and compute <code>4</code>. On the left, <code>a[2]</code> designates the element at index 2, where we write that result. <strong>Both sides require locating an element, but only the right side also requires reading its previous value.</strong></p>
+<p><img alt="Reading and writing array elements" src="../../assets/labs/w9/array-read-write.svg" /></p>
+<p><em>Figure 2: The value of <code>a[1]</code> is used in the computation, and the result is written to <code>a[2]</code>. The addresses are illustrative, and the diagram shows the state after the assignment.</em></p>
+<p>Similarly, <code>p.x</code> requires identifying the structure object <code>p</code> and then its member <code>x</code>. For <code>p.x = 3;</code>, we locate the member and write to it. For <code>return p.x;</code>, we locate the member and then read its stored value.</p>
+<p>We have now separated assignment into several operations: <strong>locating an object, reading a value, performing a computation, and writing the result</strong>. This raises another question: does evaluating an expression merely produce a result, or can it also change the program's state?</p>
+<h2 id="beyond-the-result-side-effects-and-evaluation-order">Beyond the Result: Side Effects and Evaluation Order<a class="headerlink" href="#beyond-the-result-side-effects-and-evaluation-order" title="Permanent link">&para;</a></h2>
+<p>Compare <code>x + 1;</code> with <code>x = x + 1;</code>. Both perform integer addition, but the latter also writes a new value back to <code>x</code>, changing the object's contents. An effect on program state during expression evaluation is called a <strong>side effect</strong>. In real programs, side effects can also include effects on the external environment, such as I/O.</p>
+<p>Why must a compiler track them? Consider these two expression statements:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">foo</span><span class="p">();</span>
+</code></pre></div>
+<p>The first produces an unused result and has no other effect, so the compiler can usually omit it. The second cannot be removed simply because its return value is ignored: <code>foo()</code> might modify data or perform I/O. <strong>A compiler must understand both the result an expression computes and the effects of evaluating it.</strong></p>
+<p>This leads to a related question: <strong>when an expression has several subexpressions, what determines their evaluation order?</strong></p>
+<p>We have already discussed operator precedence. For example, <code>a + b * c</code> groups as <code>a + (b * c)</code>, making the multiplication result an operand of addition. That determines <strong>grouping</strong>, but the syntax tree alone does not tell us whether <code>a</code> must be read before the values of <code>b</code> and <code>c</code>. <strong>Grouping and evaluation order are different</strong>: grouping determines the structure of the computation, while evaluation order governs when the computations and side effects occur relative to one another.</p>
+<p>To see why order matters, consider this <strong>C example, which is not SPL code</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="o">++</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">);</span>
+</code></pre></div>
+<p>The expression <code>x++</code> produces the old value of <code>x</code> and has the side effect of incrementing <code>x</code>. Which value does the second argument, <code>x</code>, read? The positions of the arguments do not answer that question. Under C's evaluation rules, there is no sequencing guarantee between the relevant evaluations of these two arguments. The modification of <code>x</code> and the computation that reads <code>x</code> are <strong>unsequenced</strong>, so this call has <strong>undefined behavior</strong> in C. It does not simply choose between two otherwise valid outcomes.</p>
+<p>C uses the relation <strong>sequenced before</strong> to express ordering constraints between evaluations. If A <em>is sequenced before</em> B, the relevant evaluation of A must precede B. These language-level guarantees let the compiler determine which evaluations can be reordered and which must retain their order.</p>
+<div class="admonition note">
+<p class="admonition-title">Further Reading: Sequenced Before, Undefined Behavior, and Optimization</p>
+<p>In the C standard, <em>sequenced before</em> is a <strong>partial order</strong>. It does not require every subexpression to be evaluated from left to right. If a modification of a scalar object is unsequenced relative to another modification of that object, or to a value computation that reads it, the behavior is undefined in C.</p>
+<p><strong>Signed integer overflow</strong> is another common example of undefined behavior in C. Undefined behavior does not mean that a program must crash; it means that the language standard imposes no requirement for a particular outcome in that case. Optimizations must preserve the behavior guaranteed by the language, so a compiler can use assumptions that hold for programs with defined behavior. You can experiment with different optimization levels in <a href="https://godbolt.org/">Compiler Explorer</a>.</p>
+<p>A language may also specify whether a subexpression is evaluated at all. For example, C uses <strong>short-circuit evaluation</strong> for <code>A &amp;&amp; B</code>: it evaluates <code>A</code> first and skips <code>B</code> if <code>A</code> is false.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kt">int</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="mi">10</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</code></pre></div>
+<p>Since <code>x != 0</code> is false, <code>10 / x</code> is never evaluated, so no division by zero occurs here. Some expressions therefore need to do more than compute values: <strong>they also determine whether another part of the code executes</strong>. We will return to this when translating control flow.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Keeping C and SPL Separate</p>
+<p>The examples involving <code>x++</code>, C's argument evaluation order, undefined behavior, and short-circuit rules illustrate <strong>how language semantics constrain code generation and optimization</strong>. The current SPL language does not support <code>++</code>. Whether SPL provides the same evaluation-order or short-circuit guarantees must be determined from SPL's own language specification.</p>
+</div>
+<h2 id="how-can-we-represent-these-operations">How Can We Represent These Operations?<a class="headerlink" href="#how-can-we-represent-these-operations" title="Permanent link">&para;</a></h2>
+<p>Return to <code>x = y + 1;</code>. We can now describe its behavior precisely: <code>y</code> designates an object, and its context requires reading the integer value stored there; addition produces a new value; <code>x</code> designates the destination; and assignment changes the contents of that object. A simple source-language expression implicitly involves <strong>locating objects, reading, computing, and writing</strong>.</p>
+<p>To generate code, the compiler needs more than a prose description. It needs an <strong>intermediate representation (IR)</strong> that makes these operations explicit. In the next lab, we will introduce LLVM IR and see how a simple implementation uses <code>load</code> for reading, <code>add</code> for addition, and <code>store</code> for writing. Later, we will cover address calculations for arrays and structures, along with control-flow representations for conditional branches and loops.</p>
+<p><strong>This lab bridges the gap between checking that a program is valid and translating it: what operations does evaluating an expression require?</strong> Understanding those semantics gives each IR instruction a clear purpose.</p>
+<h2 id="in-class-exercises">In-Class Exercises<a class="headerlink" href="#in-class-exercises" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Exercise 1: Why Does the Same Variable Name Appear Twice?</p>
+<p>Consider:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+</code></pre></div>
+<p>In the last line, explain what is needed from each occurrence of <code>x</code> and from <code>y</code>: an object or a value? Which objects must be read, and which object receives the final write?</p>
+</div>
+<!-- ??? success "Suggested Analysis"
+
+    The right-hand occurrences of `x` and `y` must yield their stored values, `2` and `5`. The addition produces `7`. The left-hand `x` designates the destination, so `7` is written into the original object named `x`. The statement therefore reads two objects and writes to one. -->
+
+<div class="admonition question">
+<p class="admonition-title">Exercise 2: Trace the Operations in Each Expression</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">    </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">    </span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="p">}</span>
+</code></pre></div>
+<p>Analyze each assignment statement in execution order. Which expressions require locating an object? Which require reading a stored value? Which operations modify an object's contents? Finally, why does <code>return x</code> need to read a value without writing anything to <code>x</code>?</p>
+</div>
+<!-- ??? success "Suggested Analysis"
+
+    - `a[1] = 3`: Locate `a[1]` and write the constant `3` into it.
+    - `x = a[1]`: Read `3` from `a[1]` and write it into `x`.
+    - `a[2] = x + 1`: Read `3` from `x`, add `1` to produce `4`, and write it into `a[2]`.
+    - `x = a[2] + x`: Read `4` from `a[2]` and `3` from `x`, add them to produce `7`, and write it into `x`.
+    - `return x`: Read `7` from `x` and return it, without writing a new value into `x`. -->
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-copyright">
+    <div class="md-copyright__highlight">
+        commit: 
+        <a href="/commit/7177ac3f, 2026-11-14 16:28:52+08:00" target="_blank" rel="noopener">
+            7177ac3f, 2026-11-14 16:28:52+08:00
+        </a>
+    </div>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.path", "navigation.tabs", "navigation.tabs.sticky"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>

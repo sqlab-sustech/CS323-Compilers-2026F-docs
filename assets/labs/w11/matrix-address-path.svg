@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="700" viewBox="0 0 1180 700">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#536579"/>
+    </marker>
+    <style>
+      text { font-family: "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", sans-serif; fill: #172b4d; }
+      .title { font-size: 27px; font-weight: 700; }
+      .label { font-size: 19px; font-weight: 600; }
+      .small { font-size: 16px; fill: #536579; }
+      .tiny { font-size: 14px; fill: #536579; }
+      .struct { fill: #f1e9f8; stroke: #8b6aa7; stroke-width: 2.5; }
+      .scalar { fill: #e7f0ff; stroke: #4c78b8; stroke-width: 2; }
+      .array { fill: #e8f2ff; stroke: #4c78b8; stroke-width: 2; }
+      .target { fill: #e4f5ec; stroke: #16845b; stroke-width: 3; }
+      .line { stroke: #536579; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="1178" height="698" rx="18" fill="#ffffff" stroke="#d6dee8" stroke-width="2"/>
+  <text x="590" y="45" text-anchor="middle" class="title">Matrix 对象：普通字段与嵌套二维数组</text>
+  <text x="590" y="78" text-anchor="middle" class="small">%struct.Matrix = type { i32, i32, [2 x [3 x i32]], i32 }</text>
+
+  <rect x="60" y="112" width="1060" height="520" rx="18" class="struct"/>
+  <text x="90" y="151" class="label">struct Matrix 对象（%m.addr）</text>
+
+  <rect x="100" y="180" width="220" height="82" rx="10" class="scalar"/>
+  <text x="210" y="214" text-anchor="middle" class="label">字段 0：rows</text>
+  <text x="210" y="241" text-anchor="middle" class="small">i32</text>
+
+  <rect x="340" y="180" width="220" height="82" rx="10" class="scalar"/>
+  <text x="450" y="214" text-anchor="middle" class="label">字段 1：cols</text>
+  <text x="450" y="241" text-anchor="middle" class="small">i32</text>
+
+  <rect x="100" y="295" width="900" height="270" rx="12" class="array"/>
+  <text x="130" y="330" class="label">字段 2：cells — [2 x [3 x i32]]</text>
+  <text x="130" y="355" class="tiny">GEP 的结构体字段索引为 i32 2；随后继续选择数组行和列</text>
+
+  <text x="145" y="416" class="label">cells[0]</text>
+  <rect x="260" y="378" width="190" height="66" rx="8" class="scalar"/>
+  <rect x="470" y="378" width="190" height="66" rx="8" class="scalar"/>
+  <rect x="680" y="378" width="190" height="66" rx="8" class="scalar"/>
+  <text x="355" y="418" text-anchor="middle" class="label">[0]</text>
+  <text x="565" y="418" text-anchor="middle" class="label">[1]</text>
+  <text x="775" y="418" text-anchor="middle" class="label">[2]</text>
+
+  <text x="145" y="520" class="label">cells[1]</text>
+  <rect x="260" y="478" width="190" height="66" rx="8" class="scalar"/>
+  <rect x="470" y="478" width="190" height="66" rx="8" class="scalar"/>
+  <rect x="680" y="478" width="190" height="66" rx="8" class="target"/>
+  <text x="355" y="518" text-anchor="middle" class="label">[0]</text>
+  <text x="565" y="518" text-anchor="middle" class="label">[1]</text>
+  <text x="775" y="510" text-anchor="middle" class="label">[2]</text>
+  <text x="775" y="534" text-anchor="middle" class="tiny">目标元素</text>
+
+  <rect x="1020" y="295" width="75" height="270" rx="10" class="scalar"/>
+  <text x="1057" y="408" text-anchor="middle" class="label">字段</text>
+  <text x="1057" y="435" text-anchor="middle" class="label">3</text>
+  <text x="1057" y="470" text-anchor="middle" class="small">version</text>
+  <text x="1057" y="496" text-anchor="middle" class="tiny">i32</text>
+
+  <rect x="75" y="650" width="1030" height="34" rx="8" fill="#fff7e9" stroke="#c89a54" stroke-width="1.5"/>
+  <text x="590" y="673" text-anchor="middle" class="small">i64 0：当前 Matrix 对象 → i32 2：字段 cells → i64 1：第 2 行 → i64 2：第 3 列</text>
+</svg>

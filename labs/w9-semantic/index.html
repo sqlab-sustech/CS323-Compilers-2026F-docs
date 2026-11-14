@@ -1,0 +1,1252 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/labs/w9-semantic/">
+      
+      
+        <link rel="prev" href="../w7-semantic/">
+      
+      
+        <link rel="next" href="../../env/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+    
+    
+      
+        <title>Week 9 - Semantic Part 3 - Expression - 编译原理 实验文档</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="编译原理 实验文档" class="md-header__button md-logo" aria-label="编译原理 实验文档" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            编译原理 实验文档
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Week 9 - Semantic Part 3 - Expression
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../en/labs/w9-semantic/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  主页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../w1-intro/" class="md-tabs__link">
+          
+  
+  每周 Lab
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../env/" class="md-tabs__link">
+          
+  
+  环境配置
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="编译原理 实验文档" class="md-nav__button md-logo" aria-label="编译原理 实验文档" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    编译原理 实验文档
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    每周 Lab
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            每周 Lab
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w1-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 1 - Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w2-lex_p1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 2 - Lexer 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w3-lex_p2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 3 - Lexer 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w4-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 4 - Parser 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w5-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 5 - Parser 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w6-symbol/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 7 - Semantic Part 1 - Symbol Table
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w7-semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 8 - Semantic Part 2 - Type Checking
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Week 9 - Semantic Part 3 - Expression
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Week 9 - Semantic Part 3 - Expression
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      从名字，到对象，再到值
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      表达式何时需要对象，何时需要值？
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="表达式何时需要对象，何时需要值？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lvalue-conversion" class="md-nav__link">
+    <span class="md-ellipsis">
+      从对象取得值：Lvalue Conversion
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      从简单变量到数组和结构体
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      计算结果之外：副作用与求值顺序
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      接下来，怎么把这些行为表示出来？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      课堂练习
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    环境配置
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            环境配置
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Linux VM 搭建
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Linux VM 搭建
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/wsl/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows WSL
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/macos-native/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    macOS 原生环境
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      从名字，到对象，再到值
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      表达式何时需要对象，何时需要值？
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="表达式何时需要对象，何时需要值？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lvalue-conversion" class="md-nav__link">
+    <span class="md-ellipsis">
+      从对象取得值：Lvalue Conversion
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      从简单变量到数组和结构体
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      计算结果之外：副作用与求值顺序
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      接下来，怎么把这些行为表示出来？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      课堂练习
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="_1">从语义到执行：一个表达式究竟做了什么？<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>在前面的 Lab 中，我们已经学习了符号表、作用域和语义分析。现在，对于下面的程序，编译器能够确定 <code>x</code> 和 <code>y</code> 分别对应哪一个声明，知道它们的类型都是 <code>int</code>，也能够判断加法和赋值在语义上是否合法。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>但知道程序合法，还不等于知道它应当怎样执行。</strong> 我们先不引入任何新概念，只看 <code>x = y + 1;</code> 最直观的执行过程：</p>
+<ol>
+<li>取得 <code>y</code> 当前保存的值 <code>3</code>；</li>
+<li>将 <code>3</code> 与常量 <code>1</code> 相加，得到 <code>4</code>；</li>
+<li>将结果 <code>4</code> 写入 <code>x</code>。</li>
+</ol>
+<p>这个过程 <strong>读取了 <code>y</code>，但没有读取 <code>x</code> 原来保存的内容</strong> 。为什么同样是变量名，有时我们需要它保存的数字，有时却需要找到一个可以写入的位置？</p>
+<p>这是本节课要回答的问题，也是我们从语义分析走向代码生成必须补上的一环。前两周回答的是 <strong>变量是谁、表达式是什么类型、程序是否合法</strong> ；而接下来要生成代码，编译器还必须弄清楚 <strong>程序运行时需要读取什么、计算什么、写入什么</strong> 。本节课先把这些行为解释清楚，下一节再学习怎样用 LLVM IR 将它们表示出来。</p>
+<h2 id="_2">从名字，到对象，再到值<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>先看 <code>y = 3;</code>。在名称解析（Name Resolution）阶段，源代码中的 <code>y</code> 是一个 <strong>Identifier（标识符）</strong>。编译器通过符号表找到它对应的声明，并使用 <code>VariableSymbol</code> 等结构记录名称、类型等信息。<strong>但 <code>VariableSymbol</code> 是编译器在编译时使用的数据结构，并不是程序运行时保存整数 <code>3</code> 的地方。</strong></p>
+<p>为了描述程序的执行，我们还需要 <strong>Object（对象）</strong> 这个概念。这里的 Object 不是 Java 等面向对象语言中的实例。对于现在讨论的简单变量，可以先把它理解为：<strong>程序运行时，一个具有确定身份、类型，并能保存数据的存储单元</strong>。例如，<code>int y;</code> 声明了一个 <code>int</code> 类型的变量对象；执行 <code>y = 3;</code>，便使这个对象当前保存的值成为 <code>3</code>。以后再修改 <code>y</code>，变的是它保存的值，而不是我们所指的那个变量对象。</p>
+<p>所以，在现阶段，我们完全可以用三个信息来理解一个简单的对象：<strong>它是哪一个对象、它是什么类型、它当前保存什么值</strong>。在采用内存的实现中，对象还对应一块存储区域，我们可以通过地址定位它。不过，<strong>对象本身不等于地址</strong>：地址只是帮助我们找到存储区域的位置，而对象是那块区域所承载的运行时实体。</p>
+<p><img alt="编译时符号与运行时对象" src="../../assets/labs/w9/name-object-memory.png" /></p>
+<p><em>图 1：编译时由标识符找到符号信息；运行时通过存储位置访问 <code>y</code> 对应的 <code>int</code> 对象。图中的地址仅用于示意。</em></p>
+<p>这里的图采用的是便于理解的内存模型，并不是说优化后的每个源语言变量都必须占据一个独立的物理内存单元。我们现在先关心源程序规定了什么行为，再讨论编译器实际采用怎样的表示。</p>
+<p>既然对象能够保存数据，那么它所保存的究竟是什么？这就引出了 <strong>Value（值）</strong> 。例如在 <code>y = 3;</code> 之后，<code>y</code> 对象当前保存的值是 <code>3</code>。但值不一定都要从一个变量对象中读取：在 <code>y + 1</code> 中，<code>1</code> 是直接写在源代码中的 <strong>整数常量</strong> ，而加法又会计算出一个新的值 <code>4</code>。</p>
+<p>因此，<strong>对象是保存值的实体，而值是计算时能够被读取、使用、传递或者产生的数据</strong>。这解释了为什么 <code>y</code> 和 <code>3</code> 不是同一回事：<code>y</code> 可以指定一个对象，那个对象的内容可能变化；<code>3</code> 则直接表示一个整数值。</p>
+<p>到这里还少一个问题：如果对象里保存的是数据，编译器凭什么知道这些数据代表什么、又能做什么操作？答案是它的 <strong>Type（类型）</strong> 。</p>
+<p>我们在 W6/W7 已经接触过类型检查，现在可以从运行时的角度再看它。例如 <code>int y;</code> 表示 <code>y</code> 是一个整数类型的对象，因此，从它取得的整数值可以与另一个整数值进行 <code>+</code> 运算。相反，下面的 <code>p</code> 是一个结构体对象：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Point</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">};</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">Point</span><span class="w"> </span><span class="n">p</span><span class="p">;</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="n">p</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="n">p</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">y</span><span class="p">;</span><span class="w">  </span><span class="c1">// 合法：两个 int 成员相加</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="c1">// p + 1;             // 非法：Point 不是整数，不能直接这样相加</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">sum</span><span class="p">;</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="p">}</span>
+</code></pre></div>
+<p>对于 <code>p</code>，类型 <code>struct Point</code> 告诉编译器：这是一个由两个 <code>int</code> 成员组成的对象。因此，<code>p.x</code> 能指定其中的一个整数成员；<code>p.x + p.y</code> 可以执行整数加法，但不能因为 <code>p</code> 内部有整数，就把整个结构体当成一个整数与 <code>1</code> 相加。</p>
+<p>从这两个例子可以看出，<strong>Type 决定了我们怎样理解对象中的数据，以及允许对它执行哪些操作</strong>；对于数组、结构体这样的复合类型，类型还描述了对象内部由哪些部分构成。我们此前在语义分析中检查加法是否合法，现在也就明白了：检查并非凭空设立的限制，而是为了确保程序运行时执行的是有意义、符合语言定义的操作。</p>
+<details class="info">
+<summary>补充：为什么相同的二进制数据可能有不同含义？</summary>
+<p>计算机最终用由 <code>0</code> 和 <code>1</code> 组成的二进制数据保存信息。假如某个存储单元中的八位数据是 <code>01000001</code>，按照无符号整数的规则解释，它是十进制的 <code>65</code>；如果按照 ASCII 字符编码解释，同样的数据可以表示字符 <code>'A'</code>。</p>
+<p><strong>二进制数据没有变，变的是解释它的规则。</strong> 这正好说明了为什么仅有一串数据还不够，我们还需要知道应该按照什么类型和表示规则理解它。</p>
+<p>这里借用了 C 语言的字符示例；当前 SPL 不包含 <code>char</code> 类型，不要求掌握字符类型的语言规则。
+现在，Object、Value 和 Type 就连到了一起：<code>y</code> 指定一个 <code>int</code> 类型的对象；对象当前保存整数值 <code>3</code>；表达式 <code>y + 1</code> 需要取得这个值，再执行整数加法。但回到完整赋值 <code>x = y + 1;</code>，右侧要的是 <strong><code>y</code> 的值</strong>，左侧要的却是 <strong><code>x</code> 所在的写入位置</strong>。仅仅知道 <code>x</code> 与 <code>y + 1</code> 都具有 <code>int</code> 类型，仍然不能解释这种区别。</p>
+</details>
+<h2 id="_3">表达式何时需要对象，何时需要值？<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>我们平时说“对表达式求值”，容易把它理解成“算出一个数字”。实际上，表达式可以做不止一件事：例如 <code>y + 1</code> 计算出整数值，<code>y</code> 能指定一个变量对象，<code>x = y + 1</code> 还会修改 <code>x</code> 所保存的内容。这也与 C 语言标准对 Expression 的描述一致：表达式可以计算值、指定对象或函数，或者产生副作用。</p>
+<p>现在比较 <code>y</code> 与 <code>y + 1</code>。假设 <code>y</code> 的类型是 <code>int</code>，这两个表达式的类型就都是 <code>int</code>，但只有前者能够指定一个确定的对象。也就是说，<strong>Type 回答的是“这是什么类型”，却不负责回答“这个表达式指定对象，还是只给出一个计算结果”</strong>。为了描述后一种区别，我们还需要 <strong>Value Category（值类别）</strong>。</p>
+<p>在 C 语言中，<strong>能够指定某个对象的表达式称为 Lvalue（左值）表达式</strong>。这个名称有历史原因：赋值通常需要在等号左边放一个能够接受写入的目标。但这并不是根据表达式 <em>当前写在哪一侧</em> 来分类的。比如 <code>y</code> 在 <code>x = y;</code> 的右侧，依然是左值表达式。<code>a[i]</code> 可以指定数组中的某个元素，<code>p.x</code> 可以指定结构体对象 <code>p</code> 中的成员，它们也是典型的左值表达式。</p>
+<p>与之相对，整数常量 <code>3</code>、算术表达式 <code>y + 1</code> 等 <strong>提供计算值，而不指定这样的对象</strong> ，通常称为 <strong>Rvalue（右值）表达式</strong>。两者可以对照理解：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">表达式</th>
+<th style="text-align: left;">值类别</th>
+<th style="text-align: left;">原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>y</code>、<code>(y)</code></td>
+<td style="text-align: left;">Lvalue</td>
+<td style="text-align: left;">指定变量<code>y</code> 对应的对象；括号不改变类别</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>a[i]</code>、<code>p.x</code></td>
+<td style="text-align: left;">Lvalue</td>
+<td style="text-align: left;">指定数组元素或结构体成员对象</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>3</code></td>
+<td style="text-align: left;">Rvalue</td>
+<td style="text-align: left;">直接提供整数值</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>y + 1</code>、<code>y &lt; 10</code></td>
+<td style="text-align: left;">Rvalue</td>
+<td style="text-align: left;">产生计算结果，而不指定可写入对象</td>
+</tr>
+</tbody>
+</table>
+<p>在我们现在使用的简单内存模型中，<strong>计算一个左值所指定的对象</strong> ，常常可以直观地理解为“找到它的存储位置”。不过左值是一种 <strong>表达式的语义类别</strong> ，不是某个具体的内存地址数值。</p>
+<h3 id="lvalue-conversion">从对象取得值：Lvalue Conversion<a class="headerlink" href="#lvalue-conversion" title="Permanent link">&para;</a></h3>
+<p>这时自然会遇到一个新问题：<code>y</code> 虽然能够指定对象，但 <code>y + 1</code> 中的加法需要的是整数值，怎么办？我们已经知道答案：<strong>取得 <code>y</code> 对象当前保存的值</strong>。</p>
+<p>在 C 语言中，对于通常的非数组左值，这个从对象取得值的过程叫作 <strong>Lvalue Conversion（左值转换）</strong>。顾名思义，表达式原本具有左值语义；当它出现在需要值的上下文中时，我们取得它所指定对象的值，<strong>转换后的结果不再是左值，而是用于后续计算的值（可以直观地理解为右值）</strong>。例如 <code>y = 3;</code> 之后计算 <code>y + 1</code>，先取得 <code>y</code> 中的 <code>3</code>，再与常量 <code>1</code> 相加。</p>
+<p>这里最容易误解的一点是：<strong><code>y</code> 这个表达式本身仍然属于 Lvalue</strong>。它不是因为出现在赋值号右侧就被重新分类；发生左值转换，是因为当前的加法运算需要它所保存的值。反过来，赋值号左侧的 <code>x</code> 要提供的是写入目标，所以不必先取得 <code>x</code> 原来的值。</p>
+<p>我们可以通过两个紧挨着的例子理解这种区别：</p>
+<div class="admonition example">
+<p class="admonition-title">例 1：<code>x = x + 1</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>最后一行中，同一个变量 <code>x</code> 出现了两次，而且这两个 <code>x</code> 都是 <strong>Lvalue Expression</strong> ，都能够指定同一个变量对象。</p>
+<p>但是，它们所处的上下文不同，因此使用方式也不同。</p>
+<p>右侧的 <code>x</code> 出现在加法表达式 <code>x + 1</code> 中。加法需要的是一个整数 <strong>值</strong> ，因此需要从 <code>x</code> 所指定的对象中读取当前保存的值 <code>3</code>：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>x
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>↓
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>指定对象 x
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>↓
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>Lvalue Conversion
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>↓
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>取得值 3
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>↓
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>3 + 1
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>↓
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>得到值 4
+</code></pre></div>
+<p>左侧的 <code>x</code> 则是赋值的目标。这里需要保留 <code>x</code> “指定对象”的含义，从而将右侧计算出的 <code>4</code> 写入这个对象，因此 <strong>不需要先读取 <code>x</code> 原来保存的值</strong> 。</p>
+<p>所以：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>x = x + 1
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>↑   ↑
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>│   └── 读取同一个对象中的旧值
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>│
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>└────── 将新值写回同一个对象
+</code></pre></div>
+<p><strong>这里读取和修改的是同一个对象，并不是两个不同的 <code>x</code> 对象。</strong></p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">例 2：<code>return x</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+</code></pre></div>
+<p><code>return</code> 语句需要的是一个要返回给调用者的 <strong>整数值</strong> 。因此，虽然这里完全没有赋值运算符，表达式 <code>x</code> 仍然需要从它所指定的对象中取得当前保存的值 <code>3</code>。</p>
+<p>也就是说，这里同样会发生 <strong>Lvalue Conversion</strong> ：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>x
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>↓
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>指定对象 x
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>↓
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>Lvalue Conversion
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>↓
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>取得值 3
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>↓
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>return 3
+</code></pre></div>
+<p>这说明一个非常重要的事实：</p>
+<p><strong>是否发生 Lvalue Conversion，并不是由表达式位于赋值号左边还是右边决定的，而是取决于当前上下文需要“对象”还是“值”。</strong></p>
+</div>
+<p><strong>Lvalue Conversion</strong> 这个名字也可以这样理解：一个 Lvalue Expression 原本能够 <strong>指定一个对象</strong> ；当当前上下文需要的是该对象中保存的值时，就从这个左值所指定的对象中 <strong>取得值</strong> 。转换以后，我们关注的已经不再是 <strong>哪个对象</strong> ，而是 <strong>这个对象当前保存的值</strong> 。</p>
+<p>因此，可以直观地把它理解为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Lvalue：指定对象
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>        ↓
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Lvalue Conversion
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        ↓
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>Value：取得对象中的值
+</code></pre></div>
+<p>传统上也常把这个过程理解为从“左值语义”转向“右值语义”。不过更准确地说，关键不是简单地把一个表达式重新贴上 <code>Rvalue</code> 标签，而是：<strong>原本指定对象的左值被转换为该对象所保存的值，转换结果不再具有原来的左值属性。</strong></p>
+<p>有了这个区别，我们也能够解释为什么下面的赋值不合法：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+</code></pre></div>
+<p><code>x + 1</code> 可以计算出一个整数值，但是这个计算结果并没有指定一个可以接收写入的对象。因此，它不能作为赋值操作的左侧。</p>
+<p>不过，到这里还需要再区分一个概念：<strong>能够指定对象，并不意味着这个对象一定允许被修改。</strong></p>
+<p>因此，C 语言进一步定义了 <strong>Modifiable Lvalue（可修改左值）</strong> 。</p>
+<p>例如：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+</code></pre></div>
+<p>这里的 <code>x</code> 是 Lvalue，同时也是 Modifiable Lvalue，因此可以作为赋值目标。</p>
+<p>但如果一个变量被 <code>const</code> 修饰：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">  </span><span class="c1">// Error</span>
+</code></pre></div>
+<p><code>x</code> 仍然能够指定一个确定的对象，所以它仍然是 <strong>Lvalue</strong>；但是这个对象不允许通过该表达式修改，因此它 <strong>不是 Modifiable Lvalue</strong> 。</p>
+<p>数组也是另一个典型例子：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w">  </span><span class="c1">// Error</span>
+</code></pre></div>
+<p>数组表达式 <code>a</code> 能够指定数组对象，因此它具有左值属性；但是在 C 中，数组不是 Modifiable Lvalue，不能通过普通赋值运算符整体赋值。</p>
+<p>所以可以把这几个概念区分为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">表达式</th>
+<th style="text-align: center;">是否为 Lvalue</th>
+<th style="text-align: center;">是否为 Modifiable Lvalue</th>
+<th style="text-align: center;">能否作为普通赋值目标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">普通变量 <code>x</code></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>const int x</code> 中的 <code>x</code></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+</tr>
+<tr>
+<td style="text-align: left;">数组 <code>a</code></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>x + 1</code></td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">SPL 中的情况</p>
+<p>当前 SPL <strong>没有 <code>const</code> 限定符</strong>，因此不会出现 <code>const int x</code> 这种“由于 <code>const</code> 而成为不可修改左值”的情况。</p>
+<p>不过，区分 <strong>Lvalue</strong> 和 <strong>Modifiable Lvalue</strong> 仍然是有意义的：是否能够作为赋值目标，最终取决于语言本身对相应表达式和类型所规定的赋值规则。</p>
+</div>
+<h3 id="_4">从简单变量到数组和结构体<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>对于简单变量 <code>x</code>，定位对象容易想象。但在 <code>a[i]</code> 或 <code>p.x</code> 中，我们还需要先弄清楚：<strong>所要访问的究竟是整个对象中的哪一个部分？</strong></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+执行最后一行时，右侧的 <code>a[1]</code> 先指定数组中的第 1 号元素，再取得该元素当前的值 <code>3</code>，计算得到 <code>4</code>；左侧的 <code>a[2]</code> 则指定第 2 号元素，然后把 <code>4</code> 写进去。<strong>两边都要确定元素的位置，但只有右侧还要读取元素原来保存的值。</strong></p>
+<p><img alt="数组元素中的读取与写入" src="../../assets/labs/w9/array-read-write.png" /></p>
+<p><em>图 2：<code>a[1]</code> 的值参与计算，结果写入 <code>a[2]</code>。图中地址是示意值，展示的是赋值完成后的状态。</em></p>
+<p>类似地，<code>p.x</code> 需要先确定结构体对象 <code>p</code>，再确定其中的成员 <code>x</code>。对于 <code>p.x = 3;</code>，找到成员后写入即可；对于 <code>return p.x;</code>，找到成员后还要取得它所保存的值。</p>
+<p>至此，我们已经把赋值表达式拆解成了几种不同的行为：<strong>定位对象、取得值、执行计算、写入结果</strong>。但还有一个问题：一次表达式计算是否只会得到一个结果，还是也可能改变程序原有的状态？</p>
+<h2 id="_5">计算结果之外：副作用与求值顺序<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>比较 <code>x + 1;</code> 和 <code>x = x + 1;</code>。两者都能执行整数加法，但后一种还会把新值写回 <code>x</code>，使对象的内容改变。这种表达式求值过程中对程序状态产生的影响称为 <strong>Side Effect（副作用）</strong>。在真实程序中，副作用除了普通变量的写入，也可能包含 I/O 等对外部环境产生的效果。</p>
+<p>为什么编译器要关心它？考虑两个表达式语句：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">foo</span><span class="p">();</span>
+</code></pre></div>
+第一行的计算结果未被使用，也没有其他效果，编译器通常可以省去它。第二行即使忽略返回值，也不能因此直接删掉调用，因为 <code>foo()</code> 可能修改数据或进行 I/O。<strong>编译器不仅要知道一个表达式算出了什么，还必须知道执行它会不会改变程序状态。</strong></p>
+<p>由此又出现了一个问题：<strong>如果一个表达式包含多个子表达式，它们的执行顺序由什么决定？</strong></p>
+<p>我们以前讨论过运算符优先级。比如 <code>a + b * c</code> 按 <code>a + (b * c)</code> 组合，这说明乘法的结果是加法的一个操作数。但它只决定表达式的 <strong>Grouping（组合方式）</strong>，并没有仅凭语法树就规定必须先读取 <code>a</code>，还是先取得 <code>b</code> 和 <code>c</code> 的值。<strong>Grouping 不等于 Evaluation Order（求值顺序）</strong>：前者决定运算结构，后者决定相关计算及副作用在运行时如何先后发生。</p>
+<p>为了体会顺序为什么重要，我们借用一个 <strong>C 语言例子（不是 SPL 代码）</strong>：</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="o">++</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">);</span>
+</code></pre></div>
+<code>x++</code> 会产生修改前的值，同时产生使 <code>x</code> 加一的副作用。那么第二个参数 <code>x</code> 读取到的到底是哪一个值？这不是“参数写在左边还是右边”就能回答的问题。按照 C 的求值顺序规则，这两个参数的相关求值之间不存在先后保证；对同一个 <code>x</code> 的修改与读值计算是 <strong>Unsequenced（未排序的）</strong>，因此这个调用在 C 中会触发 <strong>Undefined Behavior（未定义行为）</strong>，而不是简单地在两个正常结果中任选一个。</p>
+<p>C 使用 <strong>Sequenced Before</strong> 描述求值之间的先后约束：如果 A <em>is sequenced before</em> B，A 的相关求值就必须先于 B 发生。语言规范只有明确了哪些行为必须先后发生，编译器才能判断哪些求值可以交换顺序、哪些不能。</p>
+<div class="admonition note">
+<p class="admonition-title">扩展：Sequenced Before、UB 与编译器优化</p>
+<p><em>Sequenced-before</em> 在 C 标准中是一种形成 <strong>偏序（Partial Order）</strong> 的关系，而不是要求所有子表达式从左到右执行。当一个标量对象上的修改与另一次对该对象的修改或读值计算之间是 unsequenced 时，会导致 C 的未定义行为。</p>
+<p>另一个典型例子是 C 中的 <strong>Signed Integer Overflow（有符号整数溢出）</strong>。所谓 UB，并不是规定程序“必然崩溃”，而是语言标准不要求它在这种情况下表现为某个特定结果。编译器优化需要维护语言所保证的行为，因此可以利用规范对有定义程序建立的前提。可在 <a href="https://godbolt.org/">Compiler Explorer</a> 中尝试不同优化级别。
+另一种情况是语言直接规定某个表达式是否会执行。例如 C 的 <strong>Short-circuit Evaluation（短路求值）</strong>：在 <code>A &amp;&amp; B</code> 中，先对 <code>A</code> 求值；若它为假，就不再计算 <code>B</code>。</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kt">int</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="mi">10</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</code></pre></div>
+由于 <code>x != 0</code> 为假，右侧的 <code>10 / x</code> 不会被执行，因此这里不会发生除以零。可见有些表达式不仅需要计算值，<strong>还需要决定下一部分代码是否执行</strong>。这会在后面的控制流翻译中再次出现。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">C 与 SPL 的边界</p>
+<p>这里的 <code>x++</code>、C 函数参数求值顺序、C 的 UB 以及短路规则，都用于展示 <strong>语言语义为什么会约束编译器的代码生成与优化</strong> 。当前 SPL 不支持 <code>++</code>；SPL 是否对求值顺序、短路执行作出同样保证，仍须以 SPL 自己的语言规范为准。</p>
+</div>
+<h2 id="_6">接下来，怎么把这些行为表示出来？<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>现在回到最初的 <code>x = y + 1;</code>。我们已经能准确描述：右侧 <code>y</code> 指定一个对象，当前上下文需要读取它的整数值；加法产生新的值；左侧 <code>x</code> 指定写入目标，赋值使这个对象保存的内容发生变化。一个简单的源语言表达式，其实隐含了 <strong>对象定位、读取、计算、写入</strong> 等不同的行为。</p>
+<p>但编译器不能停留在这一段文字说明上。为了继续完成代码生成，它需要一种可以把这些行为明确表示出来的 <strong>Intermediate Representation（中间表示，IR）</strong>。下一节我们将正式学习 LLVM IR，认识一种简单实现如何通过 <code>load</code> 表示读取、通过 <code>add</code> 表示加法、通过 <code>store</code> 表示写入；之后还会讨论数组与结构体的地址计算，以及条件分支和循环的控制流表示。</p>
+<p><strong>因此，这一节课并不是额外增加一套术语，而是在解决从“程序合法”到“程序怎样被翻译”的中间问题：表达式执行时究竟需要做什么？</strong> 只有弄清楚这些语义，后面的 IR 指令才有明确的来源。</p>
+<h2 id="_7">课堂练习<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">练习 1：同一个变量名，为什么要使用两次？</p>
+<p>已知：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+</code></pre></div>
+<p>请解释最后一行中左右两个 <code>x</code> 与 <code>y</code> 分别需要提供对象还是值；哪些对象需要被读取，最终又向哪个对象写入？</p>
+</div>
+<!-- ??? success "参考分析"
+
+    右侧 `x` 和 `y` 需要取值，分别得到 `2` 和 `5`；加法得到 `7`；左侧 `x` 指定写入目标，把 `7` 写入原来的 `x` 对象。因此这条语句涉及对两个对象取值，向一个对象写入。 -->
+<div class="admonition question">
+<p class="admonition-title">练习 2：完整的表达式执行分析</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">    </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">    </span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="p">}</span>
+</code></pre></div>
+<p>请按执行顺序分析每条赋值语句：哪些表达式需要定位对象，哪些需要从对象中取值，哪些操作会修改对象的内容？最后 <code>return x</code> 为什么只需要取得值，而不需要向 <code>x</code> 写入？</p>
+</div>
+<!-- ??? success "参考分析"
+
+    - `a[1] = 3`：定位 `a[1]`，写入常量 `3`。
+    - `x = a[1]`：读取 `a[1]` 的值 `3`，写入 `x`。
+    - `a[2] = x + 1`：读取 `x` 的值 `3`，与 `1` 相加得到 `4`，写入 `a[2]`。
+    - `x = a[2] + x`：分别读取 `a[2]` 的 `4` 和 `x` 的 `3`，相加得到 `7`，写入 `x`。
+    - `return x`：读取 `x` 的值 `7`，将它作为返回值，而不向 `x` 写入新值。 -->
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-copyright">
+    <div class="md-copyright__highlight">
+        commit: 
+        <a href="/commit/7177ac3f, 2026-11-14 16:28:52+08:00" target="_blank" rel="noopener">
+            7177ac3f, 2026-11-14 16:28:52+08:00
+        </a>
+    </div>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.path", "navigation.tabs", "navigation.tabs.sticky"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>

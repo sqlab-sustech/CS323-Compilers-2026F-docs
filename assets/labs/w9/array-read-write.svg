@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="320" viewBox="0 0 1050 320"><defs>
+ <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.2" markerHeight="5.2" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#657483"/></marker>
+ <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.2" markerHeight="5.2" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#356C92"/></marker>
+ <marker id="arrO" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.2" markerHeight="5.2" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#AB6D2B"/></marker>
+ </defs><style>text{font-family:"Noto Sans CJK SC","Microsoft YaHei",Arial,sans-serif;fill:#27313c}.small{font-size:18px}.medium{font-size:22px}.tiny{font-size:15px}.monospace{font-family:"DejaVu Sans Mono",monospace}</style>
+<rect width="1050" height="320" fill="white"/>
+<text x="185" y="38" class="small monospace" text-anchor="middle">int a[4]</text>
+<text x="92" y="78" class="tiny" fill="#637280">地址</text>
+<text x="258" y="78" class="tiny" fill="#637280">数组元素</text>
+<text x="395" y="78" class="tiny" fill="#637280">值</text>
+<text x="85" y="124" class="small monospace" fill="#677481">0x3000</text>
+<text x="85" y="173" class="small monospace" fill="#677481">0x3004</text>
+<text x="85" y="222" class="small monospace" fill="#677481">0x3008</text>
+<text x="85" y="271" class="small monospace" fill="#677481">0x300C</text>
+<g fill="none" stroke="#c0c8d0" stroke-width="1.4"><rect x="330" y="87" width="138" height="48"/><rect x="330" y="136" width="138" height="48"/><rect x="330" y="185" width="138" height="48"/><rect x="330" y="234" width="138" height="48"/></g>
+<rect x="330" y="136" width="138" height="48" fill="#eef5fa" stroke="#356C92" stroke-width="1.8"/>
+<rect x="330" y="185" width="138" height="48" fill="#fdf2e8" stroke="#AB6D2B" stroke-width="1.8"/>
+<text x="258" y="121" class="small monospace" text-anchor="middle">a[0]</text>
+<text x="258" y="170" class="small monospace" text-anchor="middle">a[1]</text>
+<text x="258" y="219" class="small monospace" text-anchor="middle">a[2]</text>
+<text x="258" y="268" class="small monospace" text-anchor="middle">a[3]</text>
+<text x="399" y="120" class="medium" text-anchor="middle" fill="#b0b8bf">?</text>
+<text x="399" y="170" class="medium monospace" font-weight="600" text-anchor="middle">3</text>
+<text x="399" y="219" class="medium monospace" font-weight="600" text-anchor="middle">4</text>
+<text x="399" y="268" class="medium" text-anchor="middle" fill="#b0b8bf">?</text>
+<path d="M 477 160 H 599" fill="none" stroke="#356C92" stroke-width="2" marker-end="url(#arrB)"/>
+<text x="535" y="149" class="tiny" text-anchor="middle" fill="#356C92">读取</text>
+<rect x="611" y="133" width="143" height="53" fill="#fafbfc" rx="3" stroke="#adb9c2" stroke-width="1.5"/>
+<text x="683" y="169" class="medium monospace" text-anchor="middle">3 + 1</text>
+<path d="M 761 160 H 813" fill="none" stroke="#657483" stroke-width="1.8" marker-end="url(#arr)"/>
+<rect x="825" y="133" width="73" height="53" fill="#fdf2e8" rx="3" stroke="#AB6D2B" stroke-width="1.6"/>
+<text x="861" y="169" class="medium monospace" text-anchor="middle" font-weight="600">4</text>
+<path d="M 862 191 V 211 H 478" fill="none" stroke="#AB6D2B" stroke-width="2" marker-end="url(#arrO)"/>
+<text x="674" y="201" class="tiny" fill="#AB6D2B" text-anchor="middle">写入</text>
+</svg>
