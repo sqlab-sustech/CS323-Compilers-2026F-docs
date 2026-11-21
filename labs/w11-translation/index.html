@@ -1,0 +1,1982 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/labs/w11-translation/">
+      
+      
+        <link rel="prev" href="../w10-runtime-llvmir/">
+      
+      
+        <link rel="next" href="../../env/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+    
+    
+      
+        <title>Week 11 - Translation 1 - 编译原理 实验文档</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#week-11-address-computation-and-gep" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="编译原理 实验文档" class="md-header__button md-logo" aria-label="编译原理 实验文档" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            编译原理 实验文档
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Week 11 - Translation 1
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../en/labs/w11-translation/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  主页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../w1-intro/" class="md-tabs__link">
+          
+  
+  每周 Lab
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../env/" class="md-tabs__link">
+          
+  
+  环境配置
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="编译原理 实验文档" class="md-nav__button md-logo" aria-label="编译原理 实验文档" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    编译原理 实验文档
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    每周 Lab
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            每周 Lab
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w1-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 1 - Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w2-lex_p1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 2 - Lexer 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w3-lex_p2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 3 - Lexer 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w4-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 4 - Parser 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w5-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 5 - Parser 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w6-symbol/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 7 - Semantic Part 1 - Symbol Table
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w7-semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 8 - Semantic Part 2 - Type Checking
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w9-semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 9 - Semantic Part 3 - Expression
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w10-runtime-llvmir/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 10 - LLVM IR
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Week 11 - Translation 1
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Week 11 - Translation 1
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#week-11-address-computation-and-gep" class="md-nav__link">
+    <span class="md-ellipsis">
+      Week 11 — Address Computation and GEP
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 从一个完整程序开始
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 从一个完整程序开始">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-m-llvm" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.1 先弄清楚 m 在 LLVM 中是什么
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 从整个对象找到其中一个元素
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 从整个对象找到其中一个元素">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 沿着对象的类型逐层找到目标位置
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-gep" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2 为什么可以把这些步骤写成一条 GEP？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-gep" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3 现在再看 GEP 中的类型和索引
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-gep-ptr-structmatrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.4 为什么 GEP 写了 ptr，还需要写 %struct.Matrix？
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 回到原程序：动态索引、读取和写入
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 回到原程序：动态索引、读取和写入">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 动态索引从哪里来？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 找到左侧地址之后，如何完成赋值？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3 如果只是读取元素，而不是修改元素呢？
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-gep-load" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. GEP 的边界：为什么有时必须先 Load？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. 回到编译器：如何生成这段 LLVM IR？
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 回到编译器：如何生成这段 LLVM IR？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1 将主案例完整翻译
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.2 练习
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-antlr4-visitor-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. 实践：使用 ANTLR4 Visitor 生成 LLVM IR
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 实践：使用 ANTLR4 Visitor 生成 LLVM IR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1 从语法节点到 LLVM IR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-store" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.2 左侧数组元素：生成地址，再 Store
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-load" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.3 右侧数组元素：生成地址、Load，再计算
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-stringbuilder-builder" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.4 从 StringBuilder 到 Builder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.5 课堂练习（简化 Framework）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      延伸阅读
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    环境配置
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            环境配置
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Linux VM 搭建
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Linux VM 搭建
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/wsl/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows WSL
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/macos-native/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    macOS 原生环境
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#week-11-address-computation-and-gep" class="md-nav__link">
+    <span class="md-ellipsis">
+      Week 11 — Address Computation and GEP
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 从一个完整程序开始
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 从一个完整程序开始">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-m-llvm" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.1 先弄清楚 m 在 LLVM 中是什么
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 从整个对象找到其中一个元素
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 从整个对象找到其中一个元素">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 沿着对象的类型逐层找到目标位置
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-gep" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2 为什么可以把这些步骤写成一条 GEP？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-gep" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3 现在再看 GEP 中的类型和索引
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-gep-ptr-structmatrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.4 为什么 GEP 写了 ptr，还需要写 %struct.Matrix？
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 回到原程序：动态索引、读取和写入
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 回到原程序：动态索引、读取和写入">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 动态索引从哪里来？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 找到左侧地址之后，如何完成赋值？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3 如果只是读取元素，而不是修改元素呢？
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-gep-load" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. GEP 的边界：为什么有时必须先 Load？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. 回到编译器：如何生成这段 LLVM IR？
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 回到编译器：如何生成这段 LLVM IR？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1 将主案例完整翻译
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.2 练习
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-antlr4-visitor-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. 实践：使用 ANTLR4 Visitor 生成 LLVM IR
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 实践：使用 ANTLR4 Visitor 生成 LLVM IR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1 从语法节点到 LLVM IR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-store" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.2 左侧数组元素：生成地址，再 Store
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-load" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.3 右侧数组元素：生成地址、Load，再计算
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-stringbuilder-builder" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.4 从 StringBuilder 到 Builder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.5 课堂练习（简化 Framework）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      延伸阅读
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  <h1>Week 11 - Translation 1</h1>
+
+<h2 id="week-11-address-computation-and-gep">Week 11 — Address Computation and GEP<a class="headerlink" href="#week-11-address-computation-and-gep" title="Permanent link">&para;</a></h2>
+<p>上一周，我们已经学会了如何在 LLVM IR 中为变量分配存储空间，以及如何读取和写入这些空间中的内容。本周继续沿着这条线往下走：</p>
+<p><strong>如果一个变量不是简单的整数，而是数组或结构体，我们怎样访问它内部的某个元素或字段？</strong></p>
+<p>本节不从一组独立的 LLVM 指令开始，而是从一个完整的 SPL 程序出发。接下来，我们会围绕这个程序逐步分析：先看清楚对象的类型和存储空间，再找到其中某个元素的地址，然后处理动态索引、读取和写入，最后回到编译器，看看这些操作应该怎样生成 LLVM IR。</p>
+<h2 id="1">1. 从一个完整程序开始<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<p>先看下面这个程序：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">rows</span><span class="p">;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cols</span><span class="p">;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">version</span><span class="p">;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">};</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="p">;</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">41</span><span class="p">;</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">];</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="p">}</span>
+</code></pre></div>
+<p>这个程序使用了当前 SPL 支持的结构体、数组、成员访问、数组访问和赋值表达式。我们最终希望把它翻译成 LLVM IR。</p>
+<p>先不要急着翻译整段程序。我们先关注其中最关键的一句：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>这条语句看起来很普通，但编译器需要完成几件不同的事情：</p>
+<ol>
+<li>找到局部变量 <code>m</code> 的存储空间。</li>
+<li>找到结构体中的 <code>cells</code> 字段。</li>
+<li>根据 <code>i</code> 和 <code>j</code> 找到二维数组中的目标元素。</li>
+<li>计算右侧表达式 <code>value + 1</code> 的结果。</li>
+<li>将结果写入左侧目标元素。</li>
+</ol>
+<p>其中，真正需要我们本周解决的新问题是第 2、3 步：已经有了整个结构体对象的地址，怎样进一步找到它内部某个数组元素的地址？</p>
+<h3 id="11-m-llvm">1.1 先弄清楚 <code>m</code> 在 LLVM 中是什么<a class="headerlink" href="#11-m-llvm" title="Permanent link">&para;</a></h3>
+<p>源程序中的结构体定义是：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">rows</span><span class="p">;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cols</span><span class="p">;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">version</span><span class="p">;</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">};</span>
+</code></pre></div>
+<p><code>cells</code> 是一个二维数组。外层数组有 2 个元素，每个元素又是一个包含 3 个 <code>int</code> 的数组。</p>
+<p>在 LLVM IR 中，可以将这个结构体类型表示为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">%struct.Matrix</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="m">2</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">]],</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>这里：</p>
+<ul>
+<li><code>i32</code> 对应 SPL 中的 <code>int</code>。</li>
+<li><code>[3 x i32]</code> 表示一个包含 3 个 <code>i32</code> 的数组。</li>
+<li><code>[2 x [3 x i32]]</code> 表示一个包含 2 行、每行 3 个 <code>i32</code> 的二维数组。</li>
+<li><code>%struct.Matrix</code> 表示包含这四个字段的结构体类型。</li>
+</ul>
+<p>结构体字段按照声明顺序从 <code>0</code> 开始编号：</p>
+<table>
+<thead>
+<tr>
+<th>源代码字段</th>
+<th>LLVM 类型</th>
+<th style="text-align: right;">字段索引</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rows</code></td>
+<td><code>i32</code></td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>cols</code></td>
+<td><code>i32</code></td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td><code>cells</code></td>
+<td><code>[2 x [3 x i32]]</code></td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td><code>i32</code></td>
+<td style="text-align: right;">3</td>
+</tr>
+</tbody>
+</table>
+<p>因此，<code>cells</code> 虽然是一个二维数组，但它在结构体中仍然只是一个字段，字段索引为 <code>2</code>。数组内部的行和列索引，要在选中这个字段之后再继续计算。前后的 <code>rows</code>、<code>cols</code> 和 <code>version</code> 则帮助我们看清楚：结构体字段按声明顺序编号，数组字段并不会改变后续字段的编号。</p>
+<p>因此，变量 <code>m</code> 的类型就是 <code>%struct.Matrix</code>。</p>
+<p>接下来，为它分配存储空间：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">%m.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="nv">%struct.Matrix</span>
+</code></pre></div>
+<p>这条指令与 Week 10 中学过的 <code>alloca i32</code> 完全是同一类操作，只不过这次分配的对象不再是一个整数，而是一个完整的结构体。</p>
+<p><code>%m.addr</code> 保存的是整个 <code>m</code> 对象的地址。它还不是 <code>m.cells[1][2]</code> 的地址，更不是这个数组元素中保存的整数值。</p>
+<p>可以把 <code>m</code> 想象成下面这样的对象：</p>
+<p><img alt="" src="../../assets/labs/w11/matrix-address-path.svg" /></p>
+<p>现在我们已经知道了对象的类型，也得到了整个对象的起始地址。接下来就要解决本节的核心问题：如何从 <code>%m.addr</code> 找到 <code>m.cells[1][2]</code>？</p>
+<h2 id="2">2. 从整个对象找到其中一个元素<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<p>为了先把地址计算本身看清楚，我们暂时把原程序中的动态索引 <code>i</code> 和 <code>j</code> 换成常量，先看：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+</code></pre></div>
+<p>这并没有改变对象的类型，只是让我们先不必考虑索引变量的值从哪里来。</p>
+<h3 id="21">2.1 沿着对象的类型逐层找到目标位置<a class="headerlink" href="#21" title="Permanent link">&para;</a></h3>
+<p>从 <code>%m.addr</code> 出发，访问 <code>m.cells[1][2]</code> 实际上是一条逐层深入的路径：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>%m.addr
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>   |
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>   v
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>struct Matrix 对象
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>   |
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>   | 选择字段 cells（字段索引 2）
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>   v
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>[2 x [3 x i32]]
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>   |
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>   | 选择第 1 行
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>   v
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>[3 x i32]
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>   |
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>   | 选择第 2 列
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>   v
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>i32 元素
+</code></pre></div>
+<p>这里的数组下标从 <code>0</code> 开始，因此：</p>
+<ul>
+<li><code>cells[1]</code> 是第二行；</li>
+<li><code>cells[1][2]</code> 是第二行中的第三个元素。</li>
+</ul>
+<p>我们可以把这条路径拆成三次地址计算。先从结构体中找到 <code>cells</code> 字段：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">%cells.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>再从二维数组中找到第二行：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">%row.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="p">[</span><span class="m">2</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">]],</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%cells.addr</span><span class="p">,</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+<p>最后从这一行中找到第三个元素：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">],</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%row.addr</span><span class="p">,</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>这三步分别完成：</p>
+<ol>
+<li>从结构体对象进入字段 <code>cells</code>；</li>
+<li>从二维数组进入第 2 行；</li>
+<li>从这一行进入第 3 个元素。</li>
+</ol>
+<p>到这里，我们已经得到了 <code>m.cells[1][2]</code> 的地址。注意，这个结果仍然是一个地址，并没有读取该位置中保存的整数。</p>
+<h3 id="22-gep">2.2 为什么可以把这些步骤写成一条 GEP？<a class="headerlink" href="#22-gep" title="Permanent link">&para;</a></h3>
+<p>刚才我们为了理解访问路径，将地址计算拆成了三次。但这些步骤都只是在已知的结构体和数组布局中向内选择子对象，中间不需要读取内存中的其他值。</p>
+<p>因此，LLVM 可以把它们合并成一条 <code>getelementptr</code> 指令，通常简称 GEP：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>这条指令与前面三次 GEP 的地址计算结果相同。它从 <code>%m.addr</code> 出发，沿着类型和索引描述的路径，直接得到目标元素的地址。</p>
+<p>这就是 GEP 的核心作用：</p>
+<p><strong>GEP 根据一个已有的基地址、对象类型和索引路径，计算某个子对象的地址。</strong></p>
+<p>它不负责读取或写入这个地址中的内容。</p>
+<h3 id="23-gep">2.3 现在再看 GEP 中的类型和索引<a class="headerlink" href="#23-gep" title="Permanent link">&para;</a></h3>
+<p>GEP 的基本形式是：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="p">&lt;</span><span class="err">source</span><span class="w"> </span><span class="err">element</span><span class="w"> </span><span class="k">type</span><span class="p">&gt;,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="p">&lt;</span><span class="err">base</span><span class="w"> </span><span class="err">address</span><span class="p">&gt;,</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="p">&lt;</span><span class="err">inde</span><span class="k">x</span><span class="w"> </span><span class="k">type</span><span class="p">&gt;</span><span class="w"> </span><span class="p">&lt;</span><span class="err">inde</span><span class="k">x</span><span class="p">&gt;,</span><span class="w"> </span><span class="p">...</span>
+</code></pre></div>
+<p>回到刚才的指令：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>各部分的作用如下：</p>
+<table>
+<thead>
+<tr>
+<th>部分</th>
+<th>在当前例子中的含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>%struct.Matrix</code></td>
+<td>Source Element Type，告诉 LLVM 从什么类型的对象开始计算</td>
+</tr>
+<tr>
+<td><code>ptr %m.addr</code></td>
+<td>基地址，也就是整个 <code>m</code> 对象的起始地址</td>
+</tr>
+<tr>
+<td>第一个索引 <code>i64 0</code></td>
+<td>以 <code>%struct.Matrix</code> 为步进单位，从基地址移动 0 个完整结构体对象</td>
+</tr>
+<tr>
+<td>第二个索引 <code>i32 2</code></td>
+<td>进入结构体，选择第三个字段 <code>cells</code></td>
+</tr>
+<tr>
+<td>第三个索引 <code>i64 1</code></td>
+<td>进入二维数组，选择第二行</td>
+</tr>
+<tr>
+<td>第四个索引 <code>i64 2</code></td>
+<td>进入该行，选择第三个元素</td>
+</tr>
+<tr>
+<td><code>%element.addr</code></td>
+<td>最终计算得到的元素地址</td>
+</tr>
+</tbody>
+</table>
+<p>这里最容易困惑的是为什么前面会有两个 <code>0</code>。它们的含义并不相同：</p>
+<ul>
+<li>第一个 <code>i64 0</code> 是 GEP 的第一个索引。它对基地址所指向的 <code>%struct.Matrix</code> 对象进行步进；移动 0 个完整对象，仍然指向当前的 <code>m</code>。</li>
+<li>第二个 <code>i32 2</code> 才是结构体字段索引，表示选择结构体的第三个字段 <code>cells</code>。</li>
+<li>后面的 <code>i64 1</code> 和 <code>i64 2</code> 则分别进入二维数组的行和列。</li>
+</ul>
+<p>结合前面的 Matrix 对象图，可以看到这几个索引分别沿着结构体字段、数组行和数组列逐层向内选择对象。</p>
+<p>第一个索引并不永远是 <code>0</code>。如果基地址指向一组连续的结构体对象，而我们要访问下一个结构体，就可以使用第一个索引 <code>1</code>。本例只访问当前的 <code>m</code>，所以使用 <code>0</code>。</p>
+<p>结构体字段索引表示字段编号，而不是字节偏移。这里的 <code>i32 2</code> 选择第三个字段 <code>cells</code>；实际字段在内存中的字节位置由 LLVM 根据结构体类型和目标平台的 Data Layout 计算。结构体布局中即使存在 Padding，也不需要我们手工把它换算成字节偏移。</p>
+<p>这里还可以注意到，GEP 中同时出现了 <code>i64</code> 和 <code>i32</code>：</p>
+<ul>
+<li>在常见的 64 位目标平台上，第一个索引以及数组索引通常使用 <code>i64</code>，因为它们参与地址步进。</li>
+<li>结构体字段索引有特殊规则，必须是 <code>i32</code> 类型的整数常量。因此，选择 <code>cells</code> 时写作 <code>i32 2</code>。</li>
+</ul>
+<p>所以，本例中的 <code>i64 0, i32 2, i64 1, i64 2</code> 不是随意混用整数类型：它们分别对应对象步进、结构体字段选择、数组行索引和数组列索引。具体的指针索引宽度由目标平台的 Data Layout 决定；这里按常见的 64 位目标展示。</p>
+<h3 id="24-gep-ptr-structmatrix">2.4 为什么 GEP 写了 <code>ptr</code>，还需要写 <code>%struct.Matrix</code>？<a class="headerlink" href="#24-gep-ptr-structmatrix" title="Permanent link">&para;</a></h3>
+<p>你可能注意到，现代 LLVM IR 中指针通常写成：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">ptr</span>
+</code></pre></div>
+<p>而不是旧式 LLVM IR 中的：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nv">%struct.Matrix</span><span class="p">*</span>
+</code></pre></div>
+<p>这是因为现代 LLVM 使用 Opaque Pointer（不透明指针）。<code>ptr</code> 只表示一个地址，指针类型本身不再记录它指向什么类型。</p>
+<p>那么，LLVM 怎样知道应该按照什么布局计算地址？</p>
+<p>答案就在 GEP 的第一个类型参数：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span><span class="w"> </span><span class="p">...</span>
+</code></pre></div>
+<p>这里的 <code>%struct.Matrix</code> 就是 Source Element Type，它告诉 LLVM 本次地址计算应该从什么类型的对象开始。</p>
+<p>同样，读取内存时也需要明确告诉 LLVM 要读取什么类型：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nv">%value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%element.addr</span>
+</code></pre></div>
+<p>因此可以先记住：</p>
+<ul>
+<li><code>ptr</code> 表示地址；</li>
+<li>GEP 的 Source Element Type 描述地址计算所依据的对象布局；</li>
+<li>Load 的类型描述要从地址中读取什么值。</li>
+</ul>
+<h2 id="3">3. 回到原程序：动态索引、读取和写入<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
+<p>现在我们已经能够计算常量访问 <code>m.cells[1][2]</code> 的地址。回到原程序：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>这里的 <code>i</code> 和 <code>j</code> 不再是写死的常量，而是变量。地址计算的路径没有发生变化，变化的只是行和列的索引需要在运行时取得。</p>
+<h3 id="31">3.1 动态索引从哪里来？<a class="headerlink" href="#31" title="Permanent link">&para;</a></h3>
+<p>在原程序中，<code>i</code> 和 <code>j</code> 是普通的局部变量。按照 Week 10 学过的方式，先为它们分配存储空间，并写入初始值：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nv">%i.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="nv">%j.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%i.addr</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%j.addr</span>
+</code></pre></div>
+<p>但 GEP 需要的是索引的数值，而 <code>%i.addr</code> 和 <code>%j.addr</code> 是变量的存储地址。因此，需要先从这两个地址中读取它们的值：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nv">%i.value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%i.addr</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="nv">%j.value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%j.addr</span>
+</code></pre></div>
+<p>现在 <code>%i.value</code> 和 <code>%j.value</code> 才是可以用于地址计算的整数值。</p>
+<p>在当前 64 位目标的示例中，数组索引使用 <code>i64</code>。因此，需要先把从变量中读取的 <code>i32</code> 索引扩展为 <code>i64</code>：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nv">%i.index</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sext</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%i.value</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i64</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="nv">%j.index</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sext</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%j.value</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i64</span>
+</code></pre></div>
+<p>然后将它们作为 GEP 的数组索引：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%i.index</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%j.index</span>
+</code></pre></div>
+<p>这里的 <code>sext</code> 是有符号扩展：它把 <code>i32</code> 整数扩展为 <code>i64</code>，同时保留原来的数值。注意，转换的是数组索引 <code>i</code> 和 <code>j</code>，结构体字段索引仍然是 <code>i32 2</code>。</p>
+<p>GEP 并不要求所有索引都是常量。数组索引可以是运行时计算得到的整数值；其宽度需要与目标平台的指针索引规则相匹配。不同目标平台可能使用不同的 pointer index type。</p>
+<h3 id="32">3.2 找到左侧地址之后，如何完成赋值？<a class="headerlink" href="#32" title="Permanent link">&para;</a></h3>
+<p>现在，左侧 <code>m.cells[i][j]</code> 的地址已经算出来了：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%i.index</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%j.index</span>
+</code></pre></div>
+<p>但源程序要求的是：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>GEP 只找到了目标位置，还没有把结果写进去。我们还需要计算右侧表达式 <code>value + 1</code>。</p>
+<p>变量 <code>value</code> 的值保存在它的存储空间中，因此先读取它，再执行加法：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nv">%value.value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%value.addr</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="nv">%sum</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%value.value</span><span class="p">,</span><span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+<p>最后，将计算结果写入左侧地址：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%sum</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%element.addr</span>
+</code></pre></div>
+<p>把这几个操作连起来：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>左侧 m.cells[i][j]：计算目标地址
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>右侧 value + 1：读取 value 并计算结果
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>最后：将右侧结果写入左侧地址
+</code></pre></div>
+<p>到这里，我们自然会发现，同一个表达式在不同位置可能需要的是地址，也可能需要的是值。</p>
+<p>对于赋值左侧，编译器需要知道写入位置，所以要生成地址；对于加法表达式，编译器需要整数值，所以要读取变量内容。GEP、Load 和 Store 正好分别承担这些工作。</p>
+<h3 id="33">3.3 如果只是读取元素，而不是修改元素呢？<a class="headerlink" href="#33" title="Permanent link">&para;</a></h3>
+<p>原程序的最后一行是：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">return</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">];</span>
+</code></pre></div>
+<p>这次我们不需要向数组元素写入值，而是要把它当前保存的整数作为函数返回值。</p>
+<p>地址计算与前面完全一样：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="nv">%result.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>但得到地址之后，这次需要执行 Load：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%result.addr</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+</code></pre></div>
+<p>因此，赋值和读取的区别并不在于 GEP：</p>
+<ul>
+<li>访问路径相同，地址计算可以相同；</li>
+<li>要修改元素，就使用 Store；</li>
+<li>要取得元素中保存的值，就使用 Load。</li>
+</ul>
+<h2 id="4-gep-load">4. GEP 的边界：为什么有时必须先 Load？<a class="headerlink" href="#4-gep-load" title="Permanent link">&para;</a></h2>
+<p>到目前为止，主案例中的所有访问都可以沿着结构体和数组的类型布局连续计算。原因是 <code>cells</code> 是直接嵌入 <code>Matrix</code> 的数组：它属于结构体对象本身，LLVM 能够根据类型确定它的位置。</p>
+<p>现在我们只改变一个条件，看看会发生什么。</p>
+<p>先回忆主案例中的结构体：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">rows</span><span class="p">;</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cols</span><span class="p">;</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">version</span><span class="p">;</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="p">};</span>
+</code></pre></div>
+<p><code>cells</code> 是数组对象本身，直接包含在 <code>Matrix</code> 中。为了对比直接嵌入的数组与间接引用的对象，再看下面这个 C 语言结构体：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Data</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">values</span><span class="p">;</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="p">};</span>
+</code></pre></div>
+<p>这里的 <code>values</code> 不再是结构体内部的数组，而是一个指针变量。结构体中存放的是一个地址，这个地址指向另一块内存。</p>
+<p>下面的代码是 C 语言拓展，用于说明 LLVM 的间接寻址机制，不属于当前 SPL 的语法范围。</p>
+<p>假设 <code>%p</code> 已经是一个指向 <code>struct Data</code> 对象的指针值，要访问 <code>p-&gt;values[i]</code>，首先需要找到结构体中 <code>values</code> 这个字段本身：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nv">%struct.Data</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="nv">%values.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Data</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%p</span><span class="p">,</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">0</span>
+</code></pre></div>
+<p>注意，<code>%values.addr</code> 是指针字段自己的存储地址。它并不是 <code>values</code> 所指向的数组地址。</p>
+<p>要取得字段中保存的指针值，还需要 Load：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nv">%values.ptr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">ptr</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%values.addr</span>
+</code></pre></div>
+<p>现在 <code>%values.ptr</code> 才是指向整数数组的指针值。假设 <code>%i</code> 是已经计算得到的 <code>i32</code> 索引值，在当前 64 位目标的示例中，先将它扩展为 <code>i64</code>，再以 <code>%values.ptr</code> 作为新的基地址计算元素地址：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="nv">%i.index</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sext</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%i</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i64</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%values.ptr</span><span class="p">,</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%i.index</span>
+</code></pre></div>
+<p>如果要把 <code>100</code> 写入该元素，最后再执行：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">100</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%element.addr</span>
+</code></pre></div>
+<p>整个过程是：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>GEP -&gt; Load -&gt; GEP -&gt; Store
+</code></pre></div>
+<p><img alt="" src="../../assets/labs/w11/pointer-field.svg" /></p>
+<p>这与主案例中的 <code>m.cells[i][j]</code> 有什么区别？</p>
+<table>
+<thead>
+<tr>
+<th>主案例：结构体中直接包含数组</th>
+<th>C 拓展：结构体中保存指针</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cells</code> 是结构体对象的一部分</td>
+<td><code>values</code> 字段中保存一个指针值</td>
+</tr>
+<tr>
+<td>数组布局由结构体类型直接描述</td>
+<td>指针指向的对象不属于该结构体的嵌套布局</td>
+</tr>
+<tr>
+<td>GEP 可以连续计算到数组元素</td>
+<td>先 GEP 找到指针字段，再 Load 读出指针值</td>
+</tr>
+<tr>
+<td>后续 GEP 使用原有对象的类型路径</td>
+<td>后续 GEP 使用 Load 得到的新指针作为基地址</td>
+</tr>
+</tbody>
+</table>
+<p>所以，判断是否需要 Load，关键不是源代码中出现了几层 <code>[]</code> 或成员访问，而是：</p>
+<p><strong>下一步地址计算所需的基地址，是否已经在手中？如果它是存储在内存中的指针值，就必须先 Load 出来。</strong></p>
+<p>这就是 GEP 的边界：GEP 负责根据已有地址和类型布局计算新地址，但它不会替我们读取内存中的指针。</p>
+<h2 id="5-llvm-ir">5. 回到编译器：如何生成这段 LLVM IR？<a class="headerlink" href="#5-llvm-ir" title="Permanent link">&para;</a></h2>
+<p>现在再回头看最初的赋值语句：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>我们已经知道它在 LLVM IR 中需要哪些操作。对于 IR Generator 来说，最重要的是区分两件事：</p>
+<ul>
+<li>生成一个对象的地址；</li>
+<li>生成一个表达式的值。</li>
+</ul>
+<p>可以把它们抽象成两个接口：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>emitAddress(expression) -&gt; ptr
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>emitValue(expression)   -&gt; LLVM Value
+</code></pre></div>
+<p>例如：</p>
+<ul>
+<li>对标识符 <code>m</code>，<code>emitAddress(m)</code> 从符号表中取得变量的存储地址。</li>
+<li>对成员访问 <code>m.cells</code>，先取得 <code>m</code> 的地址，再根据结构体类型信息找到 <code>cells</code> 的字段编号，生成 GEP。</li>
+<li>对数组访问 <code>m.cells[i]</code>，先取得数组对象地址，再计算索引 <code>i</code> 的值，生成 GEP。</li>
+<li>对普通变量 <code>value</code>，如果需要它的数值，就先取得地址，再使用 Load。</li>
+</ul>
+<p>因此，赋值语句可以概括为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>leftAddress = emitAddress(lhs)
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>rightValue  = emitValue(rhs)
+<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>store rightValue -&gt; leftAddress
+</code></pre></div>
+<p>这不是要求编译器一定使用这两个函数名，而是表达一种实现上的职责划分：左侧需要位置，右侧需要值。</p>
+<h3 id="51">5.1 将主案例完整翻译<a class="headerlink" href="#51" title="Permanent link">&para;</a></h3>
+<p>现在把前面逐步得到的结果组合起来。</p>
+<p>首先是结构体类型：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="nv">%struct.Matrix</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="m">2</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">]],</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>完整 LLVM IR 可以写成：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="nv">%struct.Matrix</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="m">2</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">]],</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="nl">entry:</span>
+<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a><span class="w">    </span><span class="c">; Allocate local objects</span>
+<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a><span class="w">    </span><span class="nv">%m.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="nv">%struct.Matrix</span>
+<a id="__codelineno-41-7" name="__codelineno-41-7" href="#__codelineno-41-7"></a><span class="w">    </span><span class="nv">%i.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-41-8" name="__codelineno-41-8" href="#__codelineno-41-8"></a><span class="w">    </span><span class="nv">%j.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-41-9" name="__codelineno-41-9" href="#__codelineno-41-9"></a><span class="w">    </span><span class="nv">%value.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-41-10" name="__codelineno-41-10" href="#__codelineno-41-10"></a>
+<a id="__codelineno-41-11" name="__codelineno-41-11" href="#__codelineno-41-11"></a><span class="w">    </span><span class="c">; Initialize scalar variables</span>
+<a id="__codelineno-41-12" name="__codelineno-41-12" href="#__codelineno-41-12"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%i.addr</span>
+<a id="__codelineno-41-13" name="__codelineno-41-13" href="#__codelineno-41-13"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%j.addr</span>
+<a id="__codelineno-41-14" name="__codelineno-41-14" href="#__codelineno-41-14"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">41</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%value.addr</span>
+<a id="__codelineno-41-15" name="__codelineno-41-15" href="#__codelineno-41-15"></a>
+<a id="__codelineno-41-16" name="__codelineno-41-16" href="#__codelineno-41-16"></a><span class="w">    </span><span class="c">; Read the dynamic indices</span>
+<a id="__codelineno-41-17" name="__codelineno-41-17" href="#__codelineno-41-17"></a><span class="w">    </span><span class="nv">%i.value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%i.addr</span>
+<a id="__codelineno-41-18" name="__codelineno-41-18" href="#__codelineno-41-18"></a><span class="w">    </span><span class="nv">%j.value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%j.addr</span>
+<a id="__codelineno-41-19" name="__codelineno-41-19" href="#__codelineno-41-19"></a><span class="w">    </span><span class="nv">%i.index</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sext</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%i.value</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i64</span>
+<a id="__codelineno-41-20" name="__codelineno-41-20" href="#__codelineno-41-20"></a><span class="w">    </span><span class="nv">%j.index</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sext</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%j.value</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i64</span>
+<a id="__codelineno-41-21" name="__codelineno-41-21" href="#__codelineno-41-21"></a>
+<a id="__codelineno-41-22" name="__codelineno-41-22" href="#__codelineno-41-22"></a><span class="w">    </span><span class="c">; Calculate the address of m.cells[i][j]</span>
+<a id="__codelineno-41-23" name="__codelineno-41-23" href="#__codelineno-41-23"></a><span class="w">    </span><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-41-24" name="__codelineno-41-24" href="#__codelineno-41-24"></a><span class="w">        </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%i.index</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%j.index</span>
+<a id="__codelineno-41-25" name="__codelineno-41-25" href="#__codelineno-41-25"></a>
+<a id="__codelineno-41-26" name="__codelineno-41-26" href="#__codelineno-41-26"></a><span class="w">    </span><span class="c">; Evaluate value + 1</span>
+<a id="__codelineno-41-27" name="__codelineno-41-27" href="#__codelineno-41-27"></a><span class="w">    </span><span class="nv">%value.value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%value.addr</span>
+<a id="__codelineno-41-28" name="__codelineno-41-28" href="#__codelineno-41-28"></a><span class="w">    </span><span class="nv">%sum</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%value.value</span><span class="p">,</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-41-29" name="__codelineno-41-29" href="#__codelineno-41-29"></a>
+<a id="__codelineno-41-30" name="__codelineno-41-30" href="#__codelineno-41-30"></a><span class="w">    </span><span class="c">; Store the result into m.cells[i][j]</span>
+<a id="__codelineno-41-31" name="__codelineno-41-31" href="#__codelineno-41-31"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%sum</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%element.addr</span>
+<a id="__codelineno-41-32" name="__codelineno-41-32" href="#__codelineno-41-32"></a>
+<a id="__codelineno-41-33" name="__codelineno-41-33" href="#__codelineno-41-33"></a><span class="w">    </span><span class="c">; Calculate the address of m.cells[1][2]</span>
+<a id="__codelineno-41-34" name="__codelineno-41-34" href="#__codelineno-41-34"></a><span class="w">    </span><span class="nv">%result.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-41-35" name="__codelineno-41-35" href="#__codelineno-41-35"></a><span class="w">        </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-41-36" name="__codelineno-41-36" href="#__codelineno-41-36"></a>
+<a id="__codelineno-41-37" name="__codelineno-41-37" href="#__codelineno-41-37"></a><span class="w">    </span><span class="c">; Read the element and return it</span>
+<a id="__codelineno-41-38" name="__codelineno-41-38" href="#__codelineno-41-38"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%result.addr</span>
+<a id="__codelineno-41-39" name="__codelineno-41-39" href="#__codelineno-41-39"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-41-40" name="__codelineno-41-40" href="#__codelineno-41-40"></a><span class="p">}</span>
+</code></pre></div>
+<p>由于 <code>i = 1</code>、<code>j = 2</code>、<code>value = 41</code>，赋值语句会把 <code>42</code> 写入 <code>m.cells[1][2]</code>，最后程序读取这个元素并返回 <code>42</code>。</p>
+<p>回顾整段翻译：</p>
+<ol>
+<li><code>alloca</code> 为局部变量和整个结构体对象分配存储空间。</li>
+<li>Load 读取动态索引和普通变量的值。</li>
+<li>GEP 根据结构体和数组的类型布局计算目标元素地址。</li>
+<li><code>add</code> 计算右侧表达式。</li>
+<li>Store 将计算结果写入目标地址。</li>
+<li>返回表达式再次使用 GEP 得到地址，再通过 Load 读取元素值。</li>
+</ol>
+<p>从头到尾，我们解决的始终是同一个问题：如何从一个已有对象出发，找到它内部的目标元素，并正确读取或修改它？</p>
+<h3 id="52">5.2 练习<a class="headerlink" href="#52" title="Permanent link">&para;</a></h3>
+<p>下面的练习继续围绕本节的地址计算规则展开，不再引入新的语言特性。</p>
+<p><strong>Exercise 1：改变访问位置</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">rows</span><span class="p">;</span>
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cols</span><span class="p">;</span>
+<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">version</span><span class="p">;</span>
+<a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a><span class="p">};</span>
+<a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a>
+<a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-42-9" name="__codelineno-42-9" href="#__codelineno-42-9"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span><span class="p">;</span>
+</code></pre></div>
+<p>写出计算 <code>m.cells[0][1]</code> 地址的 GEP，并解释每个索引的含义。</p>
+<p><strong>Exercise 2：动态索引</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">rows</span><span class="p">;</span>
+<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cols</span><span class="p">;</span>
+<a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">version</span><span class="p">;</span>
+<a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a><span class="p">};</span>
+<a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a>
+<a id="__codelineno-43-8" name="__codelineno-43-8" href="#__codelineno-43-8"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-43-9" name="__codelineno-43-9" href="#__codelineno-43-9"></a><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<a id="__codelineno-43-10" name="__codelineno-43-10" href="#__codelineno-43-10"></a><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="p">;</span>
+<a id="__codelineno-43-11" name="__codelineno-43-11" href="#__codelineno-43-11"></a>
+<a id="__codelineno-43-12" name="__codelineno-43-12" href="#__codelineno-43-12"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span><span class="p">;</span>
+</code></pre></div>
+<p>说明为什么需要先取得 <code>i</code> 和 <code>j</code> 的值，再将它们作为 GEP 的索引。</p>
+<p><strong>Exercise 3：读取而不是写入</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="k">return</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">];</span>
+</code></pre></div>
+<p>写出对应的 GEP 和 Load，并说明为什么这里不需要 Store。</p>
+<p><strong>Exercise 4：C 拓展——指针字段</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Data</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">values</span><span class="p">;</span>
+<a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="p">};</span>
+</code></pre></div>
+<p>假设 <code>%p</code> 已经是指向 <code>struct Data</code> 的指针值，写出访问 <code>p-&gt;values[i]</code> 所需的 GEP、Load 和 GEP，并解释中间为什么必须 Load。</p>
+<h2 id="6-antlr4-visitor-llvm-ir">6. 实践：使用 ANTLR4 Visitor 生成 LLVM IR<a class="headerlink" href="#6-antlr4-visitor-llvm-ir" title="Permanent link">&para;</a></h2>
+<p>在之前的 Project 中，我们已经多次使用 ANTLR4 Visitor 遍历 Parse Tree。</p>
+<p>例如，在语义分析阶段，每当访问一个语法节点，我们可能需要检查变量是否声明、判断表达式的类型，或者向符号表中添加新的符号。</p>
+<p>现在，我们仍然使用相同的 Visitor 机制，只不过 <strong>访问语法节点时所做的事情发生了变化</strong> 。</p>
+<p>在 Code Generation 阶段，我们的目标是将 SPL 程序翻译成 LLVM IR。最直观的实现方式，就是准备一个 <code>StringBuilder</code>，用于保存已经生成的 LLVM IR：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>private final StringBuilder ir = new StringBuilder();
+</code></pre></div>
+<p>随后，我们使用 Visitor 遍历 Parse Tree。每遇到一个需要翻译的语法结构，就生成对应的 LLVM IR 指令，并将其追加到 <code>StringBuilder</code> 中。</p>
+<p>例如，遇到整数加法，我们生成 <code>add</code> 指令；遇到变量声明，我们可能需要生成 <code>alloca</code>；遇到赋值语句，我们需要生成 <code>store</code>；遇到返回语句，则生成 <code>ret</code>。</p>
+<p>这样，随着 Visitor 不断遍历语法树，LLVM IR 也会逐步生成：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>访问语法节点
+<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>    ↓
+<a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a>根据节点的语义生成 LLVM IR
+<a id="__codelineno-47-4" name="__codelineno-47-4" href="#__codelineno-47-4"></a>    ↓
+<a id="__codelineno-47-5" name="__codelineno-47-5" href="#__codelineno-47-5"></a>将指令追加到 StringBuilder
+<a id="__codelineno-47-6" name="__codelineno-47-6" href="#__codelineno-47-6"></a>    ↓
+<a id="__codelineno-47-7" name="__codelineno-47-7" href="#__codelineno-47-7"></a>继续访问后续语法节点
+<a id="__codelineno-47-8" name="__codelineno-47-8" href="#__codelineno-47-8"></a>    ↓
+<a id="__codelineno-47-9" name="__codelineno-47-9" href="#__codelineno-47-9"></a>最终得到完整的 LLVM IR
+</code></pre></div>
+<p>需要注意，这里的“一句一句翻译”并不意味着每条 SPL 语句都恰好对应一条 LLVM IR 指令。一条语句可能需要生成多条指令，而且对于复杂表达式，我们通常需要先递归翻译子表达式，再生成父表达式的指令。</p>
+<p>不过，整体思路十分简单：<strong>以前我们通过 Visitor 遍历语法树，进行检查并维护语义信息；现在我们通过 Visitor 遍历语法树，逐步生成并累积目标代码。</strong></p>
+<p>接下来，我们就结合一个简单的 SPL 程序，看看每个语法节点如何生成相应的 LLVM IR。</p>
+<h3 id="61-llvm-ir">6.1 从语法节点到 LLVM IR<a class="headerlink" href="#61-llvm-ir" title="Permanent link">&para;</a></h3>
+<p>考虑下面这个程序：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a><span class="w">    </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<a id="__codelineno-48-4" name="__codelineno-48-4" href="#__codelineno-48-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-48-5" name="__codelineno-48-5" href="#__codelineno-48-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>我们要生成的 LLVM IR 是：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="w"> </span><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a><span class="w"> </span><span class="nl">entry:</span>
+<a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a><span class="w">   </span><span class="nv">%a</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">]</span>
+<a id="__codelineno-49-4" name="__codelineno-49-4" href="#__codelineno-49-4"></a><span class="w">   </span><span class="nv">%p0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">],</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-49-5" name="__codelineno-49-5" href="#__codelineno-49-5"></a><span class="w">   </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%p0</span>
+<a id="__codelineno-49-6" name="__codelineno-49-6" href="#__codelineno-49-6"></a><span class="w">   </span><span class="nv">%p1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">],</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-49-7" name="__codelineno-49-7" href="#__codelineno-49-7"></a><span class="w">   </span><span class="nv">%t0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%p1</span>
+<a id="__codelineno-49-8" name="__codelineno-49-8" href="#__codelineno-49-8"></a><span class="w">   </span><span class="nv">%t1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%t0</span><span class="p">,</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-49-9" name="__codelineno-49-9" href="#__codelineno-49-9"></a><span class="w">   </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%t1</span>
+<a id="__codelineno-49-10" name="__codelineno-49-10" href="#__codelineno-49-10"></a><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p><strong>请特别注意今年的 SPL 语法：</strong> 赋值、数组索引和加法都是 <code>expression</code> 的不同形式，所以它们都进入同一个 <code>visitExpression()</code> 方法；不是 <code>visitAssign()</code>、<code>visitAdd()</code> 或 <code>visitArrayAccess()</code> 三个自动生成的方法。这里遍历的是 ANTLR4 生成的 <strong>Parse Tree</strong> 。</p>
+<h3 id="62-store">6.2 左侧数组元素：生成地址，再 Store<a class="headerlink" href="#62-store" title="Permanent link">&para;</a></h3>
+<p><img alt="赋值表达式的 Parse Tree 与节点操作" src="../../assets/labs/w11/assignment.png" /></p>
+<p><strong>图的阅读方式：</strong> 从赋值表达式节点开始，访问左侧 <code>a[1]</code> 取得地址 <code>%p0</code>，访问右侧常量 <code>5</code> 得到字符串 <code>"5"</code>，最后追加 <code>store</code> 指令。图是经过折叠的关键子树示意；下面的 Java 代码是精确的教学逻辑。</p>
+<p>对于赋值表达式 <code>a[1] = 5</code>，不能直接用通常的 <code>visit(ctx.expression(0))</code> 取得左侧操作数，因为普通表达式访问通常需要一个 <strong>值</strong> ，而赋值左侧需要一个 <strong>地址</strong> 。</p>
+<p>因此，先定义一个非常简单的辅助方法 <code>addressOf()</code>，仅负责计算标识符和数组元素的地址：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">addressOf</span><span class="p">(</span><span class="n">SplcParser</span><span class="p">.</span><span class="na">ExpressionContext</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">LBRACK</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// expression '[' expression ']'</span>
+<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">addressOf</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">visit</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"%p"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pointerCounter</span><span class="o">++</span><span class="p">;</span>
+<a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a>
+<a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a><span class="w">        </span><span class="n">ir</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"  "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span>
+<a id="__codelineno-50-8" name="__codelineno-50-8" href="#__codelineno-50-8"></a><span class="w">          </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">" = getelementptr [3 x i32], ptr "</span><span class="p">)</span>
+<a id="__codelineno-50-9" name="__codelineno-50-9" href="#__codelineno-50-9"></a><span class="w">          </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">base</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">", i64 0, i64 "</span><span class="p">)</span>
+<a id="__codelineno-50-10" name="__codelineno-50-10" href="#__codelineno-50-10"></a><span class="w">          </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">index</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">"\n"</span><span class="p">);</span>
+<a id="__codelineno-50-11" name="__codelineno-50-11" href="#__codelineno-50-11"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ptr</span><span class="p">;</span>
+<a id="__codelineno-50-12" name="__codelineno-50-12" href="#__codelineno-50-12"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-50-13" name="__codelineno-50-13" href="#__codelineno-50-13"></a>
+<a id="__codelineno-50-14" name="__codelineno-50-14" href="#__codelineno-50-14"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">Identifier</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">().</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-50-15" name="__codelineno-50-15" href="#__codelineno-50-15"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">variables</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">Identifier</span><span class="p">().</span><span class="na">getText</span><span class="p">());</span>
+<a id="__codelineno-50-16" name="__codelineno-50-16" href="#__codelineno-50-16"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-50-17" name="__codelineno-50-17" href="#__codelineno-50-17"></a>
+<a id="__codelineno-50-18" name="__codelineno-50-18" href="#__codelineno-50-18"></a><span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UnsupportedOperationException</span><span class="p">(</span><span class="s">"Not an addressable expression"</span><span class="p">);</span>
+<a id="__codelineno-50-19" name="__codelineno-50-19" href="#__codelineno-50-19"></a><span class="p">}</span>
+</code></pre></div>
+<p>这里的 <code>[3 x i32]</code>、两层 GEP 索引与数组类型都只针对本例；一般编译器必须根据变量类型决定具体的 Source Element Type 和索引路径。<code>variables</code> 是代码生成器维护的变量名到 LLVM 地址的映射，例如 <code>a → %a</code>。</p>
+<p>赋值表达式的 <code>visitExpression()</code> 分支则是：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">ASSIGN</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">addressOf</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+<a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">visit</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<a id="__codelineno-51-4" name="__codelineno-51-4" href="#__codelineno-51-4"></a><span class="w">    </span><span class="n">ir</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"  store i32 "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<a id="__codelineno-51-5" name="__codelineno-51-5" href="#__codelineno-51-5"></a><span class="w">      </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">", ptr "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">address</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">"\n"</span><span class="p">);</span>
+<a id="__codelineno-51-6" name="__codelineno-51-6" href="#__codelineno-51-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="p">;</span><span class="w">  </span><span class="c1">// 赋值表达式的值，即 RHS 的值</span>
+<a id="__codelineno-51-7" name="__codelineno-51-7" href="#__codelineno-51-7"></a><span class="p">}</span>
+</code></pre></div>
+<p>其中 <code>visit(5)</code> 返回 <code>"5"</code>，不会产生额外指令。两个步骤合在一起得到：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="nv">%p0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">],</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%p0</span>
+</code></pre></div>
+<h3 id="63-load">6.3 右侧数组元素：生成地址、Load，再计算<a class="headerlink" href="#63-load" title="Permanent link">&para;</a></h3>
+<p><img alt="返回表达式的 Parse Tree 与节点操作" src="../../assets/labs/w11/return.png" /></p>
+<p>返回表达式 <code>a[1] + 1</code> 同样会访问 <code>a[1]</code>，但这一次需要参与加法的是数组元素 <strong>保存的整数</strong> ，不是地址。因此先用 <code>addressOf()</code> 生成 GEP，再用 <code>load</code> 得到值。</p>
+<p>在 <code>visitExpression()</code> 中：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="c1">// expression '[' expression ']' 作为一个普通右值</span>
+<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">LBRACK</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-53-3" name="__codelineno-53-3" href="#__codelineno-53-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">addressOf</span><span class="p">(</span><span class="n">ctx</span><span class="p">);</span>
+<a id="__codelineno-53-4" name="__codelineno-53-4" href="#__codelineno-53-4"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"%t"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tempCounter</span><span class="o">++</span><span class="p">;</span>
+<a id="__codelineno-53-5" name="__codelineno-53-5" href="#__codelineno-53-5"></a><span class="w">    </span><span class="n">ir</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"  "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-53-6" name="__codelineno-53-6" href="#__codelineno-53-6"></a><span class="w">      </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">" = load i32, ptr "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+<a id="__codelineno-53-7" name="__codelineno-53-7" href="#__codelineno-53-7"></a><span class="w">      </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"\n"</span><span class="p">);</span>
+<a id="__codelineno-53-8" name="__codelineno-53-8" href="#__codelineno-53-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<a id="__codelineno-53-9" name="__codelineno-53-9" href="#__codelineno-53-9"></a><span class="p">}</span>
+</code></pre></div>
+<p>加法则直接递归访问左右子表达式：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">PLUS</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">().</span><span class="na">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">visit</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+<a id="__codelineno-54-3" name="__codelineno-54-3" href="#__codelineno-54-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">visit</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<a id="__codelineno-54-4" name="__codelineno-54-4" href="#__codelineno-54-4"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"%t"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tempCounter</span><span class="o">++</span><span class="p">;</span>
+<a id="__codelineno-54-5" name="__codelineno-54-5" href="#__codelineno-54-5"></a><span class="w">    </span><span class="n">ir</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"  "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-54-6" name="__codelineno-54-6" href="#__codelineno-54-6"></a><span class="w">      </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">" = add i32 "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+<a id="__codelineno-54-7" name="__codelineno-54-7" href="#__codelineno-54-7"></a><span class="w">      </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">", "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">right</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">"\n"</span><span class="p">);</span>
+<a id="__codelineno-54-8" name="__codelineno-54-8" href="#__codelineno-54-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<a id="__codelineno-54-9" name="__codelineno-54-9" href="#__codelineno-54-9"></a><span class="p">}</span>
+</code></pre></div>
+<p>最后，<code>visitReturnStatement()</code> 负责先访问返回表达式，再生成 <code>ret</code>：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a><span class="nd">@Override</span>
+<a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">visitReturnStatement</span><span class="p">(</span><span class="n">SplcParser</span><span class="p">.</span><span class="na">ReturnStatementContext</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-55-3" name="__codelineno-55-3" href="#__codelineno-55-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">visit</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">());</span>
+<a id="__codelineno-55-4" name="__codelineno-55-4" href="#__codelineno-55-4"></a><span class="w">    </span><span class="n">ir</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"  ret i32 "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">result</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">"\n"</span><span class="p">);</span>
+<a id="__codelineno-55-5" name="__codelineno-55-5" href="#__codelineno-55-5"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<a id="__codelineno-55-6" name="__codelineno-55-6" href="#__codelineno-55-6"></a><span class="p">}</span>
+</code></pre></div>
+<p>这样便依次得到 <code>getelementptr → load → add → ret</code>。代码中的 <code>%p0</code>、<code>%p1</code>、<code>%t0</code>、<code>%t1</code> 是递增计数器产生的名称，并不是把操作数或临时结果硬编码进输出字符串。</p>
+<blockquote>
+<p><strong>简化示例说明：</strong> 上面只展示几个关键分支，省略了函数头、函数体和数组声明部分的 Visitor 代码。数字常量的 <code>visitExpression()</code> 分支直接返回 <code>ctx.Number().getText()</code>。此外，本例为了简洁使用固定长度为 3 的一维整型数组；完整的数组与结构体翻译还需要类型信息、通用地址计算、作用域管理等。</p>
+</blockquote>
+<h3 id="64-stringbuilder-builder">6.4 从 StringBuilder 到 Builder<a class="headerlink" href="#64-stringbuilder-builder" title="Permanent link">&para;</a></h3>
+<p>直接用字符串拼接最容易看懂生成过程，但实际编译器可以将这些操作封装成 Builder。老师提供的练习 Framework 中，<code>builder.add(left, right)</code> 和 <code>builder.load(addr, name)</code> 就是此类封装；Visitor 负责确定当前节点 <strong>应该生成什么</strong> ，Builder 负责确定 <strong>指令如何表达和输出</strong> 。</p>
+<p><a href="https://github.com/zhuym1219/CS323-Compilers-2026F-Labs/tree/lab11">Lab 11 Framework（lab11 分支）</a></p>
+<p>该 Framework 使用 <strong>独立的简化 SPL 语法</strong> ，只支持标量 <code>int</code> 等基本内容，并不支持上面的数组/GEP 教学示例。它只用于下一节的轻量练习。</p>
+<h3 id="65-framework">6.5 课堂练习（简化 Framework）<a class="headerlink" href="#65-framework" title="Permanent link">&para;</a></h3>
+<p>按照教师提供的 Starter Code，完成指定的少量 <code>LLVMVisitor.java</code> TODO。其他辅助逻辑由 Framework 提供，不要求从零实现一个编译器。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<a id="__codelineno-56-3" name="__codelineno-56-3" href="#__codelineno-56-3"></a><span class="w">    </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-56-4" name="__codelineno-56-4" href="#__codelineno-56-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<a id="__codelineno-56-5" name="__codelineno-56-5" href="#__codelineno-56-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>期望程序返回 <code>6</code>。可选思考：把 <code>a = a + 1</code> 改成 <code>a = a + 3</code> 后，会有哪些生成指令发生变化？</p>
+<h3 id="_1">延伸阅读<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<div class="admonition note">
+<p class="admonition-title">LLVM 官方资料</p>
+<ul>
+<li><a href="https://llvm.org/docs/LangRef.html#getelementptr-instruction">The LLVM Language Reference — getelementptr instruction</a>：GEP 的正式语法和语义。</li>
+<li><a href="https://llvm.org/docs/GetElementPtr.html">The Often Misunderstood GEP Instruction</a>：解释 GEP 的第一个索引、结构体字段访问和指针间接访问。</li>
+<li><a href="https://llvm.org/docs/OpaquePointers.html">Opaque Pointers</a>：解释现代 LLVM 中 <code>ptr</code> 的设计。</li>
+</ul>
+</div>
+<details class="note">
+<summary>补充：<code>inbounds</code> 与数组边界</summary>
+<p><code>inbounds</code> 不是运行时数组边界检查。它是向 LLVM 提供关于地址计算范围的保证，供 LLVM 优化使用；如果实际计算违反相应约束，GEP 结果可能成为 poison value。</p>
+<p>初学阶段先掌握普通 GEP 的地址计算规则即可，不要把 <code>inbounds</code> 理解成自动插入的越界检查。</p>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-copyright">
+    <div class="md-copyright__highlight">
+        commit: 
+        <a href="/commit/c89f2484, 2026-11-21 16:03:25+08:00" target="_blank" rel="noopener">
+            c89f2484, 2026-11-21 16:03:25+08:00
+        </a>
+    </div>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.path", "navigation.tabs", "navigation.tabs.sticky"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>

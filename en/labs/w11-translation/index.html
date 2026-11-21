@@ -1,0 +1,1963 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/labs/w11-translation/">
+      
+      
+        <link rel="prev" href="../w10-runtime-llvmir/">
+      
+      
+        <link rel="next" href="../../env/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+    
+    
+      
+        <title>Week 11 - Translation 1 - Compiler Lab Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.6543a935.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#week-11-address-computation-and-gep" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../" title="Compiler Lab Documentation" class="md-header__button md-logo" aria-label="Compiler Lab Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Compiler Lab Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Week 11 - Translation 1
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../labs/w11-translation/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../" class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../w1-intro/" class="md-tabs__link">
+          
+  
+  Weekly Labs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../env/" class="md-tabs__link">
+          
+  
+  Environment Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="Compiler Lab Documentation" class="md-nav__button md-logo" aria-label="Compiler Lab Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    Compiler Lab Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Weekly Labs
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Weekly Labs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w1-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 1 - Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w2-lex_p1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 2 - Lexer 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w3-lex_p2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 3 - Lexer 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w4-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 4 - Parser 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w5-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 5 - Parser 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w6-symbol/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 7 - Semantic Part 1 - Symbol Table
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w7-semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 8 - Semantic Part 2 - Type Checking
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w9-semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 9 - Semantic Part 3 - Expression
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w10-runtime-llvmir/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 10 - LLVM IR
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Week 11 - Translation 1
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Week 11 - Translation 1
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-start-with-a-complete-program" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Start with a Complete Program
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Start with a Complete Program">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-how-is-m-represented-in-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.1 How Is m Represented in LLVM IR?
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-find-an-element-within-an-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Find an Element Within an Object
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Find an Element Within an Object">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-follow-the-objects-type-to-the-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 Follow the Object's Type to the Target
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-why-can-one-gep-express-the-whole-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2 Why Can One GEP Express the Whole Path?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-understanding-geps-type-and-indices" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3 Understanding GEP's Type and Indices
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-why-specify-structmatrix-when-gep-already-has-ptr" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.4 Why Specify %struct.Matrix When GEP Already Has ptr?
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-return-to-the-program-dynamic-indices-reads-and-writes" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Return to the Program: Dynamic Indices, Reads, and Writes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Return to the Program: Dynamic Indices, Reads, and Writes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-where-do-dynamic-index-values-come-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 Where Do Dynamic Index Values Come From?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-once-we-have-the-destination-address-how-do-we-assign-to-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 Once We Have the Destination Address, How Do We Assign to It?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-what-if-we-want-to-read-the-element" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3 What If We Want to Read the Element?
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-geps-limits-when-must-we-load-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. GEP's Limits: When Must We Load First?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-back-to-the-compiler-generating-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Back to the Compiler: Generating LLVM IR
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Back to the Compiler: Generating LLVM IR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-the-complete-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1 The Complete Translation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.2 Exercises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-practice-generate-llvm-ir-with-an-antlr4-visitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Practice: Generate LLVM IR with an ANTLR4 Visitor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Practice: Generate LLVM IR with an ANTLR4 Visitor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-from-syntax-nodes-to-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1 From Syntax Nodes to LLVM IR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-an-array-element-on-the-left-compute-its-address-then-store" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.2 An Array Element on the Left: Compute Its Address, Then Store
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-an-array-element-used-as-a-value-compute-its-address-load-then-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.3 An Array Element Used as a Value: Compute Its Address, Load, Then Add
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-from-stringbuilder-to-a-builder-abstraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.4 From StringBuilder to a Builder Abstraction
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-in-class-exercise-the-simplified-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.5 In-Class Exercise: The Simplified Framework
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      Further Reading
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Environment Setup
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Environment Setup
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Alternative Environments
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Alternative Environments
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/wsl/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows WSL
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/macos-native/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Native macOS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-start-with-a-complete-program" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Start with a Complete Program
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Start with a Complete Program">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-how-is-m-represented-in-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      1.1 How Is m Represented in LLVM IR?
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-find-an-element-within-an-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Find an Element Within an Object
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Find an Element Within an Object">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-follow-the-objects-type-to-the-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 Follow the Object's Type to the Target
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-why-can-one-gep-express-the-whole-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2 Why Can One GEP Express the Whole Path?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-understanding-geps-type-and-indices" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3 Understanding GEP's Type and Indices
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-why-specify-structmatrix-when-gep-already-has-ptr" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.4 Why Specify %struct.Matrix When GEP Already Has ptr?
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-return-to-the-program-dynamic-indices-reads-and-writes" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Return to the Program: Dynamic Indices, Reads, and Writes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Return to the Program: Dynamic Indices, Reads, and Writes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-where-do-dynamic-index-values-come-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 Where Do Dynamic Index Values Come From?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-once-we-have-the-destination-address-how-do-we-assign-to-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 Once We Have the Destination Address, How Do We Assign to It?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-what-if-we-want-to-read-the-element" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3 What If We Want to Read the Element?
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-geps-limits-when-must-we-load-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. GEP's Limits: When Must We Load First?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-back-to-the-compiler-generating-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Back to the Compiler: Generating LLVM IR
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Back to the Compiler: Generating LLVM IR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-the-complete-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1 The Complete Translation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.2 Exercises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-practice-generate-llvm-ir-with-an-antlr4-visitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Practice: Generate LLVM IR with an ANTLR4 Visitor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Practice: Generate LLVM IR with an ANTLR4 Visitor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-from-syntax-nodes-to-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1 From Syntax Nodes to LLVM IR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-an-array-element-on-the-left-compute-its-address-then-store" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.2 An Array Element on the Left: Compute Its Address, Then Store
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-an-array-element-used-as-a-value-compute-its-address-load-then-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.3 An Array Element Used as a Value: Compute Its Address, Load, Then Add
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-from-stringbuilder-to-a-builder-abstraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.4 From StringBuilder to a Builder Abstraction
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-in-class-exercise-the-simplified-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.5 In-Class Exercise: The Simplified Framework
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      Further Reading
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="week-11-address-computation-and-gep">Week 11 — Address Computation and GEP<a class="headerlink" href="#week-11-address-computation-and-gep" title="Permanent link">&para;</a></h1>
+<p>Last week, we learned how to allocate storage for variables in LLVM IR and how to read and write that storage. This week, we take the next step:</p>
+<p><strong>If a variable is an array or a structure rather than a single integer, how do we access an element or field inside it?</strong></p>
+<p>Instead of introducing LLVM instructions in isolation, we will work through a complete SPL program. We will first examine its object types and storage, then compute the address of an element, handle dynamic indices, and read and write the element. Finally, we will return to the compiler and see how to generate the corresponding LLVM IR.</p>
+<h2 id="1-start-with-a-complete-program">1. Start with a Complete Program<a class="headerlink" href="#1-start-with-a-complete-program" title="Permanent link">&para;</a></h2>
+<p>Consider the following program:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">rows</span><span class="p">;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cols</span><span class="p">;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">version</span><span class="p">;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">};</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="p">;</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">41</span><span class="p">;</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">];</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="p">}</span>
+</code></pre></div>
+<p>This program uses structures, arrays, member access, array indexing, and assignment expressions, all supported by the current SPL language. Our goal is to translate it into LLVM IR.</p>
+<p>Before translating the whole program, focus on its key statement:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>This ordinary-looking statement requires the compiler to perform several distinct operations:</p>
+<ol>
+<li>Locate the storage for the local variable <code>m</code>.</li>
+<li>Locate the <code>cells</code> field within the structure.</li>
+<li>Use <code>i</code> and <code>j</code> to locate the target element in the two-dimensional array.</li>
+<li>Evaluate the right-hand expression, <code>value + 1</code>.</li>
+<li>Write the result into the target element on the left.</li>
+</ol>
+<p>The new challenge this week lies in steps 2 and 3: given the address of an entire structure object, how do we find the address of an array element inside it?</p>
+<h3 id="11-how-is-m-represented-in-llvm-ir">1.1 How Is <code>m</code> Represented in LLVM IR?<a class="headerlink" href="#11-how-is-m-represented-in-llvm-ir" title="Permanent link">&para;</a></h3>
+<p>The source program defines the structure as follows:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">rows</span><span class="p">;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cols</span><span class="p">;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">version</span><span class="p">;</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">};</span>
+</code></pre></div>
+<p><code>cells</code> is a two-dimensional array. Its outer array has two elements, each of which is an array of three <code>int</code> values.</p>
+<p>We can represent this structure type in LLVM IR as:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">%struct.Matrix</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="m">2</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">]],</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>Here:</p>
+<ul>
+<li><code>i32</code> corresponds to SPL's <code>int</code>.</li>
+<li><code>[3 x i32]</code> is an array of three <code>i32</code> elements.</li>
+<li><code>[2 x [3 x i32]]</code> is a two-dimensional array with two rows of three <code>i32</code> elements each.</li>
+<li><code>%struct.Matrix</code> names the structure type containing these four fields.</li>
+</ul>
+<p>Structure fields are numbered from <code>0</code> in declaration order:</p>
+<table>
+<thead>
+<tr>
+<th>Source field</th>
+<th>LLVM type</th>
+<th style="text-align: right;">Field index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rows</code></td>
+<td><code>i32</code></td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><code>cols</code></td>
+<td><code>i32</code></td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td><code>cells</code></td>
+<td><code>[2 x [3 x i32]]</code></td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td><code>i32</code></td>
+<td style="text-align: right;">3</td>
+</tr>
+</tbody>
+</table>
+<p>Although <code>cells</code> is a two-dimensional array, it is still a single structure field, with field index <code>2</code>. We select this field first, then apply row and column indices within the array. The surrounding fields, <code>rows</code>, <code>cols</code>, and <code>version</code>, make the numbering clear: an array field occupies one field index, regardless of how many elements it contains.</p>
+<p>The object <code>m</code> therefore has type <code>%struct.Matrix</code>. We allocate its storage with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">%m.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="nv">%struct.Matrix</span>
+</code></pre></div>
+<p>This is the same kind of operation as the <code>alloca i32</code> instruction from Week 10. This time, however, it allocates an entire structure rather than a single integer.</p>
+<p><code>%m.addr</code> holds the address of the whole <code>m</code> object. It is neither the address of <code>m.cells[1][2]</code> nor the integer stored in that element.</p>
+<p>The following diagram shows the components of <code>m</code>:</p>
+<p><img alt="The Matrix object, its fields, and the nested cells array" src="../../assets/labs/w11/matrix-address-path.svg" /></p>
+<p>We now know the object's type and have its starting address. The central question is: how do we get from <code>%m.addr</code> to <code>m.cells[1][2]</code>?</p>
+<h2 id="2-find-an-element-within-an-object">2. Find an Element Within an Object<a class="headerlink" href="#2-find-an-element-within-an-object" title="Permanent link">&para;</a></h2>
+<p>To focus on address computation, temporarily replace the dynamic indices <code>i</code> and <code>j</code> with constants:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+</code></pre></div>
+<p>The object's type stays the same. Using constants simply lets us set aside the question of where the index values come from.</p>
+<h3 id="21-follow-the-objects-type-to-the-target">2.1 Follow the Object's Type to the Target<a class="headerlink" href="#21-follow-the-objects-type-to-the-target" title="Permanent link">&para;</a></h3>
+<p>Starting from <code>%m.addr</code>, accessing <code>m.cells[1][2]</code> follows a path through the object's nested components:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>%m.addr
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>   |
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>   v
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>struct Matrix object
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>   |
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>   | Select field cells (field index 2)
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>   v
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>[2 x [3 x i32]]
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>   |
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>   | Select row at index 1
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>   v
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>[3 x i32]
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>   |
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>   | Select column at index 2
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>   v
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>i32 element
+</code></pre></div>
+<p>Array indices start at <code>0</code>, so:</p>
+<ul>
+<li><code>cells[1]</code> is the second row.</li>
+<li><code>cells[1][2]</code> is the third element in the second row.</li>
+</ul>
+<p>We can split this path into three address computations. First, find the <code>cells</code> field within the structure:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">%cells.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>Next, find the second row within the two-dimensional array:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">%row.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="p">[</span><span class="m">2</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">]],</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%cells.addr</span><span class="p">,</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+<p>Finally, find the third element within that row:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">],</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%row.addr</span><span class="p">,</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>These three steps take us:</p>
+<ol>
+<li>From the structure object to its <code>cells</code> field.</li>
+<li>From the two-dimensional array to its second row.</li>
+<li>From that row to its third element.</li>
+</ol>
+<p>We now have the address of <code>m.cells[1][2]</code>. The result is still an address; we have not read the integer stored there.</p>
+<h3 id="22-why-can-one-gep-express-the-whole-path">2.2 Why Can One GEP Express the Whole Path?<a class="headerlink" href="#22-why-can-one-gep-express-the-whole-path" title="Permanent link">&para;</a></h3>
+<p>We split the computation into three steps to make the access path easier to follow. Each step, however, only selects a subobject within a known structure or array layout. None requires reading another value from memory.</p>
+<p>We can therefore combine them into a single <code>getelementptr</code> instruction, usually abbreviated as <strong>GEP</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>This computes the same address as the three separate GEP instructions. Starting from <code>%m.addr</code>, it follows the path described by the type and indices to the target element.</p>
+<p>That is GEP's central purpose:</p>
+<p><strong>GEP computes the address of a subobject from an existing base address, an object type, and a sequence of indices.</strong></p>
+<p>It does not read or write the contents at that address.</p>
+<h3 id="23-understanding-geps-type-and-indices">2.3 Understanding GEP's Type and Indices<a class="headerlink" href="#23-understanding-geps-type-and-indices" title="Permanent link">&para;</a></h3>
+<p>The basic form of GEP is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="p">&lt;</span><span class="err">source</span><span class="w"> </span><span class="err">element</span><span class="w"> </span><span class="k">type</span><span class="p">&gt;,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="p">&lt;</span><span class="err">base</span><span class="w"> </span><span class="err">address</span><span class="p">&gt;,</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="p">&lt;</span><span class="err">inde</span><span class="k">x</span><span class="w"> </span><span class="k">type</span><span class="p">&gt;</span><span class="w"> </span><span class="p">&lt;</span><span class="err">inde</span><span class="k">x</span><span class="p">&gt;,</span><span class="w"> </span><span class="p">...</span>
+</code></pre></div>
+<p>Return to our instruction:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>Each part has a specific role:</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Meaning in this example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>%struct.Matrix</code></td>
+<td>The source element type: tells LLVM which object type to start from.</td>
+</tr>
+<tr>
+<td><code>ptr %m.addr</code></td>
+<td>The base address: the start of the whole <code>m</code> object.</td>
+</tr>
+<tr>
+<td>First index, <code>i64 0</code></td>
+<td>Advance by zero whole <code>%struct.Matrix</code> objects from the base address.</td>
+</tr>
+<tr>
+<td>Second index, <code>i32 2</code></td>
+<td>Select the structure's third field, <code>cells</code>.</td>
+</tr>
+<tr>
+<td>Third index, <code>i64 1</code></td>
+<td>Select the second row of the two-dimensional array.</td>
+</tr>
+<tr>
+<td>Fourth index, <code>i64 2</code></td>
+<td>Select the third element of that row.</td>
+</tr>
+<tr>
+<td><code>%element.addr</code></td>
+<td>The resulting element address.</td>
+</tr>
+</tbody>
+</table>
+<p>The first two indices can be confusing because they serve different purposes:</p>
+<ul>
+<li>The first index, <code>i64 0</code>, steps through objects of type <code>%struct.Matrix</code> from the base address. Advancing by zero whole objects keeps us at the current <code>m</code>.</li>
+<li>The second index, <code>i32 2</code>, selects a field within that structure: its third field, <code>cells</code>.</li>
+<li>The remaining indices, <code>i64 1</code> and <code>i64 2</code>, select the row and column within the two-dimensional array.</li>
+</ul>
+<p>The Matrix diagram above shows how these indices lead through the structure field, array row, and array column.</p>
+<p>The first index does not always have to be <code>0</code>. If the base address points to a sequence of contiguous structure objects, a first index of <code>1</code> advances to the next structure. Here, we want the current <code>m</code>, so we use <code>0</code>.</p>
+<p>A structure field index is a <strong>field number</strong>, not a byte offset. The <code>i32 2</code> selects the third field, <code>cells</code>; LLVM computes its actual byte offset from the structure type and the target's <strong>data layout</strong>. Even when a structure contains padding, we do not need to calculate the byte offset ourselves.</p>
+<p>Notice that this GEP uses both <code>i64</code> and <code>i32</code>:</p>
+<ul>
+<li>On common 64-bit targets, the first index and array indices are often written as <code>i64</code>, since they participate in address arithmetic.</li>
+<li>Structure field indices follow a special rule: they must be constant integers of type <code>i32</code>. That is why selecting <code>cells</code> uses <code>i32 2</code>.</li>
+</ul>
+<p>The mixture in <code>i64 0, i32 2, i64 1, i64 2</code> is therefore deliberate. These indices represent object stepping, field selection, row selection, and column selection, respectively. The target's data layout determines the pointer index width; our examples use a typical 64-bit target.</p>
+<h3 id="24-why-specify-structmatrix-when-gep-already-has-ptr">2.4 Why Specify <code>%struct.Matrix</code> When GEP Already Has <code>ptr</code>?<a class="headerlink" href="#24-why-specify-structmatrix-when-gep-already-has-ptr" title="Permanent link">&para;</a></h3>
+<p>In modern LLVM IR, pointers are generally written as:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">ptr</span>
+</code></pre></div>
+<p>Older LLVM IR used typed pointers such as:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nv">%struct.Matrix</span><span class="p">*</span>
+</code></pre></div>
+<p>Modern LLVM uses <strong>opaque pointers</strong>. The type <code>ptr</code> represents an address without encoding the type of the object it points to.</p>
+<p>How, then, does LLVM know which layout to use for address computation? GEP supplies that information through its first type argument:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span><span class="w"> </span><span class="p">...</span>
+</code></pre></div>
+<p>Here, <code>%struct.Matrix</code> is the <strong>source element type</strong>. It specifies the object type from which this address computation begins.</p>
+<p>Likewise, a memory read explicitly states the type of value to read:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nv">%value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%element.addr</span>
+</code></pre></div>
+<p>Keep these roles distinct:</p>
+<ul>
+<li><code>ptr</code> represents an address.</li>
+<li>GEP's source element type supplies the object layout used for address computation.</li>
+<li>The type on <code>load</code> specifies the value to read from memory.</li>
+</ul>
+<h2 id="3-return-to-the-program-dynamic-indices-reads-and-writes">3. Return to the Program: Dynamic Indices, Reads, and Writes<a class="headerlink" href="#3-return-to-the-program-dynamic-indices-reads-and-writes" title="Permanent link">&para;</a></h2>
+<p>We can now compute the address of <code>m.cells[1][2]</code> using constant indices. Return to the original statement:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>Here, <code>i</code> and <code>j</code> are variables rather than constants written directly in the access expression. The address computation follows the same path, but the row and column indices must be obtained at runtime.</p>
+<h3 id="31-where-do-dynamic-index-values-come-from">3.1 Where Do Dynamic Index Values Come From?<a class="headerlink" href="#31-where-do-dynamic-index-values-come-from" title="Permanent link">&para;</a></h3>
+<p>In our program, <code>i</code> and <code>j</code> are ordinary local variables. Following Week 10's approach, we allocate storage and initialize them:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nv">%i.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="nv">%j.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%i.addr</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%j.addr</span>
+</code></pre></div>
+<p>GEP needs the <strong>index values</strong>, whereas <code>%i.addr</code> and <code>%j.addr</code> are the variables' storage addresses. We must first read their values:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nv">%i.value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%i.addr</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="nv">%j.value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%j.addr</span>
+</code></pre></div>
+<p>Now <code>%i.value</code> and <code>%j.value</code> are integer values we can use in address computation.</p>
+<p>Our examples use <code>i64</code> array indices for a 64-bit target. We therefore extend the loaded <code>i32</code> indices to <code>i64</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nv">%i.index</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sext</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%i.value</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i64</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="nv">%j.index</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sext</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%j.value</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i64</span>
+</code></pre></div>
+<p>Then we use them as GEP's array indices:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%i.index</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%j.index</span>
+</code></pre></div>
+<p><code>sext</code> performs <strong>sign extension</strong>: it extends an <code>i32</code> integer to <code>i64</code> while preserving its signed value. We extend the array indices <code>i</code> and <code>j</code>; the structure field index remains <code>i32 2</code>.</p>
+<p>GEP does not require every index to be constant. Array indices can be integer values computed at runtime. Their interpretation follows the target's pointer indexing rules, and different targets may use different pointer index widths.</p>
+<h3 id="32-once-we-have-the-destination-address-how-do-we-assign-to-it">3.2 Once We Have the Destination Address, How Do We Assign to It?<a class="headerlink" href="#32-once-we-have-the-destination-address-how-do-we-assign-to-it" title="Permanent link">&para;</a></h3>
+<p>We have computed the address of the left-hand element, <code>m.cells[i][j]</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%i.index</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%j.index</span>
+</code></pre></div>
+<p>But the source statement asks us to perform an assignment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>GEP has located the destination; it has not written anything there. We still need to evaluate <code>value + 1</code>.</p>
+<p>The variable <code>value</code> holds its integer in memory, so we first read it and then perform the addition:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nv">%value.value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%value.addr</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="nv">%sum</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%value.value</span><span class="p">,</span><span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+<p>Finally, we write the result to the destination address:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%sum</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%element.addr</span>
+</code></pre></div>
+<p>Putting these operations together:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>Left side, m.cells[i][j]: compute the destination address
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>Right side, value + 1:   read value and compute the sum
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>Finally:                write the sum to the destination address
+</code></pre></div>
+<p>This reveals a useful distinction: depending on the context, an expression may need to provide an address or a value.</p>
+<p>The left side of assignment must identify where to write, so the compiler generates an address. Addition needs integer values, so the compiler reads the variable's contents. GEP, <code>load</code>, and <code>store</code> provide the operations needed for these tasks.</p>
+<h3 id="33-what-if-we-want-to-read-the-element">3.3 What If We Want to Read the Element?<a class="headerlink" href="#33-what-if-we-want-to-read-the-element" title="Permanent link">&para;</a></h3>
+<p>The program's final statement is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">return</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">];</span>
+</code></pre></div>
+<p>Here, we need the integer currently stored in the element as the function's return value.</p>
+<p>The address computation is exactly the same as before:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="nv">%result.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>After computing the address, we read the value with <code>load</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%result.addr</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+</code></pre></div>
+<p>The distinction between reading and writing comes after GEP:</p>
+<ul>
+<li>The same access path can use the same address computation.</li>
+<li>To modify the element, use <code>store</code>.</li>
+<li>To obtain the value stored in the element, use <code>load</code>.</li>
+</ul>
+<h2 id="4-geps-limits-when-must-we-load-first">4. GEP's Limits: When Must We Load First?<a class="headerlink" href="#4-geps-limits-when-must-we-load-first" title="Permanent link">&para;</a></h2>
+<p>So far, every access in our running example follows the nested structure and array layout directly. This works because <code>cells</code> is an array <strong>embedded in</strong> <code>Matrix</code>: it is part of the structure object itself, and LLVM can determine its location from the type.</p>
+<p>Let us change one detail and see what happens. Recall our original structure:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">rows</span><span class="p">;</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cols</span><span class="p">;</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">version</span><span class="p">;</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="p">};</span>
+</code></pre></div>
+<p>The array object <code>cells</code> is contained directly within <code>Matrix</code>. To compare an embedded array with an indirectly referenced object, consider this C structure:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Data</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">values</span><span class="p">;</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="p">};</span>
+</code></pre></div>
+<p>Here, <code>values</code> is a pointer field. The structure stores an address that points to a separate region of memory.</p>
+<p>The following example uses C pointer syntax to illustrate indirection in LLVM. <strong>This syntax is outside the current SPL language.</strong></p>
+<p>Assume <code>%p</code> is already a pointer value referring to a <code>struct Data</code> object. To access <code>p-&gt;values[i]</code>, we first locate the <code>values</code> field itself:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nv">%struct.Data</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="nv">%values.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Data</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%p</span><span class="p">,</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">0</span>
+</code></pre></div>
+<p><code>%values.addr</code> is the storage address of the pointer field. It is not the address of the array that <code>values</code> points to.</p>
+<p>We must use <code>load</code> to obtain the pointer value stored in that field:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nv">%values.ptr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">ptr</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%values.addr</span>
+</code></pre></div>
+<p>Now <code>%values.ptr</code> is the pointer to the integer array. Assume <code>%i</code> is an already computed <code>i32</code> index value. For our 64-bit target, we first extend it to <code>i64</code>, then compute the element address using <code>%values.ptr</code> as the new base:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="nv">%i.index</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sext</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%i</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i64</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%values.ptr</span><span class="p">,</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%i.index</span>
+</code></pre></div>
+<p>To write <code>100</code> into that element, we finish with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">100</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%element.addr</span>
+</code></pre></div>
+<p>The complete sequence is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>GEP -&gt; Load -&gt; GEP -&gt; Store
+</code></pre></div>
+<p><img alt="Load the pointer stored in a structure field before computing an array element address" src="../../assets/labs/w11/pointer-field.svg" /></p>
+<p>How does this differ from <code>m.cells[i][j]</code>?</p>
+<table>
+<thead>
+<tr>
+<th>Running example: an embedded array</th>
+<th>C extension: a pointer field</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cells</code> is part of the structure object.</td>
+<td><code>values</code> stores a pointer value.</td>
+</tr>
+<tr>
+<td>The structure type directly describes the array layout.</td>
+<td>The pointed-to object is outside the structure's nested layout.</td>
+</tr>
+<tr>
+<td>GEP can follow the layout all the way to the element.</td>
+<td>GEP locates the pointer field, then <code>load</code> reads its pointer value.</td>
+</tr>
+<tr>
+<td>Further indexing follows the original object's type path.</td>
+<td>The next GEP uses the loaded pointer as a new base address.</td>
+</tr>
+</tbody>
+</table>
+<p>The question to ask is therefore not how many subscripts or member accesses appear in the source, but:</p>
+<p><strong>Do we already have the base address needed for the next address computation? If that address is a pointer value stored in memory, we must load it first.</strong></p>
+<p>This is GEP's limit: it computes a new address from an existing address and a type layout, but it does not read pointers from memory for us.</p>
+<h2 id="5-back-to-the-compiler-generating-llvm-ir">5. Back to the Compiler: Generating LLVM IR<a class="headerlink" href="#5-back-to-the-compiler-generating-llvm-ir" title="Permanent link">&para;</a></h2>
+<p>Return once more to our assignment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>We now know which LLVM IR operations it requires. For the IR generator, the key is to distinguish two tasks:</p>
+<ul>
+<li>Generate the address of an object.</li>
+<li>Generate the value of an expression.</li>
+</ul>
+<p>We can describe these tasks with two interfaces:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>emitAddress(expression) -&gt; ptr
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>emitValue(expression)   -&gt; LLVM Value
+</code></pre></div>
+<p>For example:</p>
+<ul>
+<li>For the identifier <code>m</code>, <code>emitAddress(m)</code> retrieves the variable's storage address from the symbol table.</li>
+<li>For member access <code>m.cells</code>, first obtain the address of <code>m</code>, then use its structure type information to find the field index of <code>cells</code> and generate a GEP.</li>
+<li>For array access <code>m.cells[i]</code>, first obtain the array object's address, then evaluate the index <code>i</code> and generate a GEP.</li>
+<li>When the integer value of the ordinary variable <code>value</code> is needed, obtain its address and generate a <code>load</code>.</li>
+</ul>
+<p>Assignment can therefore be summarized as:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>leftAddress = emitAddress(lhs)
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>rightValue  = emitValue(rhs)
+<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>store rightValue -&gt; leftAddress
+</code></pre></div>
+<p>These function names are illustrative. The important design choice is to separate the responsibilities: the left side supplies a location, and the right side supplies a value.</p>
+<h3 id="51-the-complete-translation">5.1 The Complete Translation<a class="headerlink" href="#51-the-complete-translation" title="Permanent link">&para;</a></h3>
+<p>We can now assemble the pieces developed above. First, define the structure type:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="nv">%struct.Matrix</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="m">2</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">]],</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>The complete LLVM IR is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="nv">%struct.Matrix</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="m">2</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">]],</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="nl">entry:</span>
+<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a><span class="w">    </span><span class="c">; Allocate local objects</span>
+<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a><span class="w">    </span><span class="nv">%m.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="nv">%struct.Matrix</span>
+<a id="__codelineno-41-7" name="__codelineno-41-7" href="#__codelineno-41-7"></a><span class="w">    </span><span class="nv">%i.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-41-8" name="__codelineno-41-8" href="#__codelineno-41-8"></a><span class="w">    </span><span class="nv">%j.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-41-9" name="__codelineno-41-9" href="#__codelineno-41-9"></a><span class="w">    </span><span class="nv">%value.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-41-10" name="__codelineno-41-10" href="#__codelineno-41-10"></a>
+<a id="__codelineno-41-11" name="__codelineno-41-11" href="#__codelineno-41-11"></a><span class="w">    </span><span class="c">; Initialize scalar variables</span>
+<a id="__codelineno-41-12" name="__codelineno-41-12" href="#__codelineno-41-12"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%i.addr</span>
+<a id="__codelineno-41-13" name="__codelineno-41-13" href="#__codelineno-41-13"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%j.addr</span>
+<a id="__codelineno-41-14" name="__codelineno-41-14" href="#__codelineno-41-14"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">41</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%value.addr</span>
+<a id="__codelineno-41-15" name="__codelineno-41-15" href="#__codelineno-41-15"></a>
+<a id="__codelineno-41-16" name="__codelineno-41-16" href="#__codelineno-41-16"></a><span class="w">    </span><span class="c">; Read the dynamic indices</span>
+<a id="__codelineno-41-17" name="__codelineno-41-17" href="#__codelineno-41-17"></a><span class="w">    </span><span class="nv">%i.value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%i.addr</span>
+<a id="__codelineno-41-18" name="__codelineno-41-18" href="#__codelineno-41-18"></a><span class="w">    </span><span class="nv">%j.value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%j.addr</span>
+<a id="__codelineno-41-19" name="__codelineno-41-19" href="#__codelineno-41-19"></a><span class="w">    </span><span class="nv">%i.index</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sext</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%i.value</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i64</span>
+<a id="__codelineno-41-20" name="__codelineno-41-20" href="#__codelineno-41-20"></a><span class="w">    </span><span class="nv">%j.index</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sext</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%j.value</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i64</span>
+<a id="__codelineno-41-21" name="__codelineno-41-21" href="#__codelineno-41-21"></a>
+<a id="__codelineno-41-22" name="__codelineno-41-22" href="#__codelineno-41-22"></a><span class="w">    </span><span class="c">; Calculate the address of m.cells[i][j]</span>
+<a id="__codelineno-41-23" name="__codelineno-41-23" href="#__codelineno-41-23"></a><span class="w">    </span><span class="nv">%element.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-41-24" name="__codelineno-41-24" href="#__codelineno-41-24"></a><span class="w">        </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%i.index</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%j.index</span>
+<a id="__codelineno-41-25" name="__codelineno-41-25" href="#__codelineno-41-25"></a>
+<a id="__codelineno-41-26" name="__codelineno-41-26" href="#__codelineno-41-26"></a><span class="w">    </span><span class="c">; Evaluate value + 1</span>
+<a id="__codelineno-41-27" name="__codelineno-41-27" href="#__codelineno-41-27"></a><span class="w">    </span><span class="nv">%value.value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%value.addr</span>
+<a id="__codelineno-41-28" name="__codelineno-41-28" href="#__codelineno-41-28"></a><span class="w">    </span><span class="nv">%sum</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%value.value</span><span class="p">,</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-41-29" name="__codelineno-41-29" href="#__codelineno-41-29"></a>
+<a id="__codelineno-41-30" name="__codelineno-41-30" href="#__codelineno-41-30"></a><span class="w">    </span><span class="c">; Store the result into m.cells[i][j]</span>
+<a id="__codelineno-41-31" name="__codelineno-41-31" href="#__codelineno-41-31"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%sum</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%element.addr</span>
+<a id="__codelineno-41-32" name="__codelineno-41-32" href="#__codelineno-41-32"></a>
+<a id="__codelineno-41-33" name="__codelineno-41-33" href="#__codelineno-41-33"></a><span class="w">    </span><span class="c">; Calculate the address of m.cells[1][2]</span>
+<a id="__codelineno-41-34" name="__codelineno-41-34" href="#__codelineno-41-34"></a><span class="w">    </span><span class="nv">%result.addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="nv">%struct.Matrix</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%m.addr</span><span class="p">,</span>
+<a id="__codelineno-41-35" name="__codelineno-41-35" href="#__codelineno-41-35"></a><span class="w">        </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-41-36" name="__codelineno-41-36" href="#__codelineno-41-36"></a>
+<a id="__codelineno-41-37" name="__codelineno-41-37" href="#__codelineno-41-37"></a><span class="w">    </span><span class="c">; Read the element and return it</span>
+<a id="__codelineno-41-38" name="__codelineno-41-38" href="#__codelineno-41-38"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%result.addr</span>
+<a id="__codelineno-41-39" name="__codelineno-41-39" href="#__codelineno-41-39"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-41-40" name="__codelineno-41-40" href="#__codelineno-41-40"></a><span class="p">}</span>
+</code></pre></div>
+<p>With <code>i = 1</code>, <code>j = 2</code>, and <code>value = 41</code>, the assignment writes <code>42</code> into <code>m.cells[1][2]</code>. The program then reads that element and returns <code>42</code>.</p>
+<p>Looking back over the translation:</p>
+<ol>
+<li><code>alloca</code> allocates storage for the local variables and the entire structure object.</li>
+<li><code>load</code> reads the dynamic indices and scalar variable values.</li>
+<li>GEP computes the target element's address from the structure and array layouts.</li>
+<li><code>add</code> evaluates the right-hand expression.</li>
+<li><code>store</code> writes the result to the destination address.</li>
+<li>The return expression uses GEP again to obtain the element address, then <code>load</code> to read its value.</li>
+</ol>
+<p>Throughout, we have been solving the same problem: starting from an existing object, how do we locate an element inside it and correctly read or modify that element?</p>
+<h3 id="52-exercises">5.2 Exercises<a class="headerlink" href="#52-exercises" title="Permanent link">&para;</a></h3>
+<p>These exercises apply the address computation rules from this lab without introducing new language features.</p>
+<p><strong>Exercise 1: Access a Different Element</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">rows</span><span class="p">;</span>
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cols</span><span class="p">;</span>
+<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">version</span><span class="p">;</span>
+<a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a><span class="p">};</span>
+<a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a>
+<a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-42-9" name="__codelineno-42-9" href="#__codelineno-42-9"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span><span class="p">;</span>
+</code></pre></div>
+<p>Write the GEP that computes the address of <code>m.cells[0][1]</code> and explain each index.</p>
+<p><strong>Exercise 2: Dynamic Indices</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">rows</span><span class="p">;</span>
+<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cols</span><span class="p">;</span>
+<a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">version</span><span class="p">;</span>
+<a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a><span class="p">};</span>
+<a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a>
+<a id="__codelineno-43-8" name="__codelineno-43-8" href="#__codelineno-43-8"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Matrix</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-43-9" name="__codelineno-43-9" href="#__codelineno-43-9"></a><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<a id="__codelineno-43-10" name="__codelineno-43-10" href="#__codelineno-43-10"></a><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="p">;</span>
+<a id="__codelineno-43-11" name="__codelineno-43-11" href="#__codelineno-43-11"></a>
+<a id="__codelineno-43-12" name="__codelineno-43-12" href="#__codelineno-43-12"></a><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span><span class="p">;</span>
+</code></pre></div>
+<p>Explain why the values of <code>i</code> and <code>j</code> must be obtained before they can be used as GEP indices.</p>
+<p><strong>Exercise 3: Read an Element</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="k">return</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">];</span>
+</code></pre></div>
+<p>Write the corresponding GEP and <code>load</code> instructions, and explain why no <code>store</code> is needed.</p>
+<p><strong>Exercise 4: C Extension — A Pointer Field</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Data</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">values</span><span class="p">;</span>
+<a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="p">};</span>
+</code></pre></div>
+<p>Assume <code>%p</code> is already a pointer value referring to a <code>struct Data</code> object. Write the GEP, <code>load</code>, and second GEP needed to access <code>p-&gt;values[i]</code>, and explain why the intermediate <code>load</code> is necessary.</p>
+<h2 id="6-practice-generate-llvm-ir-with-an-antlr4-visitor">6. Practice: Generate LLVM IR with an ANTLR4 Visitor<a class="headerlink" href="#6-practice-generate-llvm-ir-with-an-antlr4-visitor" title="Permanent link">&para;</a></h2>
+<p>In previous projects, we used ANTLR4 visitors to traverse a <strong>parse tree</strong>. During semantic analysis, visiting a syntax node might involve checking whether a variable is declared, determining an expression's type, or adding a symbol to the symbol table.</p>
+<p>We will use the same visitor mechanism for code generation. What changes is <strong>the work performed when each node is visited</strong>.</p>
+<p>Our goal is now to translate SPL into LLVM IR. A straightforward implementation uses a <code>StringBuilder</code> to accumulate the generated IR:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">StringBuilder</span><span class="w"> </span><span class="n">ir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span>
+</code></pre></div>
+<p>As the visitor traverses the parse tree, it generates the LLVM IR instructions required by each construct and appends them to the <code>StringBuilder</code>.</p>
+<p>For integer addition, we generate <code>add</code>; for a variable declaration, we may need <code>alloca</code>; for assignment, we generate <code>store</code>; and for a return statement, we generate <code>ret</code>.</p>
+<p>LLVM IR takes shape as the traversal proceeds:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>Visit a syntax node
+<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>    ↓
+<a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a>Generate LLVM IR for the node's semantics
+<a id="__codelineno-47-4" name="__codelineno-47-4" href="#__codelineno-47-4"></a>    ↓
+<a id="__codelineno-47-5" name="__codelineno-47-5" href="#__codelineno-47-5"></a>Append instructions to the StringBuilder
+<a id="__codelineno-47-6" name="__codelineno-47-6" href="#__codelineno-47-6"></a>    ↓
+<a id="__codelineno-47-7" name="__codelineno-47-7" href="#__codelineno-47-7"></a>Continue visiting subsequent nodes
+<a id="__codelineno-47-8" name="__codelineno-47-8" href="#__codelineno-47-8"></a>    ↓
+<a id="__codelineno-47-9" name="__codelineno-47-9" href="#__codelineno-47-9"></a>Obtain the complete LLVM IR
+</code></pre></div>
+<p>Translating the program step by step does not mean that each SPL statement corresponds to exactly one LLVM instruction. A single statement may require several instructions. For a compound expression, we usually translate its subexpressions recursively before emitting the instruction for the enclosing expression.</p>
+<p>The overall approach is familiar: <strong>during semantic analysis, the visitor checked the program and maintained semantic information; during code generation, it incrementally generates and accumulates target code.</strong></p>
+<p>Let us use a small SPL program to see how individual syntax nodes generate LLVM IR.</p>
+<h3 id="61-from-syntax-nodes-to-llvm-ir">6.1 From Syntax Nodes to LLVM IR<a class="headerlink" href="#61-from-syntax-nodes-to-llvm-ir" title="Permanent link">&para;</a></h3>
+<p>Consider this program:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a><span class="w">    </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<a id="__codelineno-48-4" name="__codelineno-48-4" href="#__codelineno-48-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-48-5" name="__codelineno-48-5" href="#__codelineno-48-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>We want to generate:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a><span class="w">    </span><span class="nv">%a</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">]</span>
+<a id="__codelineno-49-4" name="__codelineno-49-4" href="#__codelineno-49-4"></a><span class="w">    </span><span class="nv">%p0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">],</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-49-5" name="__codelineno-49-5" href="#__codelineno-49-5"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%p0</span>
+<a id="__codelineno-49-6" name="__codelineno-49-6" href="#__codelineno-49-6"></a><span class="w">    </span><span class="nv">%p1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">],</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-49-7" name="__codelineno-49-7" href="#__codelineno-49-7"></a><span class="w">    </span><span class="nv">%t0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%p1</span>
+<a id="__codelineno-49-8" name="__codelineno-49-8" href="#__codelineno-49-8"></a><span class="w">    </span><span class="nv">%t1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%t0</span><span class="p">,</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-49-9" name="__codelineno-49-9" href="#__codelineno-49-9"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%t1</span>
+<a id="__codelineno-49-10" name="__codelineno-49-10" href="#__codelineno-49-10"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Pay attention to this year's SPL grammar:</strong> assignment, array indexing, and addition are all alternatives of <code>expression</code>. They therefore enter the same <code>visitExpression()</code> method. ANTLR4 does not generate separate <code>visitAssign()</code>, <code>visitAdd()</code>, and <code>visitArrayAccess()</code> methods for them in this grammar. The visitor traverses the <strong>parse tree</strong> generated by ANTLR4.</p>
+<h3 id="62-an-array-element-on-the-left-compute-its-address-then-store">6.2 An Array Element on the Left: Compute Its Address, Then Store<a class="headerlink" href="#62-an-array-element-on-the-left-compute-its-address-then-store" title="Permanent link">&para;</a></h3>
+<p><img alt="Parse tree and visitor actions for an assignment expression" src="../../assets/labs/w11/assignment.png" /></p>
+<p><strong>How to read the diagram:</strong> start at the assignment expression. Obtain the address <code>%p0</code> for the left side, <code>a[1]</code>, visit the right-hand constant <code>5</code> to obtain the string <code>"5"</code>, and finally append a <code>store</code> instruction. The diagram is a schematic view of the key subtrees, with some details collapsed. The Java code below gives the precise teaching logic. Temporary names in the diagrams are illustrative; the code uses counters to generate them.</p>
+<p>For <code>a[1] = 5</code>, we cannot simply use the usual <code>visit(ctx.expression(0))</code> to obtain the left operand. Ordinary expression evaluation generally produces a <strong>value</strong>, whereas the left side of assignment needs an <strong>address</strong>.</p>
+<p>We therefore introduce a small helper, <code>addressOf()</code>, whose only job is to compute the address of an identifier or array element:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">addressOf</span><span class="p">(</span><span class="n">SplcParser</span><span class="p">.</span><span class="na">ExpressionContext</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">LBRACK</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// expression '[' expression ']'</span>
+<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">addressOf</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">visit</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"%p"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pointerCounter</span><span class="o">++</span><span class="p">;</span>
+<a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a>
+<a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a><span class="w">        </span><span class="n">ir</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"  "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span>
+<a id="__codelineno-50-8" name="__codelineno-50-8" href="#__codelineno-50-8"></a><span class="w">          </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">" = getelementptr [3 x i32], ptr "</span><span class="p">)</span>
+<a id="__codelineno-50-9" name="__codelineno-50-9" href="#__codelineno-50-9"></a><span class="w">          </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">base</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">", i64 0, i64 "</span><span class="p">)</span>
+<a id="__codelineno-50-10" name="__codelineno-50-10" href="#__codelineno-50-10"></a><span class="w">          </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">index</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">"\n"</span><span class="p">);</span>
+<a id="__codelineno-50-11" name="__codelineno-50-11" href="#__codelineno-50-11"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ptr</span><span class="p">;</span>
+<a id="__codelineno-50-12" name="__codelineno-50-12" href="#__codelineno-50-12"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-50-13" name="__codelineno-50-13" href="#__codelineno-50-13"></a>
+<a id="__codelineno-50-14" name="__codelineno-50-14" href="#__codelineno-50-14"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">Identifier</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">().</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-50-15" name="__codelineno-50-15" href="#__codelineno-50-15"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">variables</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">Identifier</span><span class="p">().</span><span class="na">getText</span><span class="p">());</span>
+<a id="__codelineno-50-16" name="__codelineno-50-16" href="#__codelineno-50-16"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-50-17" name="__codelineno-50-17" href="#__codelineno-50-17"></a>
+<a id="__codelineno-50-18" name="__codelineno-50-18" href="#__codelineno-50-18"></a><span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UnsupportedOperationException</span><span class="p">(</span><span class="s">"Not an addressable expression"</span><span class="p">);</span>
+<a id="__codelineno-50-19" name="__codelineno-50-19" href="#__codelineno-50-19"></a><span class="p">}</span>
+</code></pre></div>
+<p>The type <code>[3 x i32]</code> and the two GEP indices are specific to this example. A general compiler must determine the source element type and index path from the variable's type. Here, <code>variables</code> is a mapping maintained by the code generator from source variable names to LLVM addresses, such as <code>a → %a</code>.</p>
+<p>The assignment branch of <code>visitExpression()</code> is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">ASSIGN</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">addressOf</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+<a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">visit</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<a id="__codelineno-51-4" name="__codelineno-51-4" href="#__codelineno-51-4"></a><span class="w">    </span><span class="n">ir</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"  store i32 "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<a id="__codelineno-51-5" name="__codelineno-51-5" href="#__codelineno-51-5"></a><span class="w">      </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">", ptr "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">address</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">"\n"</span><span class="p">);</span>
+<a id="__codelineno-51-6" name="__codelineno-51-6" href="#__codelineno-51-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="p">;</span><span class="w">  </span><span class="c1">// The assignment expression yields the RHS value.</span>
+<a id="__codelineno-51-7" name="__codelineno-51-7" href="#__codelineno-51-7"></a><span class="p">}</span>
+</code></pre></div>
+<p>Visiting the constant <code>5</code> returns <code>"5"</code> without generating an instruction. Together, these steps produce:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="nv">%p0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">],</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%p0</span>
+</code></pre></div>
+<h3 id="63-an-array-element-used-as-a-value-compute-its-address-load-then-add">6.3 An Array Element Used as a Value: Compute Its Address, Load, Then Add<a class="headerlink" href="#63-an-array-element-used-as-a-value-compute-its-address-load-then-add" title="Permanent link">&para;</a></h3>
+<p><img alt="Parse tree and visitor actions for the return expression" src="../../assets/labs/w11/return.png" /></p>
+<p>The return expression <code>a[1] + 1</code> also accesses <code>a[1]</code>. This time, addition needs <strong>the integer stored in the element</strong>. We first call <code>addressOf()</code> to generate a GEP, then use <code>load</code> to obtain the value.</p>
+<p>In <code>visitExpression()</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="c1">// expression '[' expression ']' used as an ordinary rvalue</span>
+<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">LBRACK</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-53-3" name="__codelineno-53-3" href="#__codelineno-53-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">addressOf</span><span class="p">(</span><span class="n">ctx</span><span class="p">);</span>
+<a id="__codelineno-53-4" name="__codelineno-53-4" href="#__codelineno-53-4"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"%t"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tempCounter</span><span class="o">++</span><span class="p">;</span>
+<a id="__codelineno-53-5" name="__codelineno-53-5" href="#__codelineno-53-5"></a><span class="w">    </span><span class="n">ir</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"  "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-53-6" name="__codelineno-53-6" href="#__codelineno-53-6"></a><span class="w">      </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">" = load i32, ptr "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+<a id="__codelineno-53-7" name="__codelineno-53-7" href="#__codelineno-53-7"></a><span class="w">      </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"\n"</span><span class="p">);</span>
+<a id="__codelineno-53-8" name="__codelineno-53-8" href="#__codelineno-53-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<a id="__codelineno-53-9" name="__codelineno-53-9" href="#__codelineno-53-9"></a><span class="p">}</span>
+</code></pre></div>
+<p>Addition recursively visits its left and right subexpressions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">PLUS</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">().</span><span class="na">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">visit</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+<a id="__codelineno-54-3" name="__codelineno-54-3" href="#__codelineno-54-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">visit</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<a id="__codelineno-54-4" name="__codelineno-54-4" href="#__codelineno-54-4"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"%t"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tempCounter</span><span class="o">++</span><span class="p">;</span>
+<a id="__codelineno-54-5" name="__codelineno-54-5" href="#__codelineno-54-5"></a><span class="w">    </span><span class="n">ir</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"  "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-54-6" name="__codelineno-54-6" href="#__codelineno-54-6"></a><span class="w">      </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">" = add i32 "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+<a id="__codelineno-54-7" name="__codelineno-54-7" href="#__codelineno-54-7"></a><span class="w">      </span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">", "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">right</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">"\n"</span><span class="p">);</span>
+<a id="__codelineno-54-8" name="__codelineno-54-8" href="#__codelineno-54-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<a id="__codelineno-54-9" name="__codelineno-54-9" href="#__codelineno-54-9"></a><span class="p">}</span>
+</code></pre></div>
+<p>Finally, <code>visitReturnStatement()</code> visits the return expression before generating <code>ret</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a><span class="nd">@Override</span>
+<a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">visitReturnStatement</span><span class="p">(</span><span class="n">SplcParser</span><span class="p">.</span><span class="na">ReturnStatementContext</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-55-3" name="__codelineno-55-3" href="#__codelineno-55-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">visit</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="na">expression</span><span class="p">());</span>
+<a id="__codelineno-55-4" name="__codelineno-55-4" href="#__codelineno-55-4"></a><span class="w">    </span><span class="n">ir</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"  ret i32 "</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">result</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">"\n"</span><span class="p">);</span>
+<a id="__codelineno-55-5" name="__codelineno-55-5" href="#__codelineno-55-5"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<a id="__codelineno-55-6" name="__codelineno-55-6" href="#__codelineno-55-6"></a><span class="p">}</span>
+</code></pre></div>
+<p>This produces the sequence <code>getelementptr → load → add → ret</code>. Names such as <code>%p0</code>, <code>%p1</code>, <code>%t0</code>, and <code>%t1</code> come from incrementing counters; the operands and temporary results are not hardcoded into the output strings.</p>
+<blockquote>
+<p><strong>Scope of this simplified example:</strong> only the key visitor branches are shown. The visitor code for function headers, function bodies, and array declarations is omitted. The numeric-constant branch of <code>visitExpression()</code> simply returns <code>ctx.Number().getText()</code>. For simplicity, this example uses a fixed one-dimensional array of three integers. Supporting arrays and structures in general also requires type information, general address computation, scope management, and related machinery.</p>
+</blockquote>
+<h3 id="64-from-stringbuilder-to-a-builder-abstraction">6.4 From StringBuilder to a Builder Abstraction<a class="headerlink" href="#64-from-stringbuilder-to-a-builder-abstraction" title="Permanent link">&para;</a></h3>
+<p>Appending strings directly makes the generation process easy to see. A compiler can also wrap these operations in a builder. In the exercise framework provided by the instructor, methods such as <code>builder.add(left, right)</code> and <code>builder.load(addr, name)</code> provide this abstraction. The visitor decides <strong>which operations a node requires</strong>; the builder handles <strong>how the instructions are represented and emitted</strong>.</p>
+<p><a href="https://github.com/zhuym1219/CS323-Compilers-2026F-Labs/tree/lab11">Lab 11 Framework (<code>lab11</code> branch)</a></p>
+<p>The framework uses <strong>its own simplified SPL grammar</strong>, supporting scalar <code>int</code> variables and other basic constructs. It does not support the array and GEP examples above. It is intended for the small exercise in the next section.</p>
+<h3 id="65-in-class-exercise-the-simplified-framework">6.5 In-Class Exercise: The Simplified Framework<a class="headerlink" href="#65-in-class-exercise-the-simplified-framework" title="Permanent link">&para;</a></h3>
+<p>Using the instructor's starter code, complete the designated TODOs in <code>LLVMVisitor.java</code>. The framework supplies the supporting logic; you are not expected to implement a compiler from scratch.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<a id="__codelineno-56-3" name="__codelineno-56-3" href="#__codelineno-56-3"></a><span class="w">    </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-56-4" name="__codelineno-56-4" href="#__codelineno-56-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<a id="__codelineno-56-5" name="__codelineno-56-5" href="#__codelineno-56-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>The program should return <code>6</code>. As an optional follow-up, consider which generated instructions would change if you replaced <code>a = a + 1</code> with <code>a = a + 3</code>.</p>
+<h3 id="further-reading">Further Reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Official LLVM Documentation</p>
+<ul>
+<li><a href="https://llvm.org/docs/LangRef.html#getelementptr-instruction">The LLVM Language Reference — getelementptr instruction</a>: the formal syntax and semantics of GEP.</li>
+<li><a href="https://llvm.org/docs/GetElementPtr.html">The Often Misunderstood GEP Instruction</a>: explanations of GEP's first index, structure field access, and pointer indirection.</li>
+<li><a href="https://llvm.org/docs/OpaquePointers.html">Opaque Pointers</a>: the design of <code>ptr</code> in modern LLVM.</li>
+</ul>
+</div>
+<details class="note">
+<summary>Additional Note: <code>inbounds</code> and Array Bounds</summary>
+<p><code>inbounds</code> does not perform runtime array bounds checking. It gives LLVM guarantees about the address computation that it can use for optimization. If the computation violates the relevant constraints, the GEP result may become a poison value.</p>
+<p>For now, focus on the address computation rules of ordinary GEP. Do not interpret <code>inbounds</code> as automatically inserting a bounds check.</p>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-copyright">
+    <div class="md-copyright__highlight">
+        commit: 
+        <a href="/commit/c89f2484, 2026-11-21 16:03:25+08:00" target="_blank" rel="noopener">
+            c89f2484, 2026-11-21 16:03:25+08:00
+        </a>
+    </div>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.path", "navigation.tabs", "navigation.tabs.sticky"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>

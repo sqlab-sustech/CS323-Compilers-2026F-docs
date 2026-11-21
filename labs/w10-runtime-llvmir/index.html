@@ -1,0 +1,2779 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/labs/w10-runtime-llvmir/">
+      
+      
+        <link rel="prev" href="../w9-semantic/">
+      
+      
+        <link rel="next" href="../w11-translation/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+    
+    
+      
+        <title>Week 10 - LLVM IR - 编译原理 实验文档</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#week-10-from-semantics-to-llvm-ir" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="编译原理 实验文档" class="md-header__button md-logo" aria-label="编译原理 实验文档" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            编译原理 实验文档
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Week 10 - LLVM IR
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../en/labs/w10-runtime-llvmir/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  主页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../w1-intro/" class="md-tabs__link">
+          
+  
+  每周 Lab
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../env/" class="md-tabs__link">
+          
+  
+  环境配置
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="编译原理 实验文档" class="md-nav__button md-logo" aria-label="编译原理 实验文档" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    编译原理 实验文档
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    每周 Lab
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            每周 Lab
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w1-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 1 - Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w2-lex_p1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 2 - Lexer 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w3-lex_p2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 3 - Lexer 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w4-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 4 - Parser 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w5-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 5 - Parser 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w6-symbol/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 7 - Semantic Part 1 - Symbol Table
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w7-semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 8 - Semantic Part 2 - Type Checking
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w9-semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 9 - Semantic Part 3 - Expression
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Week 10 - LLVM IR
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Week 10 - LLVM IR
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-intermediate-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 为什么引入 Intermediate Representation？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 从一个最简单的函数开始
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 从一个最简单的函数开始">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 函数定义：先看清一段 IR 的整体结构
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2 整数运算指令：操作码、类型和操作数
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-value-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3 类型与 Value：只引入读 IR 必需的术语
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 为什么不能直接把源变量翻译成同名 IR 变量？
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 为什么不能直接把源变量翻译成同名 IR 变量？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-amount" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 第一次尝试：反复向同一个 %amount 赋值
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-ssa" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 静态单赋值（SSA）：一个名字只能定义一次
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. 两种变量表示策略
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 两种变量表示策略">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-ssa-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1 直接使用 SSA Value 表示变量
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-allocastore-load" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.2 使用 alloca、store 和 load 表示变量
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.3 两种策略有什么区别？
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. 完整程序：使用两种策略翻译 LLVM IR
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 完整程序：使用两种策略翻译 LLVM IR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1 使用内存表示的完整 LLVM IR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-ssa-value-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.2 使用直接 SSA Value 的完整 LLVM IR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-call-ret" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.3 函数调用与返回：call 和 ret
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-basic-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Basic Block：函数内部的指令如何组织？
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Basic Block：函数内部的指令如何组织？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1 给已经学过的指令分个类
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-clang-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. 实践：使用 Clang 观察 LLVM IR
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. 实践：使用 Clang 观察 LLVM IR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-clang" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.1 Clang 是什么？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-compiler-explorer-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.2 使用 Compiler Explorer 观察 LLVM IR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.3 使用优化观察变量表示的变化
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-linux" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.4 在课程 Linux 环境中运行
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.5 课堂练习
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Summary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#intermediate-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Intermediate Representation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-single-assignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Static Single Assignment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      两种变量表示策略
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#llvm-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      LLVM Optimization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#functions-and-basic-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions and Basic Blocks
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w11-translation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 11 - Translation 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    环境配置
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            环境配置
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Linux VM 搭建
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Linux VM 搭建
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/wsl/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows WSL
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/macos-native/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    macOS 原生环境
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-intermediate-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 为什么引入 Intermediate Representation？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 从一个最简单的函数开始
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 从一个最简单的函数开始">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 函数定义：先看清一段 IR 的整体结构
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2 整数运算指令：操作码、类型和操作数
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-value-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3 类型与 Value：只引入读 IR 必需的术语
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 为什么不能直接把源变量翻译成同名 IR 变量？
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 为什么不能直接把源变量翻译成同名 IR 变量？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-amount" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 第一次尝试：反复向同一个 %amount 赋值
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-ssa" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 静态单赋值（SSA）：一个名字只能定义一次
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. 两种变量表示策略
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 两种变量表示策略">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-ssa-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1 直接使用 SSA Value 表示变量
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-allocastore-load" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.2 使用 alloca、store 和 load 表示变量
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.3 两种策略有什么区别？
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. 完整程序：使用两种策略翻译 LLVM IR
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 完整程序：使用两种策略翻译 LLVM IR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1 使用内存表示的完整 LLVM IR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-ssa-value-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.2 使用直接 SSA Value 的完整 LLVM IR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-call-ret" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.3 函数调用与返回：call 和 ret
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-basic-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Basic Block：函数内部的指令如何组织？
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Basic Block：函数内部的指令如何组织？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1 给已经学过的指令分个类
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-clang-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. 实践：使用 Clang 观察 LLVM IR
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. 实践：使用 Clang 观察 LLVM IR">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-clang" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.1 Clang 是什么？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-compiler-explorer-llvm-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.2 使用 Compiler Explorer 观察 LLVM IR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.3 使用优化观察变量表示的变化
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-linux" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.4 在课程 Linux 环境中运行
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.5 课堂练习
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Summary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#intermediate-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Intermediate Representation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-single-assignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Static Single Assignment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      两种变量表示策略
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#llvm-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      LLVM Optimization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#functions-and-basic-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions and Basic Blocks
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="week-10-from-semantics-to-llvm-ir">Week 10 — From Semantics to LLVM IR<a class="headerlink" href="#week-10-from-semantics-to-llvm-ir" title="Permanent link">&para;</a></h1>
+<p>上一周，我们已经能够分析表达式的含义：一个表达式可能表示对象的 <strong>存储位置</strong>，也可能产生一个 <strong>值</strong>；赋值会修改对象的状态，而后续计算可以读取修改后的值。</p>
+<p>本周换一个问题：<strong>如果编译器已经理解了源程序的含义，怎样把这些行为写成能够继续编译、最终执行的代码？</strong></p>
+<p>我们将使用 LLVM IR 来回答。</p>
+<p>先看贯穿本周的 SPL 程序。它计算一笔订单的最终金额：商品单价乘数量，加上运费，再减去优惠金额。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">finalPrice</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">finalPrice</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">}</span>
+</code></pre></div>
+<p>我们知道 <code>main</code> 最终返回 <code>19</code>。接下来要做的，是让编译器生成一种能够 <strong>保留这一行为</strong> 的表示。</p>
+<h2 id="1-intermediate-representation">1. 为什么引入 Intermediate Representation？<a class="headerlink" href="#1-intermediate-representation" title="Permanent link">&para;</a></h2>
+<p>假设我们要支持 <code>m</code> 种源语言和 <code>n</code> 种目标机器（如 x86-64、AArch64、RISC-V）。如果每一种源语言都直接为每一种目标机器实现一套翻译逻辑，可能需要维护约 <code>m × n</code> 种组合。</p>
+<p>如果让所有前端先生成统一的 <strong>Intermediate Representation（IR，中间表示）</strong>，再由不同后端把 IR 转换成目标机器代码，就可以将体系结构划分成 <code>m</code> 个前端与 <code>n</code> 个后端：</p>
+<p><img alt="" src="../../assets/labs/w10/ir_rep.png" /></p>
+<p>它说明共享 IR 可以降低前端和后端的耦合。</p>
+<p>本课程采用 LLVM IR：我们的工作是把经过解析和语义检查的 SPL 程序翻译成 LLVM IR，再由 LLVM 工具链完成后续的机器代码生成。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>SPL 源程序 → Lexer / Parser → Semantic Analysis → LLVM IR → 目标代码
+</code></pre></div>
+<p>现在，问题变成了：<strong>如何把 SPL 中的运算、赋值和返回写成 LLVM IR？</strong></p>
+<h2 id="2">2. 从一个最简单的函数开始<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<p>在订单程序中，第一步是计算 <code>unitPrice * quantity</code>。我们暂时把这一步取出来，只看一个没有局部可变变量的函数。</p>
+<p><strong>SPL 源码：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">product</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>对应的完整 LLVM IR：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@product</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="21-ir">2.1 函数定义：先看清一段 IR 的整体结构<a class="headerlink" href="#21-ir" title="Permanent link">&para;</a></h3>
+<p>上面两段代码都在定义同一个 <code>product</code> 函数。LLVM IR 同样有函数名、参数、函数体和返回值，只是要求把类型和计算写得更加明确。</p>
+<p>观察完具体例子后，我们可以把常见函数定义概括成下面的通用格式（为方便入门，暂时省略函数属性等可选内容）：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">define</span><span class="w"> </span><span class="p">&lt;</span><span class="err">返回类型</span><span class="p">&gt;</span><span class="w"> </span><span class="err">@</span><span class="p">&lt;</span><span class="err">函数名</span><span class="p">&gt;(&lt;</span><span class="err">参数类型</span><span class="m">1</span><span class="p">&gt;</span><span class="w"> </span><span class="err">%</span><span class="p">&lt;</span><span class="err">参数名</span><span class="m">1</span><span class="p">&gt;,</span><span class="w"> </span><span class="p">&lt;</span><span class="err">参数类型</span><span class="m">2</span><span class="p">&gt;</span><span class="w"> </span><span class="err">%</span><span class="p">&lt;</span><span class="err">参数名</span><span class="m">2</span><span class="p">&gt;,</span><span class="w"> </span><span class="p">...)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="p">&lt;</span><span class="err">基本块标签</span><span class="p">&gt;</span><span class="err">:</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="p">&lt;</span><span class="err">指令</span><span class="m">1</span><span class="p">&gt;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="p">...</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="p">&lt;</span><span class="err">终结指令</span><span class="p">&gt;</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">}</span>
+</code></pre></div>
+<p>这里 <code>&lt;...&gt;</code> 表示需要替换的占位内容，不是实际要输入的 LLVM IR 语法；<code>...</code> 表示可以省略或重复的部分。无参数函数可写为 <code>@f()</code>，函数体内至少需要一个基本块。</p>
+<ul>
+<li><code>define</code> 表示定义函数；<code>i32</code> 等写在 <code>@</code> 前面的是返回类型。</li>
+<li><code>@函数名</code> 是函数的全局名称；参数通常写作“类型 + <code>%</code> 开头的局部名称”，用逗号分隔。</li>
+<li><code>{ ... }</code> 中是函数的基本块；每个基本块以一条终结指令结束。</li>
+<li><code>entry:</code> 是一个基本块的标签，表示从这里开始执行该基本块中的指令。</li>
+</ul>
+<p>将这些位置代入刚才的源码，就得到 <code>define i32 @product(i32 %unitPrice, i32 %quantity)</code>，而 <code>entry:</code> 是它的基本块标签。</p>
+<table>
+<thead>
+<tr>
+<th>LLVM IR 中的写法</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>define i32 @product(...)</code></td>
+<td>定义函数，返回一个 32 位整数</td>
+</tr>
+<tr>
+<td><code>i32 %unitPrice</code></td>
+<td>名为 <code>%unitPrice</code> 的 32 位整数参数</td>
+</tr>
+<tr>
+<td><code>entry:</code></td>
+<td>函数中一个基本块的入口标签</td>
+</tr>
+<tr>
+<td><code>%result = mul i32 %unitPrice, %quantity</code></td>
+<td>计算两个整数的乘积，并为结果命名</td>
+</tr>
+<tr>
+<td><code>ret i32 %result</code></td>
+<td>将计算结果作为函数返回值</td>
+</tr>
+</tbody>
+</table>
+<p>这里先认识两条重要的指令：</p>
+<ul>
+<li><code>ret</code>：结束当前函数的执行，并将指定的值返回给调用者。</li>
+<li><code>call</code>：调用另一个函数，稍后我们会结合完整程序介绍。</li>
+</ul>
+<p>特别注意，<code>ret</code> 并不是跳转到当前函数中的下一个基本块，而是结束当前函数。<strong>当被调用函数执行 <code>ret</code> 后，调用者会从函数调用指令之后的位置继续执行。</strong></p>
+<p>关于基本块的组织方式，我们暂时只需要知道它是函数内部组织指令的基本单位，后面会结合具体程序进一步介绍。</p>
+<h3 id="22">2.2 整数运算指令：操作码、类型和操作数<a class="headerlink" href="#22" title="Permanent link">&para;</a></h3>
+<p>先不需要记住一大套指令。只要能读懂刚才的 <code>mul</code>，就能举一反三。</p>
+<p>例如，源表达式：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span>
+</code></pre></div>
+<p>可以由这一条 LLVM IR 指令表达：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+</code></pre></div>
+<p>对本周常见的二元整数运算，可以提炼出统一格式：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>%结果名 = &lt;运算指令&gt; iN &lt;操作数1&gt;, &lt;操作数2&gt;
+</code></pre></div>
+<p>这里的 <code>iN</code> 是整数类型的抽象写法，实际写 IR 时要把 <code>N</code> 换成位宽，例如 <code>i32</code>、<code>i64</code>，不能原样写 <code>iN</code>。</p>
+<ul>
+<li><code>mul</code> 是操作码：告诉 LLVM 执行乘法。</li>
+<li><code>i32</code> 是操作数的整数类型，表示 32 位整数。</li>
+<li><code>%unitPrice</code>、<code>%quantity</code> 是两个操作数；它们也可以是类型匹配的整数常量。</li>
+<li><code>%result</code> 是这次计算产生的值的名字，不意味着分配内存。</li>
+</ul>
+<p>SPL 中常见的整数运算，在 LLVM IR 中有这些直接对应关系：</p>
+<table>
+<thead>
+<tr>
+<th>SPL 表达式</th>
+<th>LLVM IR 操作码</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>a + b</code></td>
+<td><code>add</code></td>
+<td>整数加法</td>
+</tr>
+<tr>
+<td><code>a - b</code></td>
+<td><code>sub</code></td>
+<td>整数减法</td>
+</tr>
+<tr>
+<td><code>a * b</code></td>
+<td><code>mul</code></td>
+<td>整数乘法</td>
+</tr>
+<tr>
+<td><code>a / b</code></td>
+<td><code>sdiv</code></td>
+<td>有符号整数除法</td>
+</tr>
+<tr>
+<td><code>a % b</code></td>
+<td><code>srem</code></td>
+<td>有符号整数取余</td>
+</tr>
+</tbody>
+</table>
+<p>LLVM IR 是强类型的：例如 <code>add i32</code> 的两个操作数都必须是 <code>i32</code>，不能把 <code>i16</code> 和 <code>i32</code> 直接混合相加。改变位宽需要显式的类型转换指令。</p>
+<h3 id="23-value-ir">2.3 类型与 Value：只引入读 IR 必需的术语<a class="headerlink" href="#23-value-ir" title="Permanent link">&para;</a></h3>
+<p><code>i32</code> 等整数类型中的数字表示位宽。我们本周常见的 <code>i1</code>、<code>i8</code>、<code>i16</code>、<code>i32</code>、<code>i64</code> 分别表示 1、8、16、32、64 位整数，其中课程 SPL 的 <code>int</code> 在本讲义中对应 <code>i32</code>。</p>
+<p><strong>类型告诉我们一个值应该如何被解释，以及哪些指令允许使用它。</strong></p>
+<p>LLVM IR 中，一个计算指令可以产生一个 Value（值），这个值可以被后续指令使用。</p>
+<p>例如：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">%product</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nv">%total</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%product</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%total</span>
+</code></pre></div>
+<p>这里：</p>
+<ul>
+<li><code>%product</code> 是乘法产生的值。</li>
+<li><code>%total</code> 是加法产生的值。</li>
+<li><code>ret</code> 使用 <code>%total</code> 作为返回值。</li>
+</ul>
+<p>需要注意，<code>%product</code> 和 <code>%total</code> 都不是必须对应某个源程序中的变量。它们只是 LLVM IR 中对计算结果的命名。</p>
+<p>在 LLVM IR 中，<code>@</code> 用于引出函数、全局变量等全局名称，<code>%</code> 用于引出局部值等名称。</p>
+<p>这里先记住一个重要特点：<strong>普通计算指令产生的 Value 具有自己的名称，后续指令可以反复使用它。</strong></p>
+<p>接下来，我们就会发现，这个特点与源语言中的可变变量之间存在一个有意思的差异。</p>
+<h2 id="3-ir">3. 为什么不能直接把源变量翻译成同名 IR 变量？<a class="headerlink" href="#3-ir" title="Permanent link">&para;</a></h2>
+<p>回到订单程序中的 <code>amount</code>。它不是计算一次就结束了，而是会连续修改。</p>
+<p><strong>SPL 源码（节选）：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="k">return</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+</code></pre></div>
+<h3 id="31-amount">3.1 第一次尝试：反复向同一个 <code>%amount</code> 赋值<a class="headerlink" href="#31-amount" title="Permanent link">&para;</a></h3>
+<p>如果把源语言的赋值照搬过来，我们可能会写出下面的东西。</p>
+<p><strong>错误的 LLVM IR 尝试（故意写错，不能编译）：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">%amount</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nv">%amount</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nv">%amount</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sub</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount</span><span class="p">,</span><span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount</span>
+</code></pre></div>
+<p>问题就在于：<strong>同一个 <code>%amount</code> 在 IR 中被反复赋值。</strong></p>
+<p>LLVM IR 不允许同一个 SSA 名称在不同指令中被重复定义。为什么？</p>
+<h3 id="32-ssa">3.2 静态单赋值（SSA）：一个名字只能定义一次<a class="headerlink" href="#32-ssa" title="Permanent link">&para;</a></h3>
+<p>LLVM IR 使用 <strong>Static Single Assignment（SSA，静态单赋值）</strong> 形式组织指令产生的值。</p>
+<p>所谓“单赋值”，指的是：</p>
+<p><strong>在静态的 LLVM IR 中，每个 SSA 名称只能在一处被定义，之后可以被反复使用，但不能再被另一条指令重新定义。</strong></p>
+<p>这里需要把源语言中的变量、对变量的赋值，以及 LLVM IR 中的 SSA Value 区分开：</p>
+<ul>
+<li><strong>SPL 的 <code>int amount;</code></strong>：声明一个名为 <code>amount</code> 的局部变量。</li>
+<li><strong>SPL 的 <code>amount = amount + 6;</code></strong>：给已经存在的变量重新赋值，修改这个对象保存的当前值。</li>
+<li><strong>LLVM IR 的 <code>%v2 = add i32 %v1, 6</code></strong>：将加法结果定义为一个新的 SSA Value <code>%v2</code>。这个名字以后可以反复使用，但不能再被另一条指令重新定义。</li>
+</ul>
+<p>这里的“静态”强调：单赋值约束针对程序文本中的定义位置，不是说函数只能执行一次。</p>
+<p>例如，函数每次被调用时，同一条指令都可以重新执行并计算出新的结果；只是不能在 IR 文本中用同一个 SSA 名称再写一条赋值指令。</p>
+<p>为什么要采用这种形式？</p>
+<p>我们可以先看下面的合法写法。</p>
+<p><strong>还是同一段 SPL 源码：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="k">return</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+</code></pre></div>
+<p><strong>使用不同 SSA 名称的合法 LLVM IR：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="nv">%amount1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="nv">%amount2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount1</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="nv">%amount3</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sub</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount2</span><span class="p">,</span><span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount3</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="p">}</span>
+</code></pre></div>
+<p>三个名字虽然都来自源代码中的 <code>amount</code>，在 LLVM IR 中却代表三个不同时间得到的值：</p>
+<table>
+<thead>
+<tr>
+<th>源程序执行到哪里</th>
+<th><code>amount</code> 当时的含义</th>
+<th>LLVM IR 中对应的值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>刚乘完单价和数量</td>
+<td>商品金额</td>
+<td><code>%amount1</code></td>
+</tr>
+<tr>
+<td>加完运费</td>
+<td>金额 + 6</td>
+<td><code>%amount2</code></td>
+</tr>
+<tr>
+<td>减完优惠</td>
+<td>最终金额</td>
+<td><code>%amount3</code></td>
+</tr>
+</tbody>
+</table>
+<p>可以发现，LLVM IR 将源程序中一个变量在不同位置的当前值，表示成了多个不同的 SSA Value。</p>
+<p>这里有一个非常重要的区别：</p>
+<p><strong>源程序中的变量可以反复赋值，但每一次赋值在直接 SSA 表示中都会产生一个新的 Value。</strong></p>
+<p>三个 Value 之间还存在明确的数据依赖：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>%unitPrice、%quantity
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>          |
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>          v
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>      %amount1
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>          |
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>          v
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>      %amount2
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>          |
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>          v
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>      %amount3
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>          |
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>          v
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>         ret
+</code></pre></div>
+<p>每个 SSA Value 都有明确的定义位置和使用位置。这种形式使编译器更容易分析数据之间的依赖关系，并进行常量传播、死代码消除等优化。</p>
+<p>需要注意，SSA 约束的是 LLVM IR 中 Value 的定义，并不禁止程序修改内存。后面我们会看到，<code>store</code> 可以多次修改同一块内存，而这些操作仍然符合 LLVM IR 的 SSA 规则。</p>
+<h2 id="4">4. 两种变量表示策略<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
+<p>刚才我们已经看到一种解决方案：当源程序中的变量被重新赋值时，生成一个新的 SSA Value，并更新该变量当前对应的 Value。</p>
+<p>这种方式可以正确表示顺序执行程序。</p>
+<p>但是，我们还可以采用另一种思路：</p>
+<p><strong>既然源程序中的变量可以反复修改，那么能不能让它始终对应一个固定的存储位置，每次赋值只修改这个位置中的内容？</strong></p>
+<p>当然可以。</p>
+<p>这就是另一种常见的变量表示策略：使用 <code>alloca</code>、<code>store</code> 和 <code>load</code> 管理可变变量。</p>
+<h3 id="41-ssa-value">4.1 直接使用 SSA Value 表示变量<a class="headerlink" href="#41-ssa-value" title="Permanent link">&para;</a></h3>
+<p>先回顾刚才的例子：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nv">%amount1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nv">%amount2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount1</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="nv">%amount3</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sub</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount2</span><span class="p">,</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>在这种方式下，源程序中的 <code>amount</code> 并不对应一个固定的内存地址，而是对应当前最新的 SSA Value。</p>
+<p>从代码生成器的角度来看，可以维护一张变量映射表：</p>
+<table>
+<thead>
+<tr>
+<th>源变量</th>
+<th>当前对应的 SSA Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>amount</code>（第一次赋值后）</td>
+<td><code>%amount1</code></td>
+</tr>
+<tr>
+<td><code>amount</code>（第二次赋值后）</td>
+<td><code>%amount2</code></td>
+</tr>
+<tr>
+<td><code>amount</code>（第三次赋值后）</td>
+<td><code>%amount3</code></td>
+</tr>
+</tbody>
+</table>
+<p>每次遇到新的赋值，生成器就产生一个新的 SSA Value，并更新映射关系。</p>
+<p>这里的映射表只是帮助理解的一种代码生成器实现方式，并不是 LLVM IR 的语法要求。</p>
+<p>这种方式有几个明显的特点：</p>
+<ul>
+<li>不需要为普通标量变量额外分配内存。</li>
+<li>不需要通过 <code>load</code> 和 <code>store</code> 读取、修改变量。</li>
+<li>计算结果可以直接传递给后续指令。</li>
+<li>数据依赖关系比较明确，便于后续分析与优化。</li>
+</ul>
+<p>但是，它也给代码生成器提出了更高的要求。</p>
+<p>在目前的例子中，程序只有一条顺序执行路径，变量当前对应哪个 Value 很容易确定。</p>
+<p>如果程序中出现条件分支，不同分支可能产生不同的 Value；如果程序中出现循环，变量还可能在多次迭代之间传递不同的 Value。</p>
+<p>这时，生成器就不能只简单地更新一张变量映射表了。</p>
+<p>我们将在后续学习控制流时进一步解决这些问题。</p>
+<h3 id="42-allocastore-load">4.2 使用 <code>alloca</code>、<code>store</code> 和 <code>load</code> 表示变量<a class="headerlink" href="#42-allocastore-load" title="Permanent link">&para;</a></h3>
+<p>现在考虑另一种方式。</p>
+<p>我们可以让源程序中的 <code>amount</code> 始终对应同一个存储位置，每次赋值只修改这个位置中的内容。</p>
+<p>这正是 <code>alloca</code>、<code>store</code> 和 <code>load</code> 这组指令适合解决的问题。</p>
+<p><strong>第一步：使用 <code>alloca</code> 为变量分配存储空间。</strong></p>
+<p>SPL 源码：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+</code></pre></div>
+<p>对应的 LLVM IR：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nv">%amount_addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+</code></pre></div>
+<p>抽象成通用格式：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>%地址名 = alloca &lt;对象类型&gt;
+</code></pre></div>
+<p>这里 <code>&lt;对象类型&gt;</code> 是要分配的对象类型，如 <code>i32</code> 或 <code>[3 x i32]</code>，不是 <code>alloca</code> 返回值的类型。</p>
+<p><code>alloca i32</code> 在当前函数的栈上分配一块能够容纳 <code>i32</code> 的内存，并返回它的地址。</p>
+<p>因此：</p>
+<ul>
+<li><code>%amount_addr</code> 的类型是 <code>ptr</code>，表示地址，而不是一个 <code>i32</code> 整数。</li>
+<li><code>%amount_addr</code> 只接收一次 <code>alloca</code> 返回的地址值。</li>
+<li><code>%amount_addr</code> 指向的内存内容可以在后续被反复修改。</li>
+<li><code>alloca</code> 本身不等于初始化，刚分配的存储空间不能直接当成已经保存了有效整数的变量使用。</li>
+</ul>
+<p>这里的 <code>ptr</code> 是 LLVM IR 表示内存地址的类型。<strong>SPL 没有 C 风格的指针操作语法，不影响 LLVM IR 在内部使用地址。</strong></p>
+<p>这个区别非常关键：</p>
+<p><strong>同一个 SSA 名称不能重新定义，不代表它指向的内存内容不能被反复修改。</strong></p>
+<p><code>alloca</code> 不仅能分配单个整数的空间，也可以为局部数组分配空间。</p>
+<p>例如：</p>
+<p>SPL 源码：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">values</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+</code></pre></div>
+<p>对应的 LLVM IR 片段：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nv">%values_addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">]</span>
+</code></pre></div>
+<p><code>[3 x i32]</code> 表示由三个 <code>i32</code> 元素组成的数组类型。这里的 <code>alloca</code> 为整个数组分配存储空间，返回的 <code>%values_addr</code> 仍然是 <code>ptr</code> 类型的地址。</p>
+<p><strong>第二步：使用 <code>store</code> 向存储位置写入值。</strong></p>
+<p>SPL 源码：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+</code></pre></div>
+<p>LLVM IR 片段（假设前面已经生成 <code>%amount_addr = alloca i32</code>）：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nv">%product</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%product</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+</code></pre></div>
+<p>先计算出 <code>%product</code>，然后把这个 <code>i32</code> 值写入 <code>%amount_addr</code> 所指向的内存空间。</p>
+<p><code>store</code> 的通用格式：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>store &lt;值类型&gt; &lt;要写入的值&gt;, ptr &lt;目标地址&gt;
+</code></pre></div>
+<p>例如：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%product</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+</code></pre></div>
+<p>其中第一个操作数是要写入的整数值，第二个操作数是目标地址。</p>
+<p><strong><code>store</code> 没有 <code>%结果名 =</code> 部分</strong>，因为它不产生一个供后续指令引用的计算结果。它产生的是内存写入效果。</p>
+<p>注意，<code>store</code> 修改的是 <code>%amount_addr</code> 指向的内存内容，而不是重新定义 <code>%amount_addr</code>。</p>
+<p><strong>第三步：使用 <code>load</code> 从存储位置读取当前值。</strong></p>
+<p>SPL 源码：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+</code></pre></div>
+<p>同一个名字在赋值语句中承担了不同角色：右边的 <code>amount</code> 要读取当前值，左边的 <code>amount</code> 要确定写入位置。这就接上了 Week 9 的 Lvalue、Lvalue Conversion 与赋值的副作用。</p>
+<p>LLVM IR 片段：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nv">%old</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="nv">%withFee</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%old</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%withFee</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+</code></pre></div>
+<p>读取内存的通用格式：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>%结果名 = load &lt;读取值的类型&gt;, ptr &lt;源地址&gt;
+</code></pre></div>
+<p>这里：</p>
+<ul>
+<li><code>load i32, ptr %amount_addr</code>：从指定地址读取一个 <code>i32</code>，将读取到的值定义为新的 SSA Value <code>%old</code>。</li>
+<li><code>add i32 %old, 6</code>：使用读取到的整数进行加法，并产生新的 SSA Value <code>%withFee</code>。</li>
+<li><code>store i32 %withFee, ptr %amount_addr</code>：将新值写回同一块内存。</li>
+</ul>
+<p>与 <code>store</code> 不同，<code>load</code> 会产生一个新的 Value，因此左侧需要一个新名称。</p>
+<p>特别注意，<code>%old</code> 只是某一次读取所得到的整数值。如果后来内存中的内容发生变化，<code>%old</code> 不会跟着改变。</p>
+<p>我们可以将这几个概念放在一起理解：</p>
+<table>
+<thead>
+<tr>
+<th>名字或对象</th>
+<th>表示的内容</th>
+<th>是否可以改变？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>%amount_addr</code></td>
+<td>一个内存地址</td>
+<td>SSA 名称不能重新定义</td>
+</tr>
+<tr>
+<td><code>%old</code></td>
+<td>某次读取到的整数值</td>
+<td>SSA 名称不能重新定义</td>
+</tr>
+<tr>
+<td><code>%withFee</code></td>
+<td>一次加法产生的整数值</td>
+<td>SSA 名称不能重新定义</td>
+</tr>
+<tr>
+<td><code>%amount_addr</code> 指向的内存</td>
+<td>保存 <code>amount</code> 当前值的空间</td>
+<td>可以通过 <code>store</code> 反复修改</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">为什么这仍然符合 SSA？</p>
+<p>每次 <code>load</code> 和算术运算都会产生一个新的 SSA Value；每次 <code>store</code> 修改的是内存状态，而不是向旧 SSA 名称重新赋值。</p>
+<p>因此，即使同一块内存被反复写入，LLVM IR 仍然符合 SSA 的要求。</p>
+</div>
+<h3 id="43">4.3 两种策略有什么区别？<a class="headerlink" href="#43" title="Permanent link">&para;</a></h3>
+<p>现在，我们已经有了两种正确的方式来表示源程序中的可变变量。</p>
+<p>它们的核心区别在于：</p>
+<ul>
+<li>直接 SSA Value：让源变量对应当前最新的计算结果。</li>
+<li>内存表示：让源变量始终对应一个固定的存储位置，通过读写内存获取和更新当前值。</li>
+</ul>
+<p>我们可以从几个方面比较它们：</p>
+<table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>直接 SSA Value</th>
+<th>内存表示</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>变量对应什么</td>
+<td>当前 SSA Value</td>
+<td>固定内存地址</td>
+</tr>
+<tr>
+<td>赋值如何实现</td>
+<td>产生新的 SSA Value，更新映射</td>
+<td>使用 <code>store</code></td>
+</tr>
+<tr>
+<td>读取如何实现</td>
+<td>直接使用当前 Value</td>
+<td>使用 <code>load</code></td>
+</tr>
+<tr>
+<td>变量管理</td>
+<td>维护变量当前对应的 Value</td>
+<td>维护变量对应的地址</td>
+</tr>
+<tr>
+<td>额外内存读写</td>
+<td>不需要额外的变量存储读写</td>
+<td>需要相应的 <code>load</code> 和 <code>store</code></td>
+</tr>
+<tr>
+<td>代码生成</td>
+<td>顺序计算较直接，复杂控制流下需要额外处理</td>
+<td>对可变变量的读写规则比较统一</td>
+</tr>
+<tr>
+<td>数据依赖</td>
+<td>直接体现在 Value 的使用关系中</td>
+<td>部分依赖关系通过内存读写体现</td>
+</tr>
+</tbody>
+</table>
+<p>那么，一个很自然的问题就出现了：</p>
+<p><strong>既然使用 <code>alloca</code>、<code>store</code> 和 <code>load</code> 可以统一管理可变变量，为什么还需要直接 SSA Value？</strong></p>
+<p>原因在于，两种策略各有适用场景。</p>
+<p>直接使用 SSA Value 时，不需要额外的内存读写操作，计算结果之间的数据依赖也更加明确。这种表示非常适合直接表达计算过程。</p>
+<p>但对于代码生成器来说，直接处理变量当前对应哪个 SSA Value，需要维护相应的映射关系。当程序出现复杂控制流时，还需要处理不同执行路径产生的值。</p>
+<p>使用内存表示时，生成器可以对可变局部变量采用一套相对统一的规则：</p>
+<ul>
+<li>声明变量时分配存储位置。</li>
+<li>赋值时向对应地址写入值。</li>
+<li>使用变量时从对应地址读取值。</li>
+</ul>
+<p>这样，生成器不需要在每次赋值时改变变量对应的地址，变量管理会更加直接。</p>
+<p>不过，这种方式也可能产生额外的内存读写指令。</p>
+<p>因此，我们不能简单地说哪一种方式绝对更好。它们实际上体现了代码生成器在实现复杂度与 IR 表示形式之间的不同选择。</p>
+<p>还有一个重要的实践问题：</p>
+<p><strong>在真正的编译器中，是否会一直保留这些 <code>alloca</code>、<code>load</code> 和 <code>store</code>？</strong></p>
+<p>不一定。</p>
+<p>LLVM 提供了 <code>mem2reg</code>（Memory to Register）优化过程，可以将符合条件的局部内存变量提升为 SSA Value。</p>
+<p>简单来说，前端可以先使用内存读写的方式生成比较容易实现的 LLVM IR，再让 LLVM 优化器将适合转换的内存变量转换为直接的 SSA Value。</p>
+<p>转换过程中，如果不同执行路径产生了不同的值，还可能需要引入 <code>phi</code> 指令。</p>
+<p>这也说明，<strong>使用内存表示并不是放弃 SSA，而是一种更容易生成可变变量代码的前端策略。</strong></p>
+<p>我们将在 Week 12 学习控制流时，进一步理解不同执行路径上的 Value 如何合并，以及 <code>phi</code> 为什么会出现在 LLVM IR 中。</p>
+<h2 id="5-llvm-ir">5. 完整程序：使用两种策略翻译 LLVM IR<a class="headerlink" href="#5-llvm-ir" title="Permanent link">&para;</a></h2>
+<p>现在回到开头的 SPL 程序，将之前学习的内容组合起来。</p>
+<h3 id="51-llvm-ir">5.1 使用内存表示的完整 LLVM IR<a class="headerlink" href="#51-llvm-ir" title="Permanent link">&para;</a></h3>
+<p>SPL 源码：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">finalPrice</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="p">}</span>
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">finalPrice</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="p">}</span>
+</code></pre></div>
+<p>选择内存表示策略，可以得到：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">    </span><span class="nv">%amount_addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">    </span><span class="nv">%product</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%product</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="w">    </span><span class="nv">%old1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="w">    </span><span class="nv">%withFee</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%old1</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%withFee</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a>
+<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="w">    </span><span class="nv">%old2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a><span class="w">    </span><span class="nv">%discounted</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sub</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%old2</span><span class="p">,</span><span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%discounted</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a>
+<a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a><span class="w">    </span><span class="nv">%answer</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-28-17" name="__codelineno-28-17" href="#__codelineno-28-17"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%answer</span>
+<a id="__codelineno-28-18" name="__codelineno-28-18" href="#__codelineno-28-18"></a><span class="p">}</span>
+<a id="__codelineno-28-19" name="__codelineno-28-19" href="#__codelineno-28-19"></a>
+<a id="__codelineno-28-20" name="__codelineno-28-20" href="#__codelineno-28-20"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-21" name="__codelineno-28-21" href="#__codelineno-28-21"></a><span class="nl">entry:</span>
+<a id="__codelineno-28-22" name="__codelineno-28-22" href="#__codelineno-28-22"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">3</span><span class="p">)</span>
+<a id="__codelineno-28-23" name="__codelineno-28-23" href="#__codelineno-28-23"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-28-24" name="__codelineno-28-24" href="#__codelineno-28-24"></a><span class="p">}</span>
+</code></pre></div>
+<p>把主要指令对应回源代码：</p>
+<table>
+<thead>
+<tr>
+<th>SPL 代码或行为</th>
+<th>对应 LLVM IR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>定义 <code>finalPrice</code></td>
+<td><code>define i32 @finalPrice(...)</code></td>
+</tr>
+<tr>
+<td><code>int amount;</code></td>
+<td><code>alloca i32</code></td>
+</tr>
+<tr>
+<td>计算 <code>unitPrice * quantity</code></td>
+<td><code>mul i32</code></td>
+</tr>
+<tr>
+<td>向 <code>amount</code> 赋值</td>
+<td><code>store</code></td>
+</tr>
+<tr>
+<td>将 <code>amount</code> 用在右侧表达式中</td>
+<td><code>load</code></td>
+</tr>
+<tr>
+<td><code>amount + 6</code>、<code>amount - 2</code></td>
+<td><code>add</code>、<code>sub</code></td>
+</tr>
+<tr>
+<td><code>return amount;</code></td>
+<td><code>load</code> 后 <code>ret</code></td>
+</tr>
+<tr>
+<td><code>finalPrice(5, 3)</code></td>
+<td><code>call i32 @finalPrice(i32 5, i32 3)</code></td>
+</tr>
+</tbody>
+</table>
+<p>这里保留了最后一次 <code>load</code>，是为了展示统一的变量读取策略。</p>
+<p>实际上，因为最后一次 <code>store</code> 写入的值就是 <code>%discounted</code>，中间没有其他修改，所以也可以直接：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%discounted</span>
+</code></pre></div>
+<p>两种写法在这个具体程序中具有相同的返回结果。</p>
+<h3 id="52-ssa-value-llvm-ir">5.2 使用直接 SSA Value 的完整 LLVM IR<a class="headerlink" href="#52-ssa-value-llvm-ir" title="Permanent link">&para;</a></h3>
+<p>对于完全相同的 SPL 源程序，我们也可以不使用 <code>alloca</code>，直接使用 SSA Value 表示变量。</p>
+<p>对应的 LLVM IR：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="nv">%amount1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">    </span><span class="nv">%amount2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount1</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">    </span><span class="nv">%amount3</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sub</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount2</span><span class="p">,</span><span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount3</span>
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="p">}</span>
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="nl">entry:</span>
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">3</span><span class="p">)</span>
+<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a><span class="p">}</span>
+</code></pre></div>
+<p>对比两份 IR，可以发现：</p>
+<ul>
+<li>两份 IR 都正确表示了 <code>amount</code> 的连续赋值。</li>
+<li>第一份使用固定地址，通过 <code>load</code> 和 <code>store</code> 更新变量。</li>
+<li>第二份通过不同的 SSA Value 表示变量在不同位置的当前值。</li>
+<li>两份 IR 都符合 LLVM IR 的 SSA 规则。</li>
+</ul>
+<p>这也说明：</p>
+<p><strong>编译器的任务是保留源程序的语义，而不是逐字复制源程序中的变量和赋值形式。</strong></p>
+<h3 id="53-call-ret">5.3 函数调用与返回：<code>call</code> 和 <code>ret</code><a class="headerlink" href="#53-call-ret" title="Permanent link">&para;</a></h3>
+<p>在刚才的完整程序中，我们第一次同时看到了 <code>call</code> 和 <code>ret</code>。</p>
+<p>先看函数调用：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">3</span><span class="p">)</span>
+</code></pre></div>
+<p>它表示：</p>
+<ol>
+<li>调用名为 <code>finalPrice</code> 的函数。</li>
+<li>传入两个 <code>i32</code> 类型的实参，分别是 <code>5</code> 和 <code>3</code>。</li>
+<li>函数返回一个 <code>i32</code> 类型的结果。</li>
+<li>将返回结果定义为新的 SSA Value <code>%result</code>。</li>
+</ol>
+<p>因此，有返回值的函数调用可以概括为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>%结果名 = call &lt;返回类型&gt; @&lt;函数名&gt;(&lt;参数类型1&gt; &lt;实参1&gt;, ...)
+</code></pre></div>
+<p>接下来：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+</code></pre></div>
+<p>表示将 <code>%result</code> 作为当前函数的返回值。</p>
+<p>这里需要明确一个问题：</p>
+<p><strong><code>ret</code> 到底返回到哪里？</strong></p>
+<p>我们以 <code>main</code> 调用 <code>finalPrice</code> 为例：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">3</span><span class="p">)</span>
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>当执行到 <code>call</code> 时，程序会进入 <code>finalPrice</code> 函数执行。</p>
+<p>当 <code>finalPrice</code> 执行：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%answer</span>
+</code></pre></div>
+<p>它会结束当前 <code>finalPrice</code> 函数的执行，将返回值交还给调用者。</p>
+<p>随后，程序回到 <code>main</code> 中，从 <code>call</code> 指令之后的位置继续执行。</p>
+<p>也就是说，函数返回不是跳转到当前函数中的某个基本块，而是回到调用者中函数调用之后的位置。</p>
+<p>对于没有返回值的函数，LLVM IR 使用 <code>void</code> 类型，调用和返回形式分别为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">call</span><span class="w"> </span><span class="k">void</span><span class="w"> </span><span class="vg">@doSomething</span><span class="p">()</span>
+</code></pre></div>
+<p>以及：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="k">ret</span><span class="w"> </span><span class="k">void</span>
+</code></pre></div>
+<p>注意，当前课程的 SPL 函数返回类型以项目语法规范为准；这里介绍 <code>void</code> 只是为了帮助理解 LLVM IR 的完整函数调用形式。</p>
+<h2 id="6-basic-block">6. Basic Block：函数内部的指令如何组织？<a class="headerlink" href="#6-basic-block" title="Permanent link">&para;</a></h2>
+<p>在前面的两个完整程序中，我们都看到了：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nl">entry:</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="w">    </span><span class="p">...</span>
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+</code></pre></div>
+<p>这里的 <code>entry:</code> 并不是函数名，而是一个 <strong>Basic Block（基本块）</strong> 的标签。</p>
+<p>可以先把 Basic Block 理解为：</p>
+<p><strong>一段从入口开始顺序执行，中途不发生控制流转移，最后由一条终结指令结束的指令序列。</strong></p>
+<p>LLVM 函数体由一个或多个基本块组成。</p>
+<p>基本块可以概括为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>&lt;基本块标签&gt;:
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>    &lt;普通指令1&gt;
+<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>    &lt;普通指令2&gt;
+<a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>    ...
+<a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a>    &lt;终结指令&gt;
+</code></pre></div>
+<p>在我们的订单程序中，计算一直按照固定顺序执行，最终返回，因此每个函数只需要一个 <code>entry</code> 基本块。</p>
+<p>以 <code>finalPrice</code> 为例：</p>
+<ul>
+<li>基本块从 <code>entry:</code> 开始。</li>
+<li>块内依次执行 <code>alloca</code>、<code>mul</code>、<code>store</code>、<code>load</code>、<code>add</code> 等操作。</li>
+<li>最后通过 <code>ret</code> 结束基本块，同时结束函数。</li>
+</ul>
+<p>这里有一条必须记住的 LLVM IR 规则：</p>
+<p><strong>每个基本块都必须以一条 Terminator Instruction（终结指令）结束。</strong></p>
+<p><code>ret</code> 就是我们已经用过的一种终结指令。它结束当前函数的执行。</p>
+<p>LLVM IR 不允许一个基本块在没有终结指令的情况下直接结束。</p>
+<p>本周我们只需要认识 <code>ret</code>。当程序中出现条件分支和循环时，还会遇到用于改变控制流的 <code>br</code> 指令，我们将在 Week 12 详细介绍。</p>
+<h3 id="61">6.1 给已经学过的指令分个类<a class="headerlink" href="#61" title="Permanent link">&para;</a></h3>
+<p>现在回看完整程序，我们已经用到了几类不同的 LLVM IR 指令：</p>
+<table>
+<thead>
+<tr>
+<th>指令类别</th>
+<th>我们已见到的指令</th>
+<th>在订单程序中负责什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>整数运算</td>
+<td><code>mul</code>、<code>add</code>、<code>sub</code></td>
+<td>商品金额计算、加运费、减优惠</td>
+</tr>
+<tr>
+<td>内存操作</td>
+<td><code>alloca</code>、<code>store</code>、<code>load</code></td>
+<td>分配变量的存储位置、写入和读取当前值</td>
+</tr>
+<tr>
+<td>函数调用</td>
+<td><code>call</code></td>
+<td><code>main</code> 调用 <code>finalPrice(5, 3)</code></td>
+</tr>
+<tr>
+<td>终结指令</td>
+<td><code>ret</code></td>
+<td>结束基本块并返回结果</td>
+</tr>
+</tbody>
+</table>
+<p>这是为了帮助阅读本周实例而采用的功能分类，不是 LLVM 全部指令的完整目录。</p>
+<p>特别注意：</p>
+<ul>
+<li><code>define</code> 是函数定义语法。</li>
+<li><code>entry:</code> 是基本块标签。</li>
+<li><code>i32</code> 是类型。</li>
+<li><code>mul</code>、<code>load</code>、<code>store</code>、<code>ret</code> 才是具体指令。</li>
+</ul>
+<p>这样我们就能区分 LLVM IR 的不同层次：</p>
+<p><strong>函数包含基本块，基本块包含指令，而指令使用带类型的值。</strong></p>
+<h2 id="7-clang-llvm-ir">7. 实践：使用 Clang 观察 LLVM IR<a class="headerlink" href="#7-clang-llvm-ir" title="Permanent link">&para;</a></h2>
+<p>前面我们都是通过手写示例学习 LLVM IR。</p>
+<p>但是，真正的编译器是如何生成这些指令的？</p>
+<p>这一节我们使用 Clang 实际观察 LLVM IR，并重点验证刚才学习的两种变量表示策略。</p>
+<h3 id="71-clang">7.1 Clang 是什么？<a class="headerlink" href="#71-clang" title="Permanent link">&para;</a></h3>
+<p><strong>Clang</strong> 是 LLVM 项目中的 C/C++ 等语言编译器前端。平时运行的 <code>clang</code> 命令也承担编译驱动程序的角色：根据输入文件和命令行选项，组织编译、生成目标代码以及链接等工作。</p>
+<p>本节我们会用它完成两件事：</p>
+<ol>
+<li>把 C 源码转换为可阅读的 LLVM IR。</li>
+<li>把自己编写的 <code>.ll</code> 文件编译并运行。</li>
+</ol>
+<p>Clang 不会直接把 SPL 当作 C 来编译；这里选择与本课程 SPL 示例语法兼容的 C 程序，只是为了观察 LLVM IR 的生成过程。</p>
+<h3 id="72-compiler-explorer-llvm-ir">7.2 使用 Compiler Explorer 观察 LLVM IR<a class="headerlink" href="#72-compiler-explorer-llvm-ir" title="Permanent link">&para;</a></h3>
+<p>打开 <a href="https://godbolt.org/">Compiler Explorer</a>，在左侧输入下面的代码，选择 Clang 编译器。</p>
+<p><strong>C 源码：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">finalPrice</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a><span class="p">}</span>
+<a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a>
+<a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">finalPrice</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a><span class="p">}</span>
+</code></pre></div>
+<p>在 Clang 编译选项中输入：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>-S -emit-llvm -O0 -fno-discard-value-names
+</code></pre></div>
+<p>这四个参数各自负责不同的事情：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+<th>为什么在这里使用？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-S</code></td>
+<td>停在输出文本形式代码的阶段</td>
+<td>与 <code>-emit-llvm</code> 一起使用时，输出文本 LLVM IR</td>
+</tr>
+<tr>
+<td><code>-emit-llvm</code></td>
+<td>要求输出 LLVM IR，而不是目标平台的汇编代码</td>
+<td>使右侧显示我们正在学习的 LLVM IR</td>
+</tr>
+<tr>
+<td><code>-O0</code></td>
+<td>使用优化级别 0</td>
+<td>尽量保留未优化的代码结构</td>
+</tr>
+<tr>
+<td><code>-fno-discard-value-names</code></td>
+<td>尽量保留局部值和参数的名称</td>
+<td>让 <code>%unitPrice</code> 等名字更容易与源码对应</td>
+</tr>
+</tbody>
+</table>
+<p>特别要区分：</p>
+<p><strong><code>-S</code> 控制输出阶段，<code>-emit-llvm</code> 控制输出哪一种代码表示。</strong></p>
+<p>因此，单独使用 <code>-S</code> 得到的通常是机器架构对应的汇编；二者配合才得到文本形式的 LLVM IR，通常保存为 <code>.ll</code> 文件。</p>
+<p>观察右侧生成的 IR，重点寻找：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="k">alloca</span>
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="k">load</span>
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="k">store</span>
+</code></pre></div>
+<p>你可能会发现，Clang 并没有像我们在 §5.2 中那样直接将所有计算结果连接起来，而是为局部变量 <code>amount</code> 分配了存储空间，并通过 <code>load</code> 和 <code>store</code> 完成变量的读取与修改。</p>
+<p>这正是我们在 §4.2 中学习的内存表示策略。</p>
+<p>需要注意，Clang 可能生成与讲义示例不同的局部名称、属性和其他辅助信息。<strong>不要求自动生成的 IR 与讲义示例逐字一致</strong>，重点是理解实际指令及其对应的程序行为。</p>
+<h3 id="73">7.3 使用优化观察变量表示的变化<a class="headerlink" href="#73" title="Permanent link">&para;</a></h3>
+<p>现在，将 Clang 的优化选项从：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>-O0
+</code></pre></div>
+<p>改为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>-O1
+</code></pre></div>
+<p>或者在命令行中执行：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>clang<span class="w"> </span>-S<span class="w"> </span>-emit-llvm<span class="w"> </span>-O1<span class="w"> </span>order.c<span class="w"> </span>-o<span class="w"> </span>order-O1.ll
+</code></pre></div>
+<p>然后观察生成的 LLVM IR。</p>
+<p>你可能会发现：</p>
+<ul>
+<li>原来的 <code>alloca</code> 消失了。</li>
+<li>部分 <code>load</code> 和 <code>store</code> 消失了。</li>
+<li>原本通过内存读写表示的变量，变成了直接使用 SSA Value。</li>
+<li>一些计算被合并或简化，甚至可能直接得到常量。</li>
+</ul>
+<p>为什么会发生这种变化？</p>
+<p>前面我们已经介绍过，LLVM IR 中的计算结果本身就采用 SSA 形式。</p>
+<p>当编译器发现某些局部变量不需要以实际内存对象的形式存在时，就可以将它们转换为直接使用 SSA Value 的形式。</p>
+<p>这里涉及一个重要的 LLVM 优化过程：</p>
+<p><strong><code>mem2reg</code>（Memory to Register）。</strong></p>
+<p><code>mem2reg</code> 用于将符合条件的局部内存变量提升为 SSA Value。</p>
+<p>简单来说，它可以将原来这样的内存操作：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="nv">%amount_addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>
+<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%product</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a><span class="nv">%old</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%old</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-46-6" name="__codelineno-46-6" href="#__codelineno-46-6"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+</code></pre></div>
+<p>转换为直接使用 SSA Value 的形式：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="nv">%amount1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a><span class="nv">%amount2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount1</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+</code></pre></div>
+<p>这只是为了说明转换思路的简化示意，并不代表每次优化都会产生完全相同的结果。</p>
+<p>需要注意，<code>mem2reg</code> 并不是简单地将所有 <code>alloca</code> 都删除。它只处理符合提升条件的局部变量。对于需要保留实际内存访问的对象，优化器仍然可能保留相应的内存操作。</p>
+<p>另外，<code>-O1</code> 不仅包含变量提升，还会执行其他优化。因此，最终 IR 可能出现常量传播、函数内联、计算简化等变化，不能将所有变化都归因于 <code>mem2reg</code>。</p>
+<div class="admonition note">
+<p class="admonition-title">为什么 LLVM 要先生成内存表示，再转换为 SSA？</p>
+<p>对编译器前端来说，直接生成内存读写形式通常更加简单。它不需要在生成每条指令时始终追踪变量当前对应哪个 SSA Value。</p>
+<p>LLVM 则可以在后续优化过程中，将适合提升的局部变量转换为 SSA 形式。</p>
+<p>这种设计将代码生成的实现复杂度与后续优化工作分开，使前端能够采用更简单的策略，同时保留 LLVM 优化器进一步改善 IR 的空间。</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">关于 align 与调试信息</p>
+<p>在 Clang 生成的 LLVM IR 中，你可能会看到：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%value</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%address</span><span class="p">,</span><span class="w"> </span><span class="k">align</span><span class="w"> </span><span class="m">4</span>
+</code></pre></div>
+<p>其中 <code>align 4</code> 表示相关内存访问按照 4 字节对齐的要求进行。</p>
+<p>本课程手写 LLVM IR 时不要求显式写出 <code>align</code>，可以使用：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%value</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%address</span>
+</code></pre></div>
+<p>LLVM 会根据相应规则处理未显式指定的对齐信息。但不能随意声明一个实际不满足的对齐要求。</p>
+<p>此外，你还可能看到 <code>!dbg</code> 等调试信息。这些信息用于将 IR 与源代码位置、变量关联，帮助调试器工作，并不是我们当前学习的重点。</p>
+</div>
+<h3 id="74-linux">7.4 在课程 Linux 环境中运行<a class="headerlink" href="#74-linux" title="Permanent link">&para;</a></h3>
+<p>首先确认编译器已经安装：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>clang-19<span class="w"> </span>--version
+</code></pre></div>
+<p><code>--version</code> 只用于查看 Clang 版本和目标平台信息，不会编译任何程序。</p>
+<p>将 §7.2 的 C 源码保存为 <code>order.c</code>，再执行：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="c1"># 把 C 源码转换为文本 LLVM IR，保存为 order-O0.ll</span>
+<a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a>clang-19<span class="w"> </span>-S<span class="w"> </span>-emit-llvm<span class="w"> </span>-O0<span class="w"> </span>-fno-discard-value-names<span class="w"> </span>order.c<span class="w"> </span>-o<span class="w"> </span>order-O0.ll
+<a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a>
+<a id="__codelineno-51-4" name="__codelineno-51-4" href="#__codelineno-51-4"></a><span class="c1"># 阅读刚才生成的 LLVM IR；按 q 退出 less</span>
+<a id="__codelineno-51-5" name="__codelineno-51-5" href="#__codelineno-51-5"></a>less<span class="w"> </span>order-O0.ll
+</code></pre></div>
+<p>命令的一般形式是：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>clang-19 [编译选项] &lt;输入文件&gt; -o &lt;输出文件&gt;
+</code></pre></div>
+<p>其中，<code>order.c</code> 是输入文件；<code>-o order-O0.ll</code> 表示将输出写入这个文件。</p>
+<p>这里的 <code>-o</code> 是小写字母 o（output），而 <code>-O0</code>、<code>-O1</code> 中的 <code>-O</code> 是大写字母 O（optimization），不要混淆。</p>
+<p>接着把 §5.1 我们自己编写的完整 LLVM IR 保存为 <code>order.ll</code>，执行：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="c1"># 编译 LLVM IR 并链接为可执行文件 order</span>
+<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>clang-19<span class="w"> </span>order.ll<span class="w"> </span>-o<span class="w"> </span>order
+<a id="__codelineno-53-3" name="__codelineno-53-3" href="#__codelineno-53-3"></a>
+<a id="__codelineno-53-4" name="__codelineno-53-4" href="#__codelineno-53-4"></a><span class="c1"># 运行程序</span>
+<a id="__codelineno-53-5" name="__codelineno-53-5" href="#__codelineno-53-5"></a>./order
+<a id="__codelineno-53-6" name="__codelineno-53-6" href="#__codelineno-53-6"></a>
+<a id="__codelineno-53-7" name="__codelineno-53-7" href="#__codelineno-53-7"></a><span class="c1"># 立刻查看上一条命令的退出状态</span>
+<a id="__codelineno-53-8" name="__codelineno-53-8" href="#__codelineno-53-8"></a><span class="nb">echo</span><span class="w"> </span><span class="nv">$?</span>
+</code></pre></div>
+<p>这里，<code>clang-19 order.ll -o order</code> 会读取已有的 LLVM IR，继续生成机器代码并完成链接。</p>
+<p><code>./order</code> 表示运行当前目录中的 <code>order</code>；<code>echo $?</code> 表示显示上一条命令的退出状态。</p>
+<p>对本例而言，<code>main</code> 返回 <code>19</code>，所以应显示：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>19
+</code></pre></div>
+<p>注意，运行 <code>./order</code> 后应立即使用 <code>echo $?</code>，中间不要插入其他命令。</p>
+<p>如果只想编译出目标文件，而不进行链接：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>clang-19<span class="w"> </span>-c<span class="w"> </span>order.ll<span class="w"> </span>-o<span class="w"> </span>order.o
+</code></pre></div>
+<p>这里 <code>-c</code> 表示只编译到目标文件阶段，不链接成可执行程序。<code>order.o</code> 是目标文件，不能像 <code>./order</code> 那样直接运行。</p>
+<p>最后，对相同的 C 源码生成一个带优化的 LLVM IR 版本：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>clang-19<span class="w"> </span>-S<span class="w"> </span>-emit-llvm<span class="w"> </span>-O1<span class="w"> </span>order.c<span class="w"> </span>-o<span class="w"> </span>order-O1.ll
+</code></pre></div>
+<p>对比 <code>order-O0.ll</code> 与 <code>order-O1.ll</code>，观察 <code>alloca</code>、<code>load</code>、<code>store</code> 是否仍然存在，以及计算结果是否直接使用 SSA Value。</p>
+<p>注意，不同 Clang 和 LLVM 版本可能产生不同的 IR。我们关注的是优化前后表示形式的变化，而不是要求生成结果与讲义完全一致。</p>
+<h3 id="75">7.5 课堂练习<a class="headerlink" href="#75" title="Permanent link">&para;</a></h3>
+<p><strong>练习一：两种策略的转换</strong></p>
+<p>在原始 SPL 源码中把运费 <code>6</code> 改成 <code>9</code>、优惠 <code>2</code> 改成 <code>4</code>。</p>
+<p>先预测返回值，再分别修改：</p>
+<ol>
+<li>直接 SSA Value 版本。</li>
+<li><code>alloca + load/store</code> 版本。</li>
+</ol>
+<p>验证两种 IR 是否得到相同结果。</p>
+<p><strong>练习二：理解内存表示</strong></p>
+<p>观察内存版本中的：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="nv">%answer</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%answer</span>
+</code></pre></div>
+<p>尝试去掉最后一次 <code>load</code>，直接返回 <code>%discounted</code>：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%discounted</span>
+</code></pre></div>
+<p>解释为什么在这段具体程序中，两种写法具有相同的效果。</p>
+<p><strong>练习三：观察 Clang 优化</strong></p>
+<p>分别使用 <code>-O0</code> 和 <code>-O1</code> 生成 LLVM IR。</p>
+<p>尝试回答：</p>
+<ol>
+<li>为什么 <code>-O0</code> 下容易观察到 <code>alloca</code>、<code>load</code> 和 <code>store</code>？</li>
+<li>为什么优化后这些指令可能消失？</li>
+<li>优化后的 IR 是否仍然符合 SSA 规则？</li>
+</ol>
+<hr />
+<h2 id="8-summary">8. Summary<a class="headerlink" href="#8-summary" title="Permanent link">&para;</a></h2>
+<p>本周，我们从一个问题出发：</p>
+<p><strong>如果源程序中的变量可以反复赋值，而 LLVM IR 使用 SSA，编译器应该如何表示这些变量？</strong></p>
+<p>通过学习，我们建立了以下认识。</p>
+<h3 id="intermediate-representation">Intermediate Representation<a class="headerlink" href="#intermediate-representation" title="Permanent link">&para;</a></h3>
+<ul>
+<li>IR 是连接源语言前端与目标机器后端的中间表示。</li>
+<li>LLVM IR 使用明确的类型、Value 和指令表示程序计算。</li>
+<li>函数由基本块组成，基本块包含指令。</li>
+</ul>
+<h3 id="static-single-assignment">Static Single Assignment<a class="headerlink" href="#static-single-assignment" title="Permanent link">&para;</a></h3>
+<ul>
+<li>LLVM IR 中的 SSA Value 只能在一个位置被定义。</li>
+<li>一个源语言变量可以在不同位置对应不同的 SSA Value。</li>
+<li>SSA 约束的是 Value 的定义，而不是源语言变量的赋值次数。</li>
+</ul>
+<h3 id="_1">两种变量表示策略<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>直接使用 SSA Value：每次赋值产生新的 Value，更新变量当前对应的 Value。</li>
+<li>使用内存表示：通过 <code>alloca</code> 分配存储空间，通过 <code>store</code> 修改内容，通过 <code>load</code> 读取当前值。</li>
+<li>两种策略都符合 LLVM IR 的 SSA 规则。</li>
+<li>两种策略的主要区别在于代码生成器如何管理可变变量。</li>
+</ul>
+<h3 id="llvm-optimization">LLVM Optimization<a class="headerlink" href="#llvm-optimization" title="Permanent link">&para;</a></h3>
+<ul>
+<li>LLVM 可以通过 <code>mem2reg</code> 将符合条件的局部内存变量提升为 SSA Value。</li>
+<li>内存表示可以降低前端代码生成的复杂度。</li>
+<li>直接 SSA Value 能够更直接地表达计算依赖关系。</li>
+<li>优化过程可能消除不必要的内存读写，并进一步简化计算。</li>
+</ul>
+<h3 id="functions-and-basic-blocks">Functions and Basic Blocks<a class="headerlink" href="#functions-and-basic-blocks" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>define</code> 用于定义函数。</li>
+<li><code>call</code> 用于调用函数。</li>
+<li><code>ret</code> 用于结束当前函数并返回调用者。</li>
+<li>Basic Block 是组织顺序执行指令的基本单位。</li>
+<li>每个 Basic Block 都必须以一条终结指令结束。</li>
+</ul>
+<p>最后，我们可以将本周的内容归纳为：</p>
+<p><strong>LLVM IR 不要求源语言中的变量与某个固定的 SSA Value 一一对应。编译器既可以通过不断产生新的 SSA Value 表示变量的当前值，也可以通过固定的内存地址和读写操作管理可变变量。两种策略各有适用场景，而 LLVM 优化器还可以进一步将适合的内存表示转换为 SSA 形式。</strong></p>
+<p>在下一阶段，我们将继续学习 LLVM IR 的控制流表示，理解程序中的条件分支、循环，以及不同执行路径上的值如何汇合。</p>
+<hr />
+<h1 id="spl-llvm-ir">附录：与 SPL 项目相关的其他基础 LLVM IR<a class="headerlink" href="#spl-llvm-ir" title="Permanent link">&para;</a></h1>
+<p>这些内容可以在需要时查阅，不承担本周主线的教学任务。每个例子都先给出源代码，再展示对应 LLVM IR；不属于当前 SPL 语法的例子会明确标注为 C。</p>
+<h2 id="a-sdivsrem">A. 整数除法与取余：<code>sdiv</code>、<code>srem</code><a class="headerlink" href="#a-sdivsrem" title="Permanent link">&para;</a></h2>
+<p><strong>SPL 源码：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">quotient</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-2" name="__codelineno-59-2" href="#__codelineno-59-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<a id="__codelineno-59-3" name="__codelineno-59-3" href="#__codelineno-59-3"></a><span class="p">}</span>
+<a id="__codelineno-59-4" name="__codelineno-59-4" href="#__codelineno-59-4"></a>
+<a id="__codelineno-59-5" name="__codelineno-59-5" href="#__codelineno-59-5"></a><span class="kt">int</span><span class="w"> </span><span class="nf">remainder</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-6" name="__codelineno-59-6" href="#__codelineno-59-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<a id="__codelineno-59-7" name="__codelineno-59-7" href="#__codelineno-59-7"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>对应的 LLVM IR：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@quotient</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-60-3" name="__codelineno-60-3" href="#__codelineno-60-3"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sdiv</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="nv">%b</span>
+<a id="__codelineno-60-4" name="__codelineno-60-4" href="#__codelineno-60-4"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-60-5" name="__codelineno-60-5" href="#__codelineno-60-5"></a><span class="p">}</span>
+<a id="__codelineno-60-6" name="__codelineno-60-6" href="#__codelineno-60-6"></a>
+<a id="__codelineno-60-7" name="__codelineno-60-7" href="#__codelineno-60-7"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@remainder</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-60-8" name="__codelineno-60-8" href="#__codelineno-60-8"></a><span class="nl">entry:</span>
+<a id="__codelineno-60-9" name="__codelineno-60-9" href="#__codelineno-60-9"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">srem</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="nv">%b</span>
+<a id="__codelineno-60-10" name="__codelineno-60-10" href="#__codelineno-60-10"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-60-11" name="__codelineno-60-11" href="#__codelineno-60-11"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>sdiv</code> 是有符号整数除法，<code>srem</code> 是有符号取余；<code>udiv</code>、<code>urem</code> 则使用无符号整数解释。</p>
+<p>负数情况下，符号处理会影响结果，不能随意互换；除数为零也不能被视为一个正常的计算结果。</p>
+<h2 id="b-sub">B. 一元负号：<code>sub</code> 不只用于两个源变量相减<a class="headerlink" href="#b-sub" title="Permanent link">&para;</a></h2>
+<p><strong>SPL 源码：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">negate</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-61-3" name="__codelineno-61-3" href="#__codelineno-61-3"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>对应的 LLVM IR：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@negate</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-62-3" name="__codelineno-62-3" href="#__codelineno-62-3"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sub</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="nv">%x</span>
+<a id="__codelineno-62-4" name="__codelineno-62-4" href="#__codelineno-62-4"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-62-5" name="__codelineno-62-5" href="#__codelineno-62-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>LLVM IR 无需为简单整数取负引入专门的 <code>neg</code> 指令：<code>0 - x</code> 就能表示相应的定宽整数运算。一元正号对于普通整数值则通常不需要额外生成算术指令。</p>
+<h2 id="c-call">C. 函数调用：<code>call</code><a class="headerlink" href="#c-call" title="Permanent link">&para;</a></h2>
+<p><strong>SPL 源码：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">square</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-63-3" name="__codelineno-63-3" href="#__codelineno-63-3"></a><span class="p">}</span>
+<a id="__codelineno-63-4" name="__codelineno-63-4" href="#__codelineno-63-4"></a>
+<a id="__codelineno-63-5" name="__codelineno-63-5" href="#__codelineno-63-5"></a><span class="kt">int</span><span class="w"> </span><span class="nf">useSquare</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-63-6" name="__codelineno-63-6" href="#__codelineno-63-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">square</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-63-7" name="__codelineno-63-7" href="#__codelineno-63-7"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>对应的 LLVM IR：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@square</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%x</span><span class="p">,</span><span class="w"> </span><span class="nv">%x</span>
+<a id="__codelineno-64-4" name="__codelineno-64-4" href="#__codelineno-64-4"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-64-5" name="__codelineno-64-5" href="#__codelineno-64-5"></a><span class="p">}</span>
+<a id="__codelineno-64-6" name="__codelineno-64-6" href="#__codelineno-64-6"></a>
+<a id="__codelineno-64-7" name="__codelineno-64-7" href="#__codelineno-64-7"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@useSquare</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-64-8" name="__codelineno-64-8" href="#__codelineno-64-8"></a><span class="nl">entry:</span>
+<a id="__codelineno-64-9" name="__codelineno-64-9" href="#__codelineno-64-9"></a><span class="w">    </span><span class="nv">%s</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@square</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%y</span><span class="p">)</span>
+<a id="__codelineno-64-10" name="__codelineno-64-10" href="#__codelineno-64-10"></a><span class="w">    </span><span class="nv">%answer</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%s</span><span class="p">,</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-64-11" name="__codelineno-64-11" href="#__codelineno-64-11"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%answer</span>
+<a id="__codelineno-64-12" name="__codelineno-64-12" href="#__codelineno-64-12"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>call i32 @square(i32 %y)</code> 表示调用 <code>square</code>，传入一个 <code>i32</code> 参数，并产生一个 <code>i32</code> 返回值。</p>
+<p>这里还要注意：形参名称写在函数定义中，实参值写在 <code>call</code> 中，两者不是同一个概念。函数名使用 <code>@</code>；局部参数和值使用 <code>%</code>。</p>
+<p>另一个常见写法是只有函数声明，没有当前模块中的函数体。例如，我们可能只在当前源文件中使用别处定义的函数。</p>
+<p><strong>C 源码：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">externalAdd</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
+<a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a>
+<a id="__codelineno-65-3" name="__codelineno-65-3" href="#__codelineno-65-3"></a><span class="kt">int</span><span class="w"> </span><span class="nf">useExternal</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-65-4" name="__codelineno-65-4" href="#__codelineno-65-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">externalAdd</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-65-5" name="__codelineno-65-5" href="#__codelineno-65-5"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>对应的 LLVM IR：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a><span class="k">declare</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@externalAdd</span><span class="p">(</span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="p">)</span>
+<a id="__codelineno-66-2" name="__codelineno-66-2" href="#__codelineno-66-2"></a>
+<a id="__codelineno-66-3" name="__codelineno-66-3" href="#__codelineno-66-3"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@useExternal</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-66-4" name="__codelineno-66-4" href="#__codelineno-66-4"></a><span class="nl">entry:</span>
+<a id="__codelineno-66-5" name="__codelineno-66-5" href="#__codelineno-66-5"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@externalAdd</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%n</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">1</span><span class="p">)</span>
+<a id="__codelineno-66-6" name="__codelineno-66-6" href="#__codelineno-66-6"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-66-7" name="__codelineno-66-7" href="#__codelineno-66-7"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>define</code> 表示定义函数（有函数体），<code>declare</code> 表示声明函数（只有签名，没有函数体）。</p>
+<p>本例的函数声明可以抽象为：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>declare &lt;返回类型&gt; @&lt;函数名&gt;(&lt;参数类型1&gt;, &lt;参数类型2&gt;, ...)
+</code></pre></div>
+<p>声明中可以省略形参名字，但参数类型不能随意省略。这段 IR 可以编译成目标文件；如果要链接成可执行程序，还必须提供 <code>externalAdd</code> 的实现以及相应入口。</p>
+<h2 id="d-icmp-i1">D. 整数比较：<code>icmp</code> 与 <code>i1</code><a class="headerlink" href="#d-icmp-i1" title="Permanent link">&para;</a></h2>
+<p>关系运算也需要 LLVM IR 表示。下面使用 C 源码来演示返回一个 0/1 整数的情况；SPL 对关系表达式的最终类型约定，应以当前课程项目的语义规范为准。</p>
+<p><strong>C 源码：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">isGreater</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-68-2" name="__codelineno-68-2" href="#__codelineno-68-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<a id="__codelineno-68-3" name="__codelineno-68-3" href="#__codelineno-68-3"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>对应的 LLVM IR：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@isGreater</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-69-2" name="__codelineno-69-2" href="#__codelineno-69-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-69-3" name="__codelineno-69-3" href="#__codelineno-69-3"></a><span class="w">    </span><span class="nv">%cond</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">icmp</span><span class="w"> </span><span class="k">sgt</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="nv">%b</span>
+<a id="__codelineno-69-4" name="__codelineno-69-4" href="#__codelineno-69-4"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">zext</span><span class="w"> </span><span class="kt">i1</span><span class="w"> </span><span class="nv">%cond</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-69-5" name="__codelineno-69-5" href="#__codelineno-69-5"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-69-6" name="__codelineno-69-6" href="#__codelineno-69-6"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>icmp</code> 比较整数，生成 <code>i1</code> 类型的结果。</p>
+<p>通用格式：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a>%结果名 = icmp &lt;比较谓词&gt; &lt;整数类型&gt; &lt;操作数1&gt;, &lt;操作数2&gt;
+</code></pre></div>
+<p>其中 <code>&lt;比较谓词&gt;</code> 指定比较方式。例如：</p>
+<table>
+<thead>
+<tr>
+<th>比较谓词</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>eq</code></td>
+<td>前者是否等于后者</td>
+</tr>
+<tr>
+<td><code>ne</code></td>
+<td>前者是否不等于后者</td>
+</tr>
+<tr>
+<td><code>sgt</code></td>
+<td>前者是否大于后者（有符号）</td>
+</tr>
+<tr>
+<td><code>sge</code></td>
+<td>前者是否大于等于后者（有符号）</td>
+</tr>
+<tr>
+<td><code>slt</code></td>
+<td>前者是否小于后者（有符号）</td>
+</tr>
+<tr>
+<td><code>sle</code></td>
+<td>前者是否小于等于后者（有符号）</td>
+</tr>
+</tbody>
+</table>
+<p>注意 <code>icmp</code> 的结果类型是 <code>i1</code>，不是两个输入操作数的 <code>i32</code>。</p>
+<p>如果函数要返回 <code>i32</code> 类型的 0/1，就需要像示例那样使用 <code>zext</code> 将 <code>i1</code> 扩展为 <code>i32</code>。LLVM 不会自动完成这次类型变化。</p>
+<h2 id="e-global">E. 全局变量：<code>global</code> 与全局地址<a class="headerlink" href="#e-global" title="Permanent link">&para;</a></h2>
+<p><strong>SPL 源码：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">counter</span><span class="p">;</span>
+<a id="__codelineno-71-2" name="__codelineno-71-2" href="#__codelineno-71-2"></a>
+<a id="__codelineno-71-3" name="__codelineno-71-3" href="#__codelineno-71-3"></a><span class="kt">int</span><span class="w"> </span><span class="nf">increment</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-71-4" name="__codelineno-71-4" href="#__codelineno-71-4"></a><span class="w">    </span><span class="n">counter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">counter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-71-5" name="__codelineno-71-5" href="#__codelineno-71-5"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">counter</span><span class="p">;</span>
+<a id="__codelineno-71-6" name="__codelineno-71-6" href="#__codelineno-71-6"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>对应的 LLVM IR（这里选择全局初始值为 0）：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a><span class="vg">@counter</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">global</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-72-2" name="__codelineno-72-2" href="#__codelineno-72-2"></a>
+<a id="__codelineno-72-3" name="__codelineno-72-3" href="#__codelineno-72-3"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@increment</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-72-4" name="__codelineno-72-4" href="#__codelineno-72-4"></a><span class="nl">entry:</span>
+<a id="__codelineno-72-5" name="__codelineno-72-5" href="#__codelineno-72-5"></a><span class="w">    </span><span class="nv">%old</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="vg">@counter</span>
+<a id="__codelineno-72-6" name="__codelineno-72-6" href="#__codelineno-72-6"></a><span class="w">    </span><span class="nv">%new</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%old</span><span class="p">,</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-72-7" name="__codelineno-72-7" href="#__codelineno-72-7"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%new</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="vg">@counter</span>
+<a id="__codelineno-72-8" name="__codelineno-72-8" href="#__codelineno-72-8"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%new</span>
+<a id="__codelineno-72-9" name="__codelineno-72-9" href="#__codelineno-72-9"></a><span class="p">}</span>
+</code></pre></div>
+<p>定义普通全局变量时，入门阶段可以先认识这个通用格式：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a>@&lt;全局变量名&gt; = global &lt;对象类型&gt; &lt;初始值&gt;
+</code></pre></div>
+<p>例如 <code>@counter = global i32 0</code>。</p>
+<p>注意它与 <code>define</code> 函数定义不同，也不是局部 <code>alloca</code> 指令。</p>
+<p><code>@counter</code> 表示全局对象的地址，而局部 <code>alloca</code> 在函数执行期间分配空间。二者来源不同，但读取和写入仍使用相同的 <code>load/store</code> 形式。</p>
+<p>这里显式选择初始值 0，具体项目的全局初始化语义以 SPL 规范为准。</p>
+<p>LLVM IR 也提供 <code>zeroinitializer</code> 表示零初始化值。例如：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a><span class="vg">@counter</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">global</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="k">zeroinitializer</span>
+</code></pre></div>
+<p>对于上面的整数全局变量，它与初始化为 <code>0</code> 的效果相同。</p>
+<h2 id="f-sextzexttrunc">F. 整数类型转换：<code>sext</code>、<code>zext</code>、<code>trunc</code><a class="headerlink" href="#f-sextzexttrunc" title="Permanent link">&para;</a></h2>
+<p><strong>C 源码（这里通过 C 的 <code>short</code> 与 <code>unsigned short</code> 举例；当前 SPL 不直接提供这些声明类型）：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">signedWiden</span><span class="p">(</span><span class="kt">short</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-75-2" name="__codelineno-75-2" href="#__codelineno-75-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-75-3" name="__codelineno-75-3" href="#__codelineno-75-3"></a><span class="p">}</span>
+<a id="__codelineno-75-4" name="__codelineno-75-4" href="#__codelineno-75-4"></a>
+<a id="__codelineno-75-5" name="__codelineno-75-5" href="#__codelineno-75-5"></a><span class="kt">int</span><span class="w"> </span><span class="nf">unsignedWiden</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-75-6" name="__codelineno-75-6" href="#__codelineno-75-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-75-7" name="__codelineno-75-7" href="#__codelineno-75-7"></a><span class="p">}</span>
+<a id="__codelineno-75-8" name="__codelineno-75-8" href="#__codelineno-75-8"></a>
+<a id="__codelineno-75-9" name="__codelineno-75-9" href="#__codelineno-75-9"></a><span class="kt">short</span><span class="w"> </span><span class="nf">narrow</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-75-10" name="__codelineno-75-10" href="#__codelineno-75-10"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">short</span><span class="p">)</span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-75-11" name="__codelineno-75-11" href="#__codelineno-75-11"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>对应的 LLVM IR（假设 <code>short</code> 为 16 位、<code>int</code> 为 32 位）：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@signedWiden</span><span class="p">(</span><span class="kt">i16</span><span class="w"> </span><span class="nv">%x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-76-2" name="__codelineno-76-2" href="#__codelineno-76-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-76-3" name="__codelineno-76-3" href="#__codelineno-76-3"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sext</span><span class="w"> </span><span class="kt">i16</span><span class="w"> </span><span class="nv">%x</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-76-4" name="__codelineno-76-4" href="#__codelineno-76-4"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-76-5" name="__codelineno-76-5" href="#__codelineno-76-5"></a><span class="p">}</span>
+<a id="__codelineno-76-6" name="__codelineno-76-6" href="#__codelineno-76-6"></a>
+<a id="__codelineno-76-7" name="__codelineno-76-7" href="#__codelineno-76-7"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@unsignedWiden</span><span class="p">(</span><span class="kt">i16</span><span class="w"> </span><span class="nv">%x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-76-8" name="__codelineno-76-8" href="#__codelineno-76-8"></a><span class="nl">entry:</span>
+<a id="__codelineno-76-9" name="__codelineno-76-9" href="#__codelineno-76-9"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">zext</span><span class="w"> </span><span class="kt">i16</span><span class="w"> </span><span class="nv">%x</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-76-10" name="__codelineno-76-10" href="#__codelineno-76-10"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-76-11" name="__codelineno-76-11" href="#__codelineno-76-11"></a><span class="p">}</span>
+<a id="__codelineno-76-12" name="__codelineno-76-12" href="#__codelineno-76-12"></a>
+<a id="__codelineno-76-13" name="__codelineno-76-13" href="#__codelineno-76-13"></a><span class="k">define</span><span class="w"> </span><span class="kt">i16</span><span class="w"> </span><span class="vg">@narrow</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-76-14" name="__codelineno-76-14" href="#__codelineno-76-14"></a><span class="nl">entry:</span>
+<a id="__codelineno-76-15" name="__codelineno-76-15" href="#__codelineno-76-15"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">trunc</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%x</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i16</span>
+<a id="__codelineno-76-16" name="__codelineno-76-16" href="#__codelineno-76-16"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i16</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-76-17" name="__codelineno-76-17" href="#__codelineno-76-17"></a><span class="p">}</span>
+</code></pre></div>
+<p>这类类型转换指令有一套共同形式：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a>%结果名 = &lt;转换指令&gt; &lt;源类型&gt; &lt;原值&gt; to &lt;目标类型&gt;
+</code></pre></div>
+<p>这里 <code>&lt;转换指令&gt;</code> 可以是 <code>sext</code>、<code>zext</code> 或 <code>trunc</code>。</p>
+<ul>
+<li><code>sext</code>：按有符号语义扩展。</li>
+<li><code>zext</code>：在高位补零。</li>
+<li><code>trunc</code>：截断高位。</li>
+</ul>
+<p>它们说明 LLVM IR 对整数位宽十分明确，不能指望不同位宽之间存在隐式转换。</p>
+<h2 id="g-void">G. <code>void</code>：无返回值函数<a class="headerlink" href="#g-void" title="Permanent link">&para;</a></h2>
+<p><strong>C 源码（当前 SPL 函数类型规范不包含 <code>void</code> 返回类型）：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">doNothing</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-78-2" name="__codelineno-78-2" href="#__codelineno-78-2"></a><span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<a id="__codelineno-78-3" name="__codelineno-78-3" href="#__codelineno-78-3"></a><span class="p">}</span>
+<a id="__codelineno-78-4" name="__codelineno-78-4" href="#__codelineno-78-4"></a>
+<a id="__codelineno-78-5" name="__codelineno-78-5" href="#__codelineno-78-5"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-78-6" name="__codelineno-78-6" href="#__codelineno-78-6"></a><span class="w">    </span><span class="n">doNothing</span><span class="p">();</span>
+<a id="__codelineno-78-7" name="__codelineno-78-7" href="#__codelineno-78-7"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-78-8" name="__codelineno-78-8" href="#__codelineno-78-8"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>对应的 LLVM IR：</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a><span class="k">define</span><span class="w"> </span><span class="k">void</span><span class="w"> </span><span class="vg">@doNothing</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-79-2" name="__codelineno-79-2" href="#__codelineno-79-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-79-3" name="__codelineno-79-3" href="#__codelineno-79-3"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="k">void</span>
+<a id="__codelineno-79-4" name="__codelineno-79-4" href="#__codelineno-79-4"></a><span class="p">}</span>
+<a id="__codelineno-79-5" name="__codelineno-79-5" href="#__codelineno-79-5"></a>
+<a id="__codelineno-79-6" name="__codelineno-79-6" href="#__codelineno-79-6"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-79-7" name="__codelineno-79-7" href="#__codelineno-79-7"></a><span class="nl">entry:</span>
+<a id="__codelineno-79-8" name="__codelineno-79-8" href="#__codelineno-79-8"></a><span class="w">    </span><span class="k">call</span><span class="w"> </span><span class="k">void</span><span class="w"> </span><span class="vg">@doNothing</span><span class="p">()</span>
+<a id="__codelineno-79-9" name="__codelineno-79-9" href="#__codelineno-79-9"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-79-10" name="__codelineno-79-10" href="#__codelineno-79-10"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>void</code> 是 LLVM IR 中表示没有返回值的一种特殊类型。</p>
+<p><code>call void</code> 不产生可以接收的返回值，<code>ret void</code> 不携带数值。</p>
+<h2 id="h">H. 常用格式速查<a class="headerlink" href="#h" title="Permanent link">&para;</a></h2>
+<p>下面是本周通过源码与 IR 对照介绍过的通用格式，作为回看正文与附录时的索引。</p>
+<p>尖括号仍是占位符；这些示意格式本身不能直接当作 <code>.ll</code> 文件编译。</p>
+<table>
+<thead>
+<tr>
+<th>用途</th>
+<th>常用格式（省略可选属性）</th>
+<th>首次完整示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>函数定义</td>
+<td><code>define &lt;返回类型&gt; @&lt;函数名&gt;(&lt;类型&gt; %&lt;形参&gt;, ...) { ... }</code></td>
+<td>§2.1</td>
+</tr>
+<tr>
+<td>二元整数运算</td>
+<td><code>%r = &lt;add/sub/mul/sdiv/srem&gt; iN &lt;x&gt;, &lt;y&gt;</code></td>
+<td>§2.2、附录 A</td>
+</tr>
+<tr>
+<td>分配局部存储</td>
+<td><code>%p = alloca &lt;对象类型&gt;</code></td>
+<td>§4.2</td>
+</tr>
+<tr>
+<td>写入内存</td>
+<td><code>store &lt;类型&gt; &lt;值&gt;, ptr &lt;地址&gt;</code></td>
+<td>§4.2</td>
+</tr>
+<tr>
+<td>读取内存</td>
+<td><code>%v = load &lt;类型&gt;, ptr &lt;地址&gt;</code></td>
+<td>§4.2</td>
+</tr>
+<tr>
+<td>调用有返回值的函数</td>
+<td><code>%r = call &lt;返回类型&gt; @&lt;函数名&gt;(&lt;类型&gt; &lt;实参&gt;, ...)</code></td>
+<td>§5.3、附录 C</td>
+</tr>
+<tr>
+<td>函数返回</td>
+<td><code>ret &lt;类型&gt; &lt;值&gt;</code> 或 <code>ret void</code></td>
+<td>§2.1、附录 G</td>
+</tr>
+<tr>
+<td>函数声明</td>
+<td><code>declare &lt;返回类型&gt; @&lt;函数名&gt;(&lt;参数类型&gt;, ...)</code></td>
+<td>附录 C</td>
+</tr>
+<tr>
+<td>整数比较</td>
+<td><code>%r = icmp &lt;谓词&gt; &lt;类型&gt; &lt;x&gt;, &lt;y&gt;</code></td>
+<td>附录 D</td>
+</tr>
+<tr>
+<td>全局变量</td>
+<td><code>@&lt;名字&gt; = global &lt;类型&gt; &lt;初始值&gt;</code></td>
+<td>附录 E</td>
+</tr>
+<tr>
+<td>整数类型转换</td>
+<td><code>%r = &lt;sext/zext/trunc&gt; &lt;源类型&gt; &lt;值&gt; to &lt;目标类型&gt;</code></td>
+<td>附录 F</td>
+</tr>
+</tbody>
+</table>
+<p>需要注意：不是所有指令都遵循“<code>%结果 = ...</code>”形式。</p>
+<p>例如 <code>store</code> 和 <code>ret</code> 不产生新的结果值；<code>define</code>、<code>declare</code> 和 <code>global</code> 也不是普通的计算指令。对具体指令应当结合其返回值、操作数和类型要求阅读。</p>
+<h2 id="_2">参考资料<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://llvm.org/docs/LangRef.html">LLVM Language Reference Manual</a>：IR 语法、类型、指令与内存操作的正式定义。</li>
+<li><a href="https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl07.html">LLVM Tutorial — Mutable Variables</a>：理解可变变量、SSA 与 <code>alloca</code> 的关系。</li>
+<li><a href="https://clang.llvm.org/docs/ClangCommandLineReference.html">Clang Command Line Reference</a>：命令行参数（<code>-S</code>、<code>-emit-llvm</code>、<code>-c</code>、<code>-o</code> 等）。</li>
+<li><a href="https://llvm.org/docs/Passes.html#mem2reg-promote-memory-to-register">LLVM Passes — Promote Memory to Register</a>：了解 <code>mem2reg</code> 优化过程。</li>
+<li><a href="https://godbolt.org/">Compiler Explorer</a>：对照源码与 Clang 生成的 LLVM IR。</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-copyright">
+    <div class="md-copyright__highlight">
+        commit: 
+        <a href="/commit/c89f2484, 2026-11-21 16:03:25+08:00" target="_blank" rel="noopener">
+            c89f2484, 2026-11-21 16:03:25+08:00
+        </a>
+    </div>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.path", "navigation.tabs", "navigation.tabs.sticky"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>

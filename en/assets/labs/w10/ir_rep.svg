@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="660" viewBox="0 0 1200 660" role="img" aria-labelledby="title desc">
+  <title id="title">A shared intermediate representation</title>
+  <desc id="desc">SPL, C, and Rust frontends produce a shared IR. Backends translate that IR to x86-64, AArch64, and RISC-V. Sharing an IR reduces coupling between frontends and backends.</desc>
+  <defs>
+    <linearGradient id="outer" x2="0" y2="1">
+      <stop stop-color="#edf3f8"/>
+      <stop offset="1" stop-color="#dce5ee"/>
+    </linearGradient>
+    <linearGradient id="center" x2="0" y2="1">
+      <stop stop-color="#e6f6ff"/>
+      <stop offset="1" stop-color="#cce8fa"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 1 1 L 11 6 L 1 11 Z" fill="#345372"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="660" fill="#fff"/>
+  <g fill="none" stroke="#345372" stroke-width="4" marker-end="url(#arrow)">
+    <path d="M290 135 C350 135 337 250 400 250"/>
+    <path d="M290 285 H400"/>
+    <path d="M290 435 C350 435 337 320 400 320"/>
+    <path d="M800 250 C863 250 850 135 910 135"/>
+    <path d="M800 285 H910"/>
+    <path d="M800 320 C863 320 850 435 910 435"/>
+  </g>
+  <g fill="url(#outer)" stroke="#345372" stroke-width="3.5">
+    <rect x="70" y="85" width="220" height="100" rx="14"/>
+    <rect x="70" y="235" width="220" height="100" rx="14"/>
+    <rect x="70" y="385" width="220" height="100" rx="14"/>
+    <rect x="910" y="85" width="220" height="100" rx="14"/>
+    <rect x="910" y="235" width="220" height="100" rx="14"/>
+    <rect x="910" y="385" width="220" height="100" rx="14"/>
+  </g>
+  <rect x="400" y="195" width="400" height="180" rx="20" fill="url(#center)" stroke="#1386c5" stroke-width="4"/>
+  <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle" fill="#102c45">
+    <g font-size="35" font-weight="700">
+      <text x="180" y="147">SPL</text>
+      <text x="180" y="297">C</text>
+      <text x="180" y="447">Rust</text>
+      <text x="1020" y="147">x86-64</text>
+      <text x="1020" y="297">AArch64</text>
+      <text x="1020" y="447">RISC-V</text>
+    </g>
+    <text x="600" y="275" font-size="46" font-weight="700">Shared IR</text>
+    <text x="600" y="320" font-size="25" fill="#345372">Intermediate Representation</text>
+    <g fill="none" stroke="#7b8997" stroke-width="3">
+      <path d="M70 510 Q70 525 90 525 H160 Q180 525 180 542 Q180 525 200 525 H270 Q290 525 290 510"/>
+      <path d="M910 510 Q910 525 930 525 H1000 Q1020 525 1020 542 Q1020 525 1040 525 H1110 Q1130 525 1130 510"/>
+    </g>
+    <text x="180" y="578" font-size="29"><tspan font-style="italic">m</tspan> frontends</text>
+    <text x="1020" y="578" font-size="29"><tspan font-style="italic">n</tspan> backends</text>
+    <text x="600" y="635" font-size="29" font-weight="700" fill="#284e73">A shared IR reduces coupling between frontends and backends</text>
+  </g>
+</svg>

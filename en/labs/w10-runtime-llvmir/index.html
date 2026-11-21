@@ -1,0 +1,2693 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://sqlab-sustech.github.io/CS323-Compilers-2026F-docs/en/labs/w10-runtime-llvmir/">
+      
+      
+        <link rel="prev" href="../w9-semantic/">
+      
+      
+        <link rel="next" href="../w11-translation/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+    
+    
+      
+        <title>Week 10 - LLVM IR - Compiler Lab Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.6543a935.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#week-10-from-semantics-to-llvm-ir" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../" title="Compiler Lab Documentation" class="md-header__button md-logo" aria-label="Compiler Lab Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Compiler Lab Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Week 10 - LLVM IR
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../labs/w10-runtime-llvmir/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../" class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../w1-intro/" class="md-tabs__link">
+          
+  
+  Weekly Labs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../env/" class="md-tabs__link">
+          
+  
+  Environment Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="Compiler Lab Documentation" class="md-nav__button md-logo" aria-label="Compiler Lab Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    Compiler Lab Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Weekly Labs
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Weekly Labs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w1-intro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 1 - Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w2-lex_p1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 2 - Lexer 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w3-lex_p2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 3 - Lexer 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w4-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 4 - Parser 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w5-parser/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 5 - Parser 2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w6-symbol/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 7 - Semantic Part 1 - Symbol Table
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w7-semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 8 - Semantic Part 2 - Type Checking
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w9-semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 9 - Semantic Part 3 - Expression
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Week 10 - LLVM IR
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Week 10 - LLVM IR
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-why-introduce-an-intermediate-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Why Introduce an Intermediate Representation?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-start-with-a-simple-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Start with a Simple Function
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Start with a Simple Function">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-function-definitions-the-overall-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 Function Definitions: The Overall Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-integer-arithmetic-opcodes-types-and-operands" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2 Integer Arithmetic: Opcodes, Types, and Operands
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-types-and-values-the-terms-we-need-to-read-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3 Types and Values: The Terms We Need to Read IR
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-why-cant-we-give-each-source-variable-a-single-ir-value-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Why Can't We Give Each Source Variable a Single IR Value Name?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Why Can't We Give Each Source Variable a Single IR Value Name?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-first-attempt-repeated-assignment-to-amount" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 First Attempt: Repeated Assignment to %amount
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-static-single-assignment-define-each-name-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 Static Single Assignment: Define Each Name Once
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-two-strategies-for-representing-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Two Strategies for Representing Variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Two Strategies for Representing Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-represent-variables-directly-with-ssa-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1 Represent Variables Directly with SSA Values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-represent-variables-with-alloca-store-and-load" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.2 Represent Variables with alloca, store, and load
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-comparing-the-two-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.3 Comparing the Two Strategies
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-the-complete-program-two-llvm-ir-translations" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. The Complete Program: Two LLVM IR Translations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. The Complete Program: Two LLVM IR Translations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-complete-llvm-ir-using-a-memory-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1 Complete LLVM IR Using a Memory Representation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-complete-llvm-ir-using-direct-ssa-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.2 Complete LLVM IR Using Direct SSA Values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-function-calls-and-returns-call-and-ret" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.3 Function Calls and Returns: call and ret
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-basic-blocks-organizing-instructions-within-a-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Basic Blocks: Organizing Instructions Within a Function
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Basic Blocks: Organizing Instructions Within a Function">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-grouping-the-instructions-we-have-seen" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1 Grouping the Instructions We Have Seen
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-practice-observe-llvm-ir-with-clang" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Practice: Observe LLVM IR with Clang
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Practice: Observe LLVM IR with Clang">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-what-is-clang" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.1 What Is Clang?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-inspect-llvm-ir-with-compiler-explorer" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.2 Inspect LLVM IR with Compiler Explorer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-observe-how-optimization-changes-variable-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.3 Observe How Optimization Changes Variable Representation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-run-the-program-in-the-course-linux-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.4 Run the Program in the Course Linux Environment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-in-class-exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.5 In-Class Exercises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Summary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#intermediate-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Intermediate Representation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-single-assignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Static Single Assignment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#two-strategies-for-representing-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Two Strategies for Representing Variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#llvm-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      LLVM Optimization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#functions-and-basic-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions and Basic Blocks
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../w11-translation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Week 11 - Translation 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Environment Setup
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Environment Setup
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Alternative Environments
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Alternative Environments
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/wsl/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows WSL
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../env/setup/macos-native/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Native macOS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-why-introduce-an-intermediate-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Why Introduce an Intermediate Representation?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-start-with-a-simple-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Start with a Simple Function
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Start with a Simple Function">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-function-definitions-the-overall-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 Function Definitions: The Overall Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-integer-arithmetic-opcodes-types-and-operands" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2 Integer Arithmetic: Opcodes, Types, and Operands
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-types-and-values-the-terms-we-need-to-read-ir" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3 Types and Values: The Terms We Need to Read IR
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-why-cant-we-give-each-source-variable-a-single-ir-value-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Why Can't We Give Each Source Variable a Single IR Value Name?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Why Can't We Give Each Source Variable a Single IR Value Name?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-first-attempt-repeated-assignment-to-amount" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 First Attempt: Repeated Assignment to %amount
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-static-single-assignment-define-each-name-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 Static Single Assignment: Define Each Name Once
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-two-strategies-for-representing-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Two Strategies for Representing Variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Two Strategies for Representing Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-represent-variables-directly-with-ssa-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1 Represent Variables Directly with SSA Values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-represent-variables-with-alloca-store-and-load" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.2 Represent Variables with alloca, store, and load
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-comparing-the-two-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.3 Comparing the Two Strategies
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-the-complete-program-two-llvm-ir-translations" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. The Complete Program: Two LLVM IR Translations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. The Complete Program: Two LLVM IR Translations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-complete-llvm-ir-using-a-memory-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1 Complete LLVM IR Using a Memory Representation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-complete-llvm-ir-using-direct-ssa-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.2 Complete LLVM IR Using Direct SSA Values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-function-calls-and-returns-call-and-ret" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.3 Function Calls and Returns: call and ret
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-basic-blocks-organizing-instructions-within-a-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Basic Blocks: Organizing Instructions Within a Function
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Basic Blocks: Organizing Instructions Within a Function">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-grouping-the-instructions-we-have-seen" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1 Grouping the Instructions We Have Seen
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-practice-observe-llvm-ir-with-clang" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Practice: Observe LLVM IR with Clang
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Practice: Observe LLVM IR with Clang">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-what-is-clang" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.1 What Is Clang?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-inspect-llvm-ir-with-compiler-explorer" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.2 Inspect LLVM IR with Compiler Explorer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-observe-how-optimization-changes-variable-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.3 Observe How Optimization Changes Variable Representation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-run-the-program-in-the-course-linux-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.4 Run the Program in the Course Linux Environment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-in-class-exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.5 In-Class Exercises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Summary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#intermediate-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Intermediate Representation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-single-assignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Static Single Assignment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#two-strategies-for-representing-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Two Strategies for Representing Variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#llvm-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      LLVM Optimization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#functions-and-basic-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions and Basic Blocks
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="week-10-from-semantics-to-llvm-ir">Week 10 — From Semantics to LLVM IR<a class="headerlink" href="#week-10-from-semantics-to-llvm-ir" title="Permanent link">&para;</a></h1>
+<p>Last week, we learned to describe what expressions mean: an expression may designate an object's <strong>storage location</strong> or produce a <strong>value</strong>. Assignment changes an object's state, and later computations can read the updated value.</p>
+<p>This week, we take the next step: <strong>once a compiler understands a source program, how can it express that behavior in code that can be compiled further and eventually executed?</strong> We will use LLVM IR to explore this question.</p>
+<p>The following SPL program will be our running example. It calculates the final price of an order by multiplying the unit price by the quantity, adding a delivery fee, and subtracting a discount.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">finalPrice</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">finalPrice</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">}</span>
+</code></pre></div>
+<p>We know that <code>main</code> ultimately returns <code>19</code>. Our task is to have the compiler generate a representation that <strong>preserves this behavior</strong>.</p>
+<h2 id="1-why-introduce-an-intermediate-representation">1. Why Introduce an Intermediate Representation?<a class="headerlink" href="#1-why-introduce-an-intermediate-representation" title="Permanent link">&para;</a></h2>
+<p>Suppose we want to support <code>m</code> source languages and <code>n</code> target architectures, such as x86-64, AArch64, and RISC-V. If we implement a separate translation from every source language to every target, we may need to maintain roughly <code>m × n</code> combinations.</p>
+<p>Instead, all frontends can generate a shared <strong>intermediate representation (IR)</strong>, which different backends then translate into target machine code. This lets us organize the compiler infrastructure around <code>m</code> frontends and <code>n</code> backends:</p>
+<p><img alt="Multiple language frontends and target backends connected through a shared IR" src="../../assets/labs/w10/ir_rep.svg" /></p>
+<p>A shared IR reduces the coupling between frontends and backends.</p>
+<p>In this course, we use LLVM IR. Our job is to translate SPL programs, after parsing and semantic checking, into LLVM IR. The LLVM toolchain then handles machine code generation.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>SPL source → Lexer / Parser → Semantic Analysis → LLVM IR → Target code
+</code></pre></div>
+<p>The question is now more concrete: <strong>how do we express SPL arithmetic, assignment, and return statements in LLVM IR?</strong></p>
+<h2 id="2-start-with-a-simple-function">2. Start with a Simple Function<a class="headerlink" href="#2-start-with-a-simple-function" title="Permanent link">&para;</a></h2>
+<p>The order calculation begins with <code>unitPrice * quantity</code>. Let us isolate that step in a function with no mutable local variables.</p>
+<p><strong>SPL source:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">product</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Complete LLVM IR:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@product</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="21-function-definitions-the-overall-structure">2.1 Function Definitions: The Overall Structure<a class="headerlink" href="#21-function-definitions-the-overall-structure" title="Permanent link">&para;</a></h3>
+<p>Both versions define the same <code>product</code> function. LLVM IR also has function names, parameters, bodies, and return values; it simply requires types and computations to be written more explicitly.</p>
+<p>From this example, we can outline the <strong>usual form of a function definition</strong>. For now, we omit optional details such as function attributes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">define</span><span class="w"> </span><span class="p">&lt;</span><span class="err">return-</span><span class="k">type</span><span class="p">&gt;</span><span class="w"> </span><span class="err">@</span><span class="p">&lt;</span><span class="k">function</span><span class="err">-</span><span class="k">name</span><span class="p">&gt;(&lt;</span><span class="k">param</span><span class="err">-type</span><span class="m">1</span><span class="p">&gt;</span><span class="w"> </span><span class="err">%</span><span class="p">&lt;</span><span class="k">param</span><span class="err">-name</span><span class="m">1</span><span class="p">&gt;,</span><span class="w"> </span><span class="p">&lt;</span><span class="k">param</span><span class="err">-type</span><span class="m">2</span><span class="p">&gt;</span><span class="w"> </span><span class="err">%</span><span class="p">&lt;</span><span class="k">param</span><span class="err">-name</span><span class="m">2</span><span class="p">&gt;,</span><span class="w"> </span><span class="p">...)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="p">&lt;</span><span class="err">block-</span><span class="kt">label</span><span class="p">&gt;</span><span class="err">:</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="p">&lt;</span><span class="err">instruction</span><span class="m">1</span><span class="p">&gt;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="p">...</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="p">&lt;</span><span class="err">terminat</span><span class="k">or</span><span class="p">&gt;</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">}</span>
+</code></pre></div>
+<p>Here, <code>&lt;...&gt;</code> marks <strong>a placeholder to replace</strong>, rather than literal LLVM IR syntax. The ellipsis <code>...</code> indicates parts that may be omitted or repeated. A function with no parameters can be written as <code>@f()</code>, and a function body must contain at least one basic block.</p>
+<ul>
+<li><code>define</code> introduces a function definition. The type before <code>@</code>, such as <code>i32</code>, is its return type.</li>
+<li><code>@function-name</code> is the function's global name. Parameters are usually written as a type followed by a local name beginning with <code>%</code>, separated by commas.</li>
+<li>The braces <code>{ ... }</code> contain the function's basic blocks. Each block ends with a terminator instruction.</li>
+<li><code>entry:</code> is a basic block label, marking where execution of that block begins.</li>
+</ul>
+<p>Substituting the details of our function gives <code>define i32 @product(i32 %unitPrice, i32 %quantity)</code>, with <code>entry:</code> as its basic block label.</p>
+<table>
+<thead>
+<tr>
+<th>LLVM IR</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>define i32 @product(...)</code></td>
+<td>Define a function that returns a 32-bit integer.</td>
+</tr>
+<tr>
+<td><code>i32 %unitPrice</code></td>
+<td>A 32-bit integer parameter named <code>%unitPrice</code>.</td>
+</tr>
+<tr>
+<td><code>entry:</code></td>
+<td>A label marking the entry to a basic block in the function.</td>
+</tr>
+<tr>
+<td><code>%result = mul i32 %unitPrice, %quantity</code></td>
+<td>Multiply two integers and name the result.</td>
+</tr>
+<tr>
+<td><code>ret i32 %result</code></td>
+<td>Return the computed value.</td>
+</tr>
+</tbody>
+</table>
+<p>Two instructions are worth introducing here:</p>
+<ul>
+<li><code>ret</code> ends execution of the current function and returns the specified value to its caller.</li>
+<li><code>call</code> invokes another function. We will examine it in the complete program later.</li>
+</ul>
+<p>In particular, <code>ret</code> does not jump to the next basic block in the current function. <strong>When a called function executes <code>ret</code>, its caller resumes just after the function call instruction.</strong></p>
+<p>For now, think of basic blocks as the units that organize instructions within a function. We will explore their structure using a concrete program later.</p>
+<h3 id="22-integer-arithmetic-opcodes-types-and-operands">2.2 Integer Arithmetic: Opcodes, Types, and Operands<a class="headerlink" href="#22-integer-arithmetic-opcodes-types-and-operands" title="Permanent link">&para;</a></h3>
+<p>There is no need to memorize a large instruction set yet. Understanding <code>mul</code> gives us a pattern we can apply to other operations.</p>
+<p>For example, the source expression</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span>
+</code></pre></div>
+<p>can be represented by a single LLVM IR instruction:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+</code></pre></div>
+<p>The <strong>binary integer operations</strong> we use this week share the following form:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>%result-name = &lt;opcode&gt; iN &lt;operand1&gt;, &lt;operand2&gt;
+</code></pre></div>
+<p><code>iN</code> is a schematic integer type. Replace <code>N</code> with a bit width when writing actual IR, as in <code>i32</code> or <code>i64</code>; you cannot write <code>iN</code> literally.</p>
+<ul>
+<li><code>mul</code> is the opcode: it tells LLVM to <strong>perform multiplication</strong>.</li>
+<li><code>i32</code> is the operands' integer type, meaning a <strong>32-bit integer</strong>.</li>
+<li><code>%unitPrice</code> and <code>%quantity</code> are the two operands. Integer constants of the appropriate type can also be used.</li>
+<li><code>%result</code> names <strong>the value produced by this computation</strong>; naming a result does not allocate memory.</li>
+</ul>
+<p>Common SPL integer operations have direct LLVM IR counterparts:</p>
+<table>
+<thead>
+<tr>
+<th>SPL expression</th>
+<th>LLVM IR opcode</th>
+<th>Operation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>a + b</code></td>
+<td><code>add</code></td>
+<td>Integer addition</td>
+</tr>
+<tr>
+<td><code>a - b</code></td>
+<td><code>sub</code></td>
+<td>Integer subtraction</td>
+</tr>
+<tr>
+<td><code>a * b</code></td>
+<td><code>mul</code></td>
+<td>Integer multiplication</td>
+</tr>
+<tr>
+<td><code>a / b</code></td>
+<td><code>sdiv</code></td>
+<td>Signed integer division</td>
+</tr>
+<tr>
+<td><code>a % b</code></td>
+<td><code>srem</code></td>
+<td>Signed integer remainder</td>
+</tr>
+</tbody>
+</table>
+<p>LLVM IR is strongly typed. For example, both operands of <code>add i32</code> must be <code>i32</code>; you cannot directly add an <code>i16</code> to an <code>i32</code>. Changing the bit width requires an explicit conversion instruction.</p>
+<h3 id="23-types-and-values-the-terms-we-need-to-read-ir">2.3 Types and Values: The Terms We Need to Read IR<a class="headerlink" href="#23-types-and-values-the-terms-we-need-to-read-ir" title="Permanent link">&para;</a></h3>
+<p>The number in an integer type such as <code>i32</code> specifies its bit width. The types <code>i1</code>, <code>i8</code>, <code>i16</code>, <code>i32</code>, and <code>i64</code> represent 1-, 8-, 16-, 32-, and 64-bit integers, respectively. In this handout, SPL's <code>int</code> corresponds to <code>i32</code>.</p>
+<p><strong>A type tells us how to interpret a value and which instructions can use it.</strong></p>
+<p>In LLVM IR, a computation can produce a <strong>value</strong> for later instructions to use. For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">%product</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nv">%total</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%product</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%total</span>
+</code></pre></div>
+<p>Here, <code>%product</code> is the value produced by multiplication, <code>%total</code> is the value produced by addition, and <code>ret</code> uses <code>%total</code> as the return value.</p>
+<p>Neither <code>%product</code> nor <code>%total</code> has to correspond to a source variable. They simply name computation results in LLVM IR.</p>
+<p>LLVM IR uses <code>@</code> for global names, such as functions and global variables, and <code>%</code> for names such as local values.</p>
+<p>Keep this important property in mind: <strong>the values produced by ordinary computation instructions have their own names, which later instructions can use repeatedly.</strong> As we try to represent mutable source variables, we will see why this matters.</p>
+<h2 id="3-why-cant-we-give-each-source-variable-a-single-ir-value-name">3. Why Can't We Give Each Source Variable a Single IR Value Name?<a class="headerlink" href="#3-why-cant-we-give-each-source-variable-a-single-ir-value-name" title="Permanent link">&para;</a></h2>
+<p>Return to <code>amount</code> in the order program. It is updated several times rather than computed just once.</p>
+<p><strong>SPL source excerpt:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="k">return</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+</code></pre></div>
+<h3 id="31-first-attempt-repeated-assignment-to-amount">3.1 First Attempt: Repeated Assignment to <code>%amount</code><a class="headerlink" href="#31-first-attempt-repeated-assignment-to-amount" title="Permanent link">&para;</a></h3>
+<p>If we carry source-language assignment directly into IR, we might write the following:</p>
+<p><strong>Invalid LLVM IR attempt, deliberately written so that it cannot compile:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">%amount</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nv">%amount</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nv">%amount</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sub</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount</span><span class="p">,</span><span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount</span>
+</code></pre></div>
+<p>The problem is that <strong>the same <code>%amount</code> is assigned repeatedly</strong>. LLVM IR does not allow different instructions to define the same SSA name. Why impose this rule?</p>
+<h3 id="32-static-single-assignment-define-each-name-once">3.2 Static Single Assignment: Define Each Name Once<a class="headerlink" href="#32-static-single-assignment-define-each-name-once" title="Permanent link">&para;</a></h3>
+<p>LLVM IR uses <strong>static single assignment (SSA)</strong> form for values produced by instructions.</p>
+<p>“Single assignment” means that <strong>each SSA name is defined at only one place in the static IR. It can be used repeatedly afterward, but another instruction cannot redefine it.</strong></p>
+<p>We need to distinguish source variables, assignments to those variables, and SSA values in LLVM IR:</p>
+<ul>
+<li><strong>SPL's <code>int amount;</code></strong> declares a local variable named <code>amount</code>.</li>
+<li><strong>SPL's <code>amount = amount + 6;</code></strong> reassigns an existing variable, changing the current value stored in that object.</li>
+<li><strong>LLVM IR's <code>%v2 = add i32 %v1, 6</code></strong> defines the addition result as a new SSA value, <code>%v2</code>. That name may be used repeatedly afterward, but another instruction cannot redefine it.</li>
+</ul>
+<p>“Static” refers to definition sites in the program text. It does not limit how often a function can execute. Each call can execute the same instruction again and compute a new result; what is forbidden is writing another assignment to the same SSA name in the IR text.</p>
+<p>To see why this form is useful, consider a valid translation of the same SPL source:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="k">return</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+</code></pre></div>
+<p><strong>Valid LLVM IR using distinct SSA names:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="nv">%amount1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="nv">%amount2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount1</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="nv">%amount3</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sub</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount2</span><span class="p">,</span><span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount3</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="p">}</span>
+</code></pre></div>
+<p>Although all three names originate from the source variable <code>amount</code>, they represent values obtained at three different stages:</p>
+<table>
+<thead>
+<tr>
+<th>Point in the source program</th>
+<th>What <code>amount</code> holds</th>
+<th>Corresponding IR value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>After multiplying unit price by quantity</td>
+<td>Cost of the items</td>
+<td><code>%amount1</code></td>
+</tr>
+<tr>
+<td>After adding the delivery fee</td>
+<td>Item cost + 6</td>
+<td><code>%amount2</code></td>
+</tr>
+<tr>
+<td>After subtracting the discount</td>
+<td>Final price</td>
+<td><code>%amount3</code></td>
+</tr>
+</tbody>
+</table>
+<p>LLVM IR represents the current value of one source variable at different program points using several distinct SSA values. <strong>A source variable can be assigned repeatedly, but each assignment in a direct SSA representation produces a new value.</strong></p>
+<p>The dependencies between those values are explicit:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>%unitPrice, %quantity
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>          |
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>          v
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>      %amount1
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>          |
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>          v
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>      %amount2
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>          |
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>          v
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>      %amount3
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>          |
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>          v
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>         ret
+</code></pre></div>
+<p>Each SSA value has a clear definition site and clear uses. This makes data dependencies easier to analyze and supports optimizations such as constant propagation and dead code elimination.</p>
+<p>SSA restricts the definitions of LLVM IR values; it does not prohibit memory updates. As we will see, multiple <code>store</code> instructions can modify the same memory location while still satisfying SSA rules.</p>
+<h2 id="4-two-strategies-for-representing-variables">4. Two Strategies for Representing Variables<a class="headerlink" href="#4-two-strategies-for-representing-variables" title="Permanent link">&para;</a></h2>
+<p>We have already seen one solution: whenever a source variable is reassigned, generate a new SSA value and update the value currently associated with that variable. This works for sequential programs.</p>
+<p>There is another approach: <strong>can a mutable source variable keep the same storage location, with each assignment changing only the contents of that location?</strong></p>
+<p>It can. This gives us a second common strategy: managing mutable variables with <code>alloca</code>, <code>store</code>, and <code>load</code>.</p>
+<h3 id="41-represent-variables-directly-with-ssa-values">4.1 Represent Variables Directly with SSA Values<a class="headerlink" href="#41-represent-variables-directly-with-ssa-values" title="Permanent link">&para;</a></h3>
+<p>Recall the earlier example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nv">%amount1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nv">%amount2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount1</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="nv">%amount3</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sub</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount2</span><span class="p">,</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>Here, the source variable <code>amount</code> corresponds to its latest SSA value rather than a fixed memory address. A code generator could maintain a variable mapping like this:</p>
+<table>
+<thead>
+<tr>
+<th>Source variable</th>
+<th>Current SSA value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>amount</code>, after the first assignment</td>
+<td><code>%amount1</code></td>
+</tr>
+<tr>
+<td><code>amount</code>, after the second assignment</td>
+<td><code>%amount2</code></td>
+</tr>
+<tr>
+<td><code>amount</code>, after the third assignment</td>
+<td><code>%amount3</code></td>
+</tr>
+</tbody>
+</table>
+<p>Each assignment produces a new SSA value and updates the mapping. This table illustrates one possible implementation of the code generator; LLVM IR does not require such a table as part of its syntax.</p>
+<p>This strategy has several useful properties:</p>
+<ul>
+<li>Ordinary scalar variables need no additional memory allocation.</li>
+<li>Reading and updating variables requires no <code>load</code> or <code>store</code> instructions.</li>
+<li>Computation results can be passed directly to later instructions.</li>
+<li>Data dependencies are explicit, helping later analysis and optimization.</li>
+</ul>
+<p>It also asks more of the code generator. Our example has a single execution path, so determining a variable's current value is easy. With conditional branches, different paths may produce different values. With loops, values may also pass between iterations. Simply updating a variable mapping is no longer enough in those cases. We will address them when we study control flow.</p>
+<h3 id="42-represent-variables-with-alloca-store-and-load">4.2 Represent Variables with <code>alloca</code>, <code>store</code>, and <code>load</code><a class="headerlink" href="#42-represent-variables-with-alloca-store-and-load" title="Permanent link">&para;</a></h3>
+<p>Alternatively, we can keep <code>amount</code> associated with the same storage location and change its contents on each assignment. The instructions <code>alloca</code>, <code>store</code>, and <code>load</code> support exactly this approach.</p>
+<p><strong>Step 1: Allocate storage with <code>alloca</code>.</strong></p>
+<p>SPL source:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+</code></pre></div>
+<p>Corresponding LLVM IR:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nv">%amount_addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+</code></pre></div>
+<p>The general form is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>%address-name = alloca &lt;object-type&gt;
+</code></pre></div>
+<p>Here, <code>&lt;object-type&gt;</code> is the type of object to allocate, such as <code>i32</code> or <code>[3 x i32]</code>. It is not the type of the value returned by <code>alloca</code>.</p>
+<p><code>alloca i32</code> allocates enough stack memory for an <code>i32</code> in the current function and returns its address. Therefore:</p>
+<ul>
+<li><code>%amount_addr</code> has type <code>ptr</code>: it represents an address rather than an <code>i32</code> integer.</li>
+<li><code>%amount_addr</code> receives the address from <code>alloca</code> only once.</li>
+<li>The contents of the memory it points to can be modified repeatedly afterward.</li>
+<li>Allocation does not initialize the object. Newly allocated storage cannot be treated as if it already contained a valid integer.</li>
+</ul>
+<p><code>ptr</code> is the LLVM IR type used for memory addresses. <strong>SPL does not need C-style pointer syntax for LLVM IR to use addresses internally.</strong></p>
+<p>The key distinction is that <strong>an SSA name cannot be redefined, but the contents of the memory it points to can change repeatedly</strong>.</p>
+<p><code>alloca</code> can allocate local arrays as well as individual integers. For example:</p>
+<p>SPL source:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">values</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+</code></pre></div>
+<p>Corresponding LLVM IR fragment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nv">%values_addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="p">[</span><span class="m">3</span><span class="w"> </span><span class="k">x</span><span class="w"> </span><span class="kt">i32</span><span class="p">]</span>
+</code></pre></div>
+<p><code>[3 x i32]</code> is an array type containing three <code>i32</code> elements. This instruction allocates storage for the whole array, and the returned address <code>%values_addr</code> still has type <code>ptr</code>.</p>
+<p><strong>Step 2: Write a value with <code>store</code>.</strong></p>
+<p>SPL source:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+</code></pre></div>
+<p>LLVM IR fragment, assuming <code>%amount_addr = alloca i32</code> has already been generated:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nv">%product</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%product</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+</code></pre></div>
+<p>We first compute <code>%product</code>, then write that <code>i32</code> value into the storage pointed to by <code>%amount_addr</code>.</p>
+<p>The general form of <code>store</code> is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>store &lt;value-type&gt; &lt;value-to-write&gt;, ptr &lt;destination-address&gt;
+</code></pre></div>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%product</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+</code></pre></div>
+<p>The first operand is the integer value to write, and the second is the destination address. <strong>There is no <code>%result-name =</code> part</strong>, because <code>store</code> produces no computation result for later instructions to reference. Its effect is to write memory.</p>
+<p>A <code>store</code> changes the contents of the memory pointed to by <code>%amount_addr</code>; it does not redefine <code>%amount_addr</code>.</p>
+<p><strong>Step 3: Read the current value with <code>load</code>.</strong></p>
+<p>SPL source:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+</code></pre></div>
+<p>The same variable name plays two roles in this assignment. On the right, we need its current value; on the left, we need the destination for the write. This connects directly to Week 9's discussion of lvalues, lvalue conversion, and the side effect of assignment.</p>
+<p>LLVM IR fragment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nv">%old</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="nv">%withFee</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%old</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%withFee</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+</code></pre></div>
+<p>The general form of a memory read is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>%result-name = load &lt;value-type&gt;, ptr &lt;source-address&gt;
+</code></pre></div>
+<p>Here:</p>
+<ul>
+<li><code>load i32, ptr %amount_addr</code> reads an <code>i32</code> from the address and defines the value as a new SSA value, <code>%old</code>.</li>
+<li><code>add i32 %old, 6</code> uses that integer in an addition and produces a new SSA value, <code>%withFee</code>.</li>
+<li><code>store i32 %withFee, ptr %amount_addr</code> writes the new value back to the same memory location.</li>
+</ul>
+<p>Unlike <code>store</code>, <code>load</code> produces a new value, so we give it a new name on the left.</p>
+<p>Notice that <code>%old</code> is the integer obtained by one particular read. If the memory contents change later, <code>%old</code> does not change with them.</p>
+<table>
+<thead>
+<tr>
+<th>Name or object</th>
+<th>What it represents</th>
+<th>Can it change?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>%amount_addr</code></td>
+<td>A memory address</td>
+<td>The SSA name cannot be redefined.</td>
+</tr>
+<tr>
+<td><code>%old</code></td>
+<td>The integer obtained by one read</td>
+<td>The SSA name cannot be redefined.</td>
+</tr>
+<tr>
+<td><code>%withFee</code></td>
+<td>The integer produced by one addition</td>
+<td>The SSA name cannot be redefined.</td>
+</tr>
+<tr>
+<td>Memory pointed to by <code>%amount_addr</code></td>
+<td>Storage holding the current value of <code>amount</code></td>
+<td>Repeated <code>store</code> instructions can modify it.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Why Does This Still Satisfy SSA?</p>
+<p>Each <code>load</code> and arithmetic operation produces a new SSA value. Each <code>store</code> changes memory state without reassigning an existing SSA name.</p>
+<p>Repeated writes to the same memory location therefore still satisfy LLVM IR's SSA requirements.</p>
+</div>
+<h3 id="43-comparing-the-two-strategies">4.3 Comparing the Two Strategies<a class="headerlink" href="#43-comparing-the-two-strategies" title="Permanent link">&para;</a></h3>
+<p>We now have two correct ways to represent mutable source variables. With direct SSA values, a source variable corresponds to its latest computation result. With a memory representation, it keeps a fixed storage location, whose current value is read and updated through memory operations.</p>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Direct SSA values</th>
+<th>Memory representation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What a variable corresponds to</td>
+<td>Its current SSA value</td>
+<td>A fixed memory address</td>
+</tr>
+<tr>
+<td>Assignment</td>
+<td>Produce a new SSA value and update the mapping.</td>
+<td>Use <code>store</code>.</td>
+</tr>
+<tr>
+<td>Reading a variable</td>
+<td>Use its current value directly.</td>
+<td>Use <code>load</code>.</td>
+</tr>
+<tr>
+<td>Variable management</td>
+<td>Track the variable's current value.</td>
+<td>Track the variable's address.</td>
+</tr>
+<tr>
+<td>Additional memory access</td>
+<td>No extra reads or writes for variable storage.</td>
+<td>Requires the corresponding <code>load</code> and <code>store</code> instructions.</td>
+</tr>
+<tr>
+<td>Code generation</td>
+<td>Straightforward for sequential computations; requires extra handling for complex control flow.</td>
+<td>Relatively uniform rules for reading and updating mutable variables.</td>
+</tr>
+<tr>
+<td>Data dependencies</td>
+<td>Explicit in the uses of values.</td>
+<td>Some dependencies are expressed through memory reads and writes.</td>
+</tr>
+</tbody>
+</table>
+<p>If memory operations provide a uniform way to manage mutable variables, <strong>why use direct SSA values at all?</strong></p>
+<p>Each strategy has its uses. Direct SSA values avoid extra memory accesses and make dependencies between computation results explicit, so they are well suited to representing computation directly. The generator must, however, track each variable's current value and handle values produced along different execution paths when control flow becomes more complex.</p>
+<p>With a memory representation, the generator can use one set of rules for mutable local variables:</p>
+<ul>
+<li>Allocate storage when a variable is declared.</li>
+<li>Write to its address on assignment.</li>
+<li>Read from its address when its value is needed.</li>
+</ul>
+<p>The address associated with a variable stays the same after each assignment, simplifying variable management. The tradeoff is that this may introduce extra memory operations.</p>
+<p>Neither strategy is universally better. They reflect different choices about the complexity of the code generator and the form of the IR it produces.</p>
+<p>This raises a practical question: <strong>does a real compiler keep all those <code>alloca</code>, <code>load</code>, and <code>store</code> instructions?</strong></p>
+<p>Not necessarily. LLVM provides the <strong><code>mem2reg</code> (Memory to Register)</strong> optimization pass, which promotes eligible local memory variables to SSA values. A frontend can first generate memory operations using the simpler strategy, then let LLVM convert suitable variables into direct SSA values.</p>
+<p>When different execution paths produce different values, this conversion may introduce <code>phi</code> instructions. <strong>Using a memory representation still satisfies SSA; it is a frontend strategy that makes code generation for mutable variables easier.</strong></p>
+<p>In Week 12, when we study control flow, we will explore how values from different execution paths merge and why <code>phi</code> instructions appear in LLVM IR.</p>
+<h2 id="5-the-complete-program-two-llvm-ir-translations">5. The Complete Program: Two LLVM IR Translations<a class="headerlink" href="#5-the-complete-program-two-llvm-ir-translations" title="Permanent link">&para;</a></h2>
+<p>Let us return to the opening SPL program and put the pieces together.</p>
+<h3 id="51-complete-llvm-ir-using-a-memory-representation">5.1 Complete LLVM IR Using a Memory Representation<a class="headerlink" href="#51-complete-llvm-ir-using-a-memory-representation" title="Permanent link">&para;</a></h3>
+<p>SPL source:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">finalPrice</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="p">}</span>
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">finalPrice</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="p">}</span>
+</code></pre></div>
+<p>Using the memory strategy gives us:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">    </span><span class="nv">%amount_addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">    </span><span class="nv">%product</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%product</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="w">    </span><span class="nv">%old1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="w">    </span><span class="nv">%withFee</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%old1</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%withFee</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a>
+<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="w">    </span><span class="nv">%old2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a><span class="w">    </span><span class="nv">%discounted</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sub</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%old2</span><span class="p">,</span><span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%discounted</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a>
+<a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a><span class="w">    </span><span class="nv">%answer</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-28-17" name="__codelineno-28-17" href="#__codelineno-28-17"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%answer</span>
+<a id="__codelineno-28-18" name="__codelineno-28-18" href="#__codelineno-28-18"></a><span class="p">}</span>
+<a id="__codelineno-28-19" name="__codelineno-28-19" href="#__codelineno-28-19"></a>
+<a id="__codelineno-28-20" name="__codelineno-28-20" href="#__codelineno-28-20"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-21" name="__codelineno-28-21" href="#__codelineno-28-21"></a><span class="nl">entry:</span>
+<a id="__codelineno-28-22" name="__codelineno-28-22" href="#__codelineno-28-22"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">3</span><span class="p">)</span>
+<a id="__codelineno-28-23" name="__codelineno-28-23" href="#__codelineno-28-23"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-28-24" name="__codelineno-28-24" href="#__codelineno-28-24"></a><span class="p">}</span>
+</code></pre></div>
+<p>Here is how the main instructions correspond to the source:</p>
+<table>
+<thead>
+<tr>
+<th>SPL code or behavior</th>
+<th>Corresponding LLVM IR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Define <code>finalPrice</code></td>
+<td><code>define i32 @finalPrice(...)</code></td>
+</tr>
+<tr>
+<td><code>int amount;</code></td>
+<td><code>alloca i32</code></td>
+</tr>
+<tr>
+<td>Compute <code>unitPrice * quantity</code></td>
+<td><code>mul i32</code></td>
+</tr>
+<tr>
+<td>Assign to <code>amount</code></td>
+<td><code>store</code></td>
+</tr>
+<tr>
+<td>Use <code>amount</code> in a right-hand expression</td>
+<td><code>load</code></td>
+</tr>
+<tr>
+<td><code>amount + 6</code>, <code>amount - 2</code></td>
+<td><code>add</code>, <code>sub</code></td>
+</tr>
+<tr>
+<td><code>return amount;</code></td>
+<td><code>load</code> followed by <code>ret</code></td>
+</tr>
+<tr>
+<td><code>finalPrice(5, 3)</code></td>
+<td><code>call i32 @finalPrice(i32 5, i32 3)</code></td>
+</tr>
+</tbody>
+</table>
+<p>We keep the final <code>load</code> to illustrate the uniform rule for reading a variable. In this particular program, the last <code>store</code> writes <code>%discounted</code>, and nothing changes the memory afterward. We could therefore return it directly:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%discounted</span>
+</code></pre></div>
+<p>Both forms return the same result for this program.</p>
+<h3 id="52-complete-llvm-ir-using-direct-ssa-values">5.2 Complete LLVM IR Using Direct SSA Values<a class="headerlink" href="#52-complete-llvm-ir-using-direct-ssa-values" title="Permanent link">&para;</a></h3>
+<p>For the same SPL source, we can also represent the variable directly with SSA values, without using <code>alloca</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="nv">%amount1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">    </span><span class="nv">%amount2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount1</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">    </span><span class="nv">%amount3</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sub</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount2</span><span class="p">,</span><span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount3</span>
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="p">}</span>
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="nl">entry:</span>
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">3</span><span class="p">)</span>
+<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a><span class="p">}</span>
+</code></pre></div>
+<p>Comparing the two versions:</p>
+<ul>
+<li>Both correctly represent the successive assignments to <code>amount</code>.</li>
+<li>The first uses a fixed address, updating the variable through <code>load</code> and <code>store</code>.</li>
+<li>The second uses distinct SSA values for the variable's current value at different program points.</li>
+<li>Both satisfy LLVM IR's SSA rules.</li>
+</ul>
+<p><strong>The compiler's task is to preserve the source program's semantics, rather than reproduce every source variable and assignment literally.</strong></p>
+<h3 id="53-function-calls-and-returns-call-and-ret">5.3 Function Calls and Returns: <code>call</code> and <code>ret</code><a class="headerlink" href="#53-function-calls-and-returns-call-and-ret" title="Permanent link">&para;</a></h3>
+<p>The complete program brings <code>call</code> and <code>ret</code> together. Start with the call:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">3</span><span class="p">)</span>
+</code></pre></div>
+<p>This instruction:</p>
+<ol>
+<li>Calls the function named <code>finalPrice</code>.</li>
+<li>Passes two <code>i32</code> arguments, <code>5</code> and <code>3</code>.</li>
+<li>Receives an <code>i32</code> return value from the function.</li>
+<li>Defines that result as a new SSA value, <code>%result</code>.</li>
+</ol>
+<p>A function call with a return value therefore has this general form:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>%result-name = call &lt;return-type&gt; @&lt;function-name&gt;(&lt;param-type1&gt; &lt;argument1&gt;, ...)
+</code></pre></div>
+<p>The following instruction returns <code>%result</code> from the current function:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+</code></pre></div>
+<p><strong>Where does <code>ret</code> return to?</strong> Consider <code>main</code> calling <code>finalPrice</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@finalPrice</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">3</span><span class="p">)</span>
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>At the <code>call</code>, execution enters <code>finalPrice</code>. When that function executes</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%answer</span>
+</code></pre></div>
+<p>it finishes its execution and passes the return value back to the caller. Execution then resumes in <code>main</code>, immediately after the <code>call</code> instruction. Returning from a function takes us back to the caller after the call, rather than to another basic block in the function that is returning.</p>
+<p>For a function with no return value, LLVM IR uses <code>void</code>. The call is written as:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">call</span><span class="w"> </span><span class="k">void</span><span class="w"> </span><span class="vg">@doSomething</span><span class="p">()</span>
+</code></pre></div>
+<p>and the return as:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="k">ret</span><span class="w"> </span><span class="k">void</span>
+</code></pre></div>
+<p>Follow the current project's grammar specification for the return types supported by SPL. We introduce <code>void</code> here to show the full range of LLVM IR call and return forms.</p>
+<h2 id="6-basic-blocks-organizing-instructions-within-a-function">6. Basic Blocks: Organizing Instructions Within a Function<a class="headerlink" href="#6-basic-blocks-organizing-instructions-within-a-function" title="Permanent link">&para;</a></h2>
+<p>Both complete programs contain a block of this form:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nl">entry:</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="w">    </span><span class="p">...</span>
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+</code></pre></div>
+<p>Here, <code>entry:</code> labels a <strong>basic block</strong>, rather than naming a function.</p>
+<p>Think of a basic block as <strong>a sequence of instructions that executes in order from its entry, with no control-flow transfer midway through, ending in a terminator instruction</strong>. An LLVM function body consists of one or more basic blocks.</p>
+<p>The general structure is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>&lt;block-label&gt;:
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>    &lt;ordinary-instruction1&gt;
+<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>    &lt;ordinary-instruction2&gt;
+<a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>    ...
+<a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a>    &lt;terminator&gt;
+</code></pre></div>
+<p>Our order program performs its computations in a fixed sequence and then returns, so each function needs only one <code>entry</code> block. In <code>finalPrice</code>:</p>
+<ul>
+<li>The block begins at <code>entry:</code>.</li>
+<li>It executes <code>alloca</code>, <code>mul</code>, <code>store</code>, <code>load</code>, <code>add</code>, and the remaining operations in order.</li>
+<li>The final <code>ret</code> ends both the block and the function.</li>
+</ul>
+<p>One LLVM IR rule is essential: <strong>every basic block must end with a terminator instruction</strong>.</p>
+<p>The <code>ret</code> instruction we have been using is one such terminator: it ends execution of the current function. LLVM IR does not allow a basic block to end without a terminator.</p>
+<p>For this week, we only need <code>ret</code>. When we introduce conditional branches and loops, we will also use <code>br</code> to change control flow. We will cover it in Week 12.</p>
+<h3 id="61-grouping-the-instructions-we-have-seen">6.1 Grouping the Instructions We Have Seen<a class="headerlink" href="#61-grouping-the-instructions-we-have-seen" title="Permanent link">&para;</a></h3>
+<p>Our complete program already uses several categories of LLVM IR instructions:</p>
+<table>
+<thead>
+<tr>
+<th>Instruction category</th>
+<th>Instructions we have seen</th>
+<th>Role in the order program</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Integer arithmetic</td>
+<td><code>mul</code>, <code>add</code>, <code>sub</code></td>
+<td>Calculate the item cost, add the delivery fee, and subtract the discount.</td>
+</tr>
+<tr>
+<td>Memory operations</td>
+<td><code>alloca</code>, <code>store</code>, <code>load</code></td>
+<td>Allocate storage for a variable and write and read its current value.</td>
+</tr>
+<tr>
+<td>Function calls</td>
+<td><code>call</code></td>
+<td>Call <code>finalPrice(5, 3)</code> from <code>main</code>.</td>
+</tr>
+<tr>
+<td>Terminators</td>
+<td><code>ret</code></td>
+<td>End a block and return a result.</td>
+</tr>
+</tbody>
+</table>
+<p>This functional grouping helps us read this week's examples; it is not a complete catalog of LLVM instructions.</p>
+<p>Keep the different kinds of syntax separate:</p>
+<ul>
+<li><code>define</code> introduces a function definition.</li>
+<li><code>entry:</code> is a basic block label.</li>
+<li><code>i32</code> is a type.</li>
+<li><code>mul</code>, <code>load</code>, <code>store</code>, and <code>ret</code> are instructions.</li>
+</ul>
+<p>These form the structural levels of LLVM IR: <strong>functions contain basic blocks, blocks contain instructions, and instructions use typed values</strong>.</p>
+<h2 id="7-practice-observe-llvm-ir-with-clang">7. Practice: Observe LLVM IR with Clang<a class="headerlink" href="#7-practice-observe-llvm-ir-with-clang" title="Permanent link">&para;</a></h2>
+<p>So far, we have learned LLVM IR through handwritten examples. To see how a real compiler generates these instructions, we will use Clang and look for the two variable representation strategies we just studied.</p>
+<h3 id="71-what-is-clang">7.1 What Is Clang?<a class="headerlink" href="#71-what-is-clang" title="Permanent link">&para;</a></h3>
+<p><strong>Clang</strong> is the LLVM project's compiler frontend for languages including C and C++. The <code>clang</code> command also acts as a compiler driver: it uses the input files and command-line options to coordinate compilation, object code generation, linking, and related steps.</p>
+<p>We will use it to:</p>
+<ol>
+<li>Convert C source into readable LLVM IR.</li>
+<li>Compile and run our own <code>.ll</code> files.</li>
+</ol>
+<p>Clang does not compile SPL directly as C. We use a C program that shares the syntax of our SPL example to observe how LLVM IR is generated.</p>
+<h3 id="72-inspect-llvm-ir-with-compiler-explorer">7.2 Inspect LLVM IR with Compiler Explorer<a class="headerlink" href="#72-inspect-llvm-ir-with-compiler-explorer" title="Permanent link">&para;</a></h3>
+<p>Open <a href="https://godbolt.org/">Compiler Explorer</a>, enter the following code on the left, and select a Clang compiler.</p>
+<p><strong>C source:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">finalPrice</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">unitPrice</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">quantity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unitPrice</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">quantity</span><span class="p">;</span>
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="w">    </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+<a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a><span class="p">}</span>
+<a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a>
+<a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">finalPrice</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a><span class="p">}</span>
+</code></pre></div>
+<p>Enter these Clang compiler options:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>-S -emit-llvm -O0 -fno-discard-value-names
+</code></pre></div>
+<p>Each option has a different purpose:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+<th>Why use it here?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-S</code></td>
+<td>Stop after producing code in textual form.</td>
+<td>Combined with <code>-emit-llvm</code>, this produces textual LLVM IR.</td>
+</tr>
+<tr>
+<td><code>-emit-llvm</code></td>
+<td>Emit LLVM IR instead of assembly for the target platform.</td>
+<td>Show the LLVM IR we are studying in the output pane.</td>
+</tr>
+<tr>
+<td><code>-O0</code></td>
+<td>Use optimization level 0.</td>
+<td>Largely preserve the unoptimized code structure.</td>
+</tr>
+<tr>
+<td><code>-fno-discard-value-names</code></td>
+<td>Retain local value and parameter names where possible.</td>
+<td>Make names such as <code>%unitPrice</code> easier to relate to the source.</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>-S</code> controls the output stage, while <code>-emit-llvm</code> controls the code representation.</strong> On its own, <code>-S</code> normally produces assembly for the target architecture. Together, they produce textual LLVM IR, usually stored in a <code>.ll</code> file.</p>
+<p>In the generated IR on the right, look for:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="k">alloca</span>
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="k">load</span>
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="k">store</span>
+</code></pre></div>
+<p>Rather than connecting all computation results directly as we did in §5.2, Clang may allocate storage for the local variable <code>amount</code>, then read and update it with <code>load</code> and <code>store</code>. This is the memory representation strategy from §4.2.</p>
+<p>Clang may generate different local names, attributes, and other supporting information. <strong>Its generated IR does not have to match this handout word for word.</strong> Focus on the instructions and the program behavior they represent.</p>
+<h3 id="73-observe-how-optimization-changes-variable-representation">7.3 Observe How Optimization Changes Variable Representation<a class="headerlink" href="#73-observe-how-optimization-changes-variable-representation" title="Permanent link">&para;</a></h3>
+<p>Now change Clang's optimization option from:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>-O0
+</code></pre></div>
+<p>to:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>-O1
+</code></pre></div>
+<p>Alternatively, run this command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>clang<span class="w"> </span>-S<span class="w"> </span>-emit-llvm<span class="w"> </span>-O1<span class="w"> </span>order.c<span class="w"> </span>-o<span class="w"> </span>order-O1.ll
+</code></pre></div>
+<p>Inspect the generated LLVM IR. You may find that:</p>
+<ul>
+<li>The original <code>alloca</code> disappears.</li>
+<li>Some <code>load</code> and <code>store</code> instructions disappear.</li>
+<li>Variables previously represented through memory accesses now use SSA values directly.</li>
+<li>Some computations are combined or simplified, possibly even becoming constants.</li>
+</ul>
+<p>Recall that computation results in LLVM IR already use SSA form. If the compiler determines that certain local variables do not need to exist as actual memory objects, it can represent them directly with SSA values.</p>
+<p>An important LLVM optimization pass supports this transformation: <strong><code>mem2reg</code> (Memory to Register)</strong>. It promotes eligible local memory variables to SSA values.</p>
+<p>For example, memory operations such as these:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="nv">%amount_addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">alloca</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>
+<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%product</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a><span class="nv">%old</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%old</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-46-6" name="__codelineno-46-6" href="#__codelineno-46-6"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+</code></pre></div>
+<p>can give way to direct use of SSA values:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="nv">%amount1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%unitPrice</span><span class="p">,</span><span class="w"> </span><span class="nv">%quantity</span>
+<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a><span class="nv">%amount2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%amount1</span><span class="p">,</span><span class="w"> </span><span class="m">6</span>
+</code></pre></div>
+<p>This is a simplified illustration of the transformation, not a guarantee that every optimization run produces exactly this result.</p>
+<p><code>mem2reg</code> does not simply remove every <code>alloca</code>. It only handles local variables that meet the requirements for promotion. Objects that still need actual memory accesses may retain their memory operations.</p>
+<p>Also, <code>-O1</code> enables other optimizations besides variable promotion. The final IR may reflect constant propagation, function inlining, and simplified computations, so not every change can be attributed to <code>mem2reg</code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Why Generate a Memory Representation First and Convert It to SSA Later?</p>
+<p>Generating explicit memory reads and writes is often simpler for a frontend. It avoids having to track the SSA value currently associated with each variable as every instruction is generated.</p>
+<p>LLVM can then promote eligible local variables to SSA values during optimization.</p>
+<p>This separates the complexity of code generation from later optimization. The frontend can use a simpler strategy while leaving LLVM room to improve the IR.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Alignment and Debug Information</p>
+<p>Clang's generated LLVM IR may include an instruction such as:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%value</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%address</span><span class="p">,</span><span class="w"> </span><span class="k">align</span><span class="w"> </span><span class="m">4</span>
+</code></pre></div>
+<p>Here, <code>align 4</code> specifies a 4-byte alignment requirement for the memory access.</p>
+<p>In this course, the IR you write does not need explicit <code>align</code> operands. You can write:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%value</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%address</span>
+</code></pre></div>
+<p>LLVM applies its rules for alignment when it is not explicitly specified. However, you must not claim an alignment that the address does not satisfy.</p>
+<p>You may also see debug information such as <code>!dbg</code>. It associates IR with source locations and variables to support debugging; it is outside our current focus.</p>
+</div>
+<h3 id="74-run-the-program-in-the-course-linux-environment">7.4 Run the Program in the Course Linux Environment<a class="headerlink" href="#74-run-the-program-in-the-course-linux-environment" title="Permanent link">&para;</a></h3>
+<p>First, check that the compiler is installed:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>clang-19<span class="w"> </span>--version
+</code></pre></div>
+<p><code>--version</code> displays Clang's version and target information; it does not compile a program.</p>
+<p>Save the C source from §7.2 as <code>order.c</code>, then run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="c1"># Convert the C source to textual LLVM IR in order-O0.ll</span>
+<a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a>clang-19<span class="w"> </span>-S<span class="w"> </span>-emit-llvm<span class="w"> </span>-O0<span class="w"> </span>-fno-discard-value-names<span class="w"> </span>order.c<span class="w"> </span>-o<span class="w"> </span>order-O0.ll
+<a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a>
+<a id="__codelineno-51-4" name="__codelineno-51-4" href="#__codelineno-51-4"></a><span class="c1"># Read the generated IR; press q to exit less</span>
+<a id="__codelineno-51-5" name="__codelineno-51-5" href="#__codelineno-51-5"></a>less<span class="w"> </span>order-O0.ll
+</code></pre></div>
+<p>The general command structure is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>clang-19 [compiler-options] &lt;input-file&gt; -o &lt;output-file&gt;
+</code></pre></div>
+<p>Here, <code>order.c</code> is the input, and <code>-o order-O0.ll</code> means write the output to that file. The <code>o</code> in <code>-o</code> is lowercase, for <em>output</em>. The <code>O</code> in <code>-O0</code> and <code>-O1</code> is uppercase, for <em>optimization</em>. Take care not to confuse them.</p>
+<p>Next, save the complete LLVM IR we wrote in §5.1 as <code>order.ll</code>, then run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="c1"># Compile the LLVM IR and link it into an executable named order</span>
+<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>clang-19<span class="w"> </span>order.ll<span class="w"> </span>-o<span class="w"> </span>order
+<a id="__codelineno-53-3" name="__codelineno-53-3" href="#__codelineno-53-3"></a>
+<a id="__codelineno-53-4" name="__codelineno-53-4" href="#__codelineno-53-4"></a><span class="c1"># Run the program</span>
+<a id="__codelineno-53-5" name="__codelineno-53-5" href="#__codelineno-53-5"></a>./order
+<a id="__codelineno-53-6" name="__codelineno-53-6" href="#__codelineno-53-6"></a>
+<a id="__codelineno-53-7" name="__codelineno-53-7" href="#__codelineno-53-7"></a><span class="c1"># Immediately check the previous command's exit status</span>
+<a id="__codelineno-53-8" name="__codelineno-53-8" href="#__codelineno-53-8"></a><span class="nb">echo</span><span class="w"> </span><span class="nv">$?</span>
+</code></pre></div>
+<p><code>clang-19 order.ll -o order</code> reads the existing LLVM IR, generates machine code, and links the executable. <code>./order</code> runs <code>order</code> from the current directory, and <code>echo $?</code> displays the previous command's exit status.</p>
+<p>In this example, <code>main</code> returns <code>19</code>, so the displayed status should be:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>19
+</code></pre></div>
+<p>Run <code>echo $?</code> immediately after <code>./order</code>, without inserting another command between them.</p>
+<p>To generate only an object file, without linking:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>clang-19<span class="w"> </span>-c<span class="w"> </span>order.ll<span class="w"> </span>-o<span class="w"> </span>order.o
+</code></pre></div>
+<p><code>-c</code> means compile to an object file without linking an executable. The resulting <code>order.o</code> cannot be run directly like <code>./order</code>.</p>
+<p>Finally, generate optimized LLVM IR from the same C source:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>clang-19<span class="w"> </span>-S<span class="w"> </span>-emit-llvm<span class="w"> </span>-O1<span class="w"> </span>order.c<span class="w"> </span>-o<span class="w"> </span>order-O1.ll
+</code></pre></div>
+<p>Compare <code>order-O0.ll</code> with <code>order-O1.ll</code>. Check whether <code>alloca</code>, <code>load</code>, and <code>store</code> remain, and whether computation results now use SSA values directly.</p>
+<p>Different Clang and LLVM versions may produce different IR. Focus on how the representation changes after optimization, rather than expecting output identical to this handout.</p>
+<h3 id="75-in-class-exercises">7.5 In-Class Exercises<a class="headerlink" href="#75-in-class-exercises" title="Permanent link">&para;</a></h3>
+<p><strong>Exercise 1: Work with Both Strategies</strong></p>
+<p>In the original SPL program, change the delivery fee from <code>6</code> to <code>9</code> and the discount from <code>2</code> to <code>4</code>. Predict the return value first, then update:</p>
+<ol>
+<li>The version using direct SSA values.</li>
+<li>The version using <code>alloca + load/store</code>.</li>
+</ol>
+<p>Check that both IR versions produce the same result.</p>
+<p><strong>Exercise 2: Understand the Memory Representation</strong></p>
+<p>Consider the final read and return in the memory-based version:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="nv">%answer</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="nv">%amount_addr</span>
+<a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%answer</span>
+</code></pre></div>
+<p>Try removing the final <code>load</code> and returning <code>%discounted</code> directly:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%discounted</span>
+</code></pre></div>
+<p>Explain why these forms have the same effect in this particular program.</p>
+<p><strong>Exercise 3: Observe Clang's Optimizations</strong></p>
+<p>Generate LLVM IR with <code>-O0</code> and <code>-O1</code>, then answer:</p>
+<ol>
+<li>Why is it easy to observe <code>alloca</code>, <code>load</code>, and <code>store</code> at <code>-O0</code>?</li>
+<li>Why might these instructions disappear after optimization?</li>
+<li>Does the optimized IR still satisfy SSA rules?</li>
+</ol>
+<hr />
+<h2 id="8-summary">8. Summary<a class="headerlink" href="#8-summary" title="Permanent link">&para;</a></h2>
+<p>We began with a question: <strong>how should a compiler represent source variables that can be assigned repeatedly when LLVM IR uses SSA?</strong> The following ideas give us an answer.</p>
+<h3 id="intermediate-representation">Intermediate Representation<a class="headerlink" href="#intermediate-representation" title="Permanent link">&para;</a></h3>
+<ul>
+<li>An IR connects source-language frontends with target-machine backends.</li>
+<li>LLVM IR represents computations using explicit types, values, and instructions.</li>
+<li>Functions consist of basic blocks, which contain instructions.</li>
+</ul>
+<h3 id="static-single-assignment">Static Single Assignment<a class="headerlink" href="#static-single-assignment" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Each SSA value in LLVM IR is defined at only one place.</li>
+<li>A source variable can correspond to different SSA values at different program points.</li>
+<li>SSA restricts value definitions, rather than the number of assignments to a source variable.</li>
+</ul>
+<h3 id="two-strategies-for-representing-variables">Two Strategies for Representing Variables<a class="headerlink" href="#two-strategies-for-representing-variables" title="Permanent link">&para;</a></h3>
+<ul>
+<li>With direct SSA values, each assignment produces a new value and updates the value currently associated with the variable.</li>
+<li>With a memory representation, <code>alloca</code> allocates storage, <code>store</code> updates its contents, and <code>load</code> reads its current value.</li>
+<li>Both strategies satisfy LLVM IR's SSA rules.</li>
+<li>Their main difference lies in how the code generator manages mutable variables.</li>
+</ul>
+<h3 id="llvm-optimization">LLVM Optimization<a class="headerlink" href="#llvm-optimization" title="Permanent link">&para;</a></h3>
+<ul>
+<li>LLVM's <code>mem2reg</code> pass can promote eligible local memory variables to SSA values.</li>
+<li>A memory representation can simplify frontend code generation.</li>
+<li>Direct SSA values express computation dependencies more explicitly.</li>
+<li>Optimization can eliminate unnecessary memory accesses and further simplify computations.</li>
+</ul>
+<h3 id="functions-and-basic-blocks">Functions and Basic Blocks<a class="headerlink" href="#functions-and-basic-blocks" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>define</code> introduces a function definition.</li>
+<li><code>call</code> invokes a function.</li>
+<li><code>ret</code> ends the current function and returns to its caller.</li>
+<li>A basic block organizes a sequence of instructions.</li>
+<li>Every basic block must end with a terminator instruction.</li>
+</ul>
+<p><strong>LLVM IR does not require each source variable to correspond to one fixed SSA value. A compiler can represent its current value through successive SSA values, or manage it through a fixed memory address and explicit reads and writes. Each strategy has its uses, and LLVM's optimizer can convert suitable memory representations into SSA values.</strong></p>
+<p>Next, we will study control flow in LLVM IR: conditional branches, loops, and the merging of values from different execution paths.</p>
+<hr />
+<h1 id="appendix-more-llvm-ir-basics-for-the-spl-project">Appendix: More LLVM IR Basics for the SPL Project<a class="headerlink" href="#appendix-more-llvm-ir-basics-for-the-spl-project" title="Permanent link">&para;</a></h1>
+<p>Use these sections as a reference when needed; they are outside this week's main walkthrough. Each example starts with source code and then shows the corresponding LLVM IR. Examples that use syntax outside the current SPL language are explicitly labeled as C.</p>
+<h2 id="a-integer-division-and-remainder-sdiv-and-srem">A. Integer Division and Remainder: <code>sdiv</code> and <code>srem</code><a class="headerlink" href="#a-integer-division-and-remainder-sdiv-and-srem" title="Permanent link">&para;</a></h2>
+<p><strong>SPL source:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">quotient</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-2" name="__codelineno-59-2" href="#__codelineno-59-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<a id="__codelineno-59-3" name="__codelineno-59-3" href="#__codelineno-59-3"></a><span class="p">}</span>
+<a id="__codelineno-59-4" name="__codelineno-59-4" href="#__codelineno-59-4"></a>
+<a id="__codelineno-59-5" name="__codelineno-59-5" href="#__codelineno-59-5"></a><span class="kt">int</span><span class="w"> </span><span class="nf">remainder</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-6" name="__codelineno-59-6" href="#__codelineno-59-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<a id="__codelineno-59-7" name="__codelineno-59-7" href="#__codelineno-59-7"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Corresponding LLVM IR:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@quotient</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-60-3" name="__codelineno-60-3" href="#__codelineno-60-3"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sdiv</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="nv">%b</span>
+<a id="__codelineno-60-4" name="__codelineno-60-4" href="#__codelineno-60-4"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-60-5" name="__codelineno-60-5" href="#__codelineno-60-5"></a><span class="p">}</span>
+<a id="__codelineno-60-6" name="__codelineno-60-6" href="#__codelineno-60-6"></a>
+<a id="__codelineno-60-7" name="__codelineno-60-7" href="#__codelineno-60-7"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@remainder</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-60-8" name="__codelineno-60-8" href="#__codelineno-60-8"></a><span class="nl">entry:</span>
+<a id="__codelineno-60-9" name="__codelineno-60-9" href="#__codelineno-60-9"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">srem</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="nv">%b</span>
+<a id="__codelineno-60-10" name="__codelineno-60-10" href="#__codelineno-60-10"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-60-11" name="__codelineno-60-11" href="#__codelineno-60-11"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>sdiv</code> performs signed integer division, and <code>srem</code> computes the signed remainder. Their counterparts <code>udiv</code> and <code>urem</code> interpret the operands as unsigned integers. With negative operands, this difference affects the result, so the instructions are not interchangeable. Division by zero must not be treated as producing an ordinary valid result either.</p>
+<h2 id="b-unary-minus-another-use-for-sub">B. Unary Minus: Another Use for <code>sub</code><a class="headerlink" href="#b-unary-minus-another-use-for-sub" title="Permanent link">&para;</a></h2>
+<p><strong>SPL source:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">negate</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-61-3" name="__codelineno-61-3" href="#__codelineno-61-3"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Corresponding LLVM IR:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@negate</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-62-3" name="__codelineno-62-3" href="#__codelineno-62-3"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sub</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="nv">%x</span>
+<a id="__codelineno-62-4" name="__codelineno-62-4" href="#__codelineno-62-4"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-62-5" name="__codelineno-62-5" href="#__codelineno-62-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>LLVM IR does not need a dedicated <code>neg</code> instruction for simple integer negation: <code>0 - x</code> expresses the corresponding fixed-width operation. Unary plus on an ordinary integer value generally needs no additional arithmetic instruction.</p>
+<h2 id="c-function-calls-call">C. Function Calls: <code>call</code><a class="headerlink" href="#c-function-calls-call" title="Permanent link">&para;</a></h2>
+<p><strong>SPL source:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">square</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-63-3" name="__codelineno-63-3" href="#__codelineno-63-3"></a><span class="p">}</span>
+<a id="__codelineno-63-4" name="__codelineno-63-4" href="#__codelineno-63-4"></a>
+<a id="__codelineno-63-5" name="__codelineno-63-5" href="#__codelineno-63-5"></a><span class="kt">int</span><span class="w"> </span><span class="nf">useSquare</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-63-6" name="__codelineno-63-6" href="#__codelineno-63-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">square</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-63-7" name="__codelineno-63-7" href="#__codelineno-63-7"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Corresponding LLVM IR:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@square</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%x</span><span class="p">,</span><span class="w"> </span><span class="nv">%x</span>
+<a id="__codelineno-64-4" name="__codelineno-64-4" href="#__codelineno-64-4"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-64-5" name="__codelineno-64-5" href="#__codelineno-64-5"></a><span class="p">}</span>
+<a id="__codelineno-64-6" name="__codelineno-64-6" href="#__codelineno-64-6"></a>
+<a id="__codelineno-64-7" name="__codelineno-64-7" href="#__codelineno-64-7"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@useSquare</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-64-8" name="__codelineno-64-8" href="#__codelineno-64-8"></a><span class="nl">entry:</span>
+<a id="__codelineno-64-9" name="__codelineno-64-9" href="#__codelineno-64-9"></a><span class="w">    </span><span class="nv">%s</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@square</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%y</span><span class="p">)</span>
+<a id="__codelineno-64-10" name="__codelineno-64-10" href="#__codelineno-64-10"></a><span class="w">    </span><span class="nv">%answer</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%s</span><span class="p">,</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-64-11" name="__codelineno-64-11" href="#__codelineno-64-11"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%answer</span>
+<a id="__codelineno-64-12" name="__codelineno-64-12" href="#__codelineno-64-12"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>call i32 @square(i32 %y)</code> calls <code>square</code> with one <code>i32</code> argument and produces an <code>i32</code> return value.</p>
+<p>Notice the distinction between parameter names in a function definition and argument values at a call site. Function names use <code>@</code>; local parameters and values use <code>%</code>.</p>
+<p>Another common construct is <strong>a function declaration without a body in the current module</strong>. For example, a source file may call a function defined elsewhere.</p>
+<p><strong>C source illustrating a function declaration:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">externalAdd</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
+<a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a>
+<a id="__codelineno-65-3" name="__codelineno-65-3" href="#__codelineno-65-3"></a><span class="kt">int</span><span class="w"> </span><span class="nf">useExternal</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-65-4" name="__codelineno-65-4" href="#__codelineno-65-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">externalAdd</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-65-5" name="__codelineno-65-5" href="#__codelineno-65-5"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Corresponding LLVM IR:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a><span class="k">declare</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@externalAdd</span><span class="p">(</span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="p">)</span>
+<a id="__codelineno-66-2" name="__codelineno-66-2" href="#__codelineno-66-2"></a>
+<a id="__codelineno-66-3" name="__codelineno-66-3" href="#__codelineno-66-3"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@useExternal</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-66-4" name="__codelineno-66-4" href="#__codelineno-66-4"></a><span class="nl">entry:</span>
+<a id="__codelineno-66-5" name="__codelineno-66-5" href="#__codelineno-66-5"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@externalAdd</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%n</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">1</span><span class="p">)</span>
+<a id="__codelineno-66-6" name="__codelineno-66-6" href="#__codelineno-66-6"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-66-7" name="__codelineno-66-7" href="#__codelineno-66-7"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>define</code> introduces a function <strong>definition</strong>, including its body. <code>declare</code> introduces a function <strong>declaration</strong>, with a signature but no body. The declaration above follows this pattern:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>declare &lt;return-type&gt; @&lt;function-name&gt;(&lt;param-type1&gt;, &lt;param-type2&gt;, ...)
+</code></pre></div>
+<p>Parameter names may be omitted in a declaration, but <strong>parameter types must still be provided</strong>. This IR can be compiled into an object file. To link an executable, you must also provide an implementation of <code>externalAdd</code> and an appropriate entry point.</p>
+<h2 id="d-integer-comparisons-icmp-and-i1">D. Integer Comparisons: <code>icmp</code> and <code>i1</code><a class="headerlink" href="#d-integer-comparisons-icmp-and-i1" title="Permanent link">&para;</a></h2>
+<p>LLVM IR must also represent relational operations. The following <strong>C source</strong> illustrates a function returning an integer <code>0</code> or <code>1</code>. For the result types of relational expressions in SPL, follow the semantic specification for the current course project.</p>
+<p><strong>C source:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">isGreater</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-68-2" name="__codelineno-68-2" href="#__codelineno-68-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<a id="__codelineno-68-3" name="__codelineno-68-3" href="#__codelineno-68-3"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Corresponding LLVM IR:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@isGreater</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-69-2" name="__codelineno-69-2" href="#__codelineno-69-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-69-3" name="__codelineno-69-3" href="#__codelineno-69-3"></a><span class="w">    </span><span class="nv">%cond</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">icmp</span><span class="w"> </span><span class="k">sgt</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%a</span><span class="p">,</span><span class="w"> </span><span class="nv">%b</span>
+<a id="__codelineno-69-4" name="__codelineno-69-4" href="#__codelineno-69-4"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">zext</span><span class="w"> </span><span class="kt">i1</span><span class="w"> </span><span class="nv">%cond</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-69-5" name="__codelineno-69-5" href="#__codelineno-69-5"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-69-6" name="__codelineno-69-6" href="#__codelineno-69-6"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>icmp</code> compares integers and produces an <code>i1</code> result. Its general form is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a>%result-name = icmp &lt;predicate&gt; &lt;integer-type&gt; &lt;operand1&gt;, &lt;operand2&gt;
+</code></pre></div>
+<p>The <code>&lt;predicate&gt;</code> specifies the comparison:</p>
+<table>
+<thead>
+<tr>
+<th>Predicate</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>eq</code></td>
+<td>The first operand equals the second.</td>
+</tr>
+<tr>
+<td><code>ne</code></td>
+<td>The first operand does not equal the second.</td>
+</tr>
+<tr>
+<td><code>sgt</code></td>
+<td>The first operand is greater than the second, using a signed comparison.</td>
+</tr>
+<tr>
+<td><code>sge</code></td>
+<td>The first operand is greater than or equal to the second, using a signed comparison.</td>
+</tr>
+<tr>
+<td><code>slt</code></td>
+<td>The first operand is less than the second, using a signed comparison.</td>
+</tr>
+<tr>
+<td><code>sle</code></td>
+<td>The first operand is less than or equal to the second, using a signed comparison.</td>
+</tr>
+</tbody>
+</table>
+<p>For a scalar integer comparison, the result is <code>i1</code>, not the <code>i32</code> type of the input operands.</p>
+<p>If the function must return an <code>i32</code> containing <code>0</code> or <code>1</code>, explicitly extend the <code>i1</code> with <code>zext</code>, as shown above. LLVM does not perform this type conversion automatically.</p>
+<h2 id="e-global-variables-global-and-global-addresses">E. Global Variables: <code>global</code> and Global Addresses<a class="headerlink" href="#e-global-variables-global-and-global-addresses" title="Permanent link">&para;</a></h2>
+<p><strong>SPL source:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">counter</span><span class="p">;</span>
+<a id="__codelineno-71-2" name="__codelineno-71-2" href="#__codelineno-71-2"></a>
+<a id="__codelineno-71-3" name="__codelineno-71-3" href="#__codelineno-71-3"></a><span class="kt">int</span><span class="w"> </span><span class="nf">increment</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-71-4" name="__codelineno-71-4" href="#__codelineno-71-4"></a><span class="w">    </span><span class="n">counter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">counter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-71-5" name="__codelineno-71-5" href="#__codelineno-71-5"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">counter</span><span class="p">;</span>
+<a id="__codelineno-71-6" name="__codelineno-71-6" href="#__codelineno-71-6"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Corresponding LLVM IR, choosing an initial global value of <code>0</code>:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a><span class="vg">@counter</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">global</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-72-2" name="__codelineno-72-2" href="#__codelineno-72-2"></a>
+<a id="__codelineno-72-3" name="__codelineno-72-3" href="#__codelineno-72-3"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@increment</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-72-4" name="__codelineno-72-4" href="#__codelineno-72-4"></a><span class="nl">entry:</span>
+<a id="__codelineno-72-5" name="__codelineno-72-5" href="#__codelineno-72-5"></a><span class="w">    </span><span class="nv">%old</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="vg">@counter</span>
+<a id="__codelineno-72-6" name="__codelineno-72-6" href="#__codelineno-72-6"></a><span class="w">    </span><span class="nv">%new</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%old</span><span class="p">,</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-72-7" name="__codelineno-72-7" href="#__codelineno-72-7"></a><span class="w">    </span><span class="k">store</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%new</span><span class="p">,</span><span class="w"> </span><span class="kt">ptr</span><span class="w"> </span><span class="vg">@counter</span>
+<a id="__codelineno-72-8" name="__codelineno-72-8" href="#__codelineno-72-8"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%new</span>
+<a id="__codelineno-72-9" name="__codelineno-72-9" href="#__codelineno-72-9"></a><span class="p">}</span>
+</code></pre></div>
+<p>For an ordinary global variable, start with this general form:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a>@&lt;global-name&gt; = global &lt;object-type&gt; &lt;initial-value&gt;
+</code></pre></div>
+<p>An example is <code>@counter = global i32 0</code>. This differs from a <code>define</code> function definition and is not a local <code>alloca</code> instruction.</p>
+<p><code>@counter</code> represents the address of a global object, whereas a local <code>alloca</code> allocates storage during function execution. The addresses come from different sources, but both use the same <code>load/store</code> forms for reads and writes. We explicitly choose an initial value of <code>0</code> here; follow the SPL specification for the project's global initialization semantics.</p>
+<p>LLVM IR also provides <code>zeroinitializer</code> to represent a zero-initialized value. For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a><span class="vg">@counter</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">global</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="k">zeroinitializer</span>
+</code></pre></div>
+<p>For the integer global above, this has the same effect as initializing it to <code>0</code>.</p>
+<h2 id="f-integer-type-conversions-sext-zext-and-trunc">F. Integer Type Conversions: <code>sext</code>, <code>zext</code>, and <code>trunc</code><a class="headerlink" href="#f-integer-type-conversions-sext-zext-and-trunc" title="Permanent link">&para;</a></h2>
+<p><strong>C source using <code>short</code> and <code>unsigned short</code>, declaration types not directly available in the current SPL language:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">signedWiden</span><span class="p">(</span><span class="kt">short</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-75-2" name="__codelineno-75-2" href="#__codelineno-75-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-75-3" name="__codelineno-75-3" href="#__codelineno-75-3"></a><span class="p">}</span>
+<a id="__codelineno-75-4" name="__codelineno-75-4" href="#__codelineno-75-4"></a>
+<a id="__codelineno-75-5" name="__codelineno-75-5" href="#__codelineno-75-5"></a><span class="kt">int</span><span class="w"> </span><span class="nf">unsignedWiden</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-75-6" name="__codelineno-75-6" href="#__codelineno-75-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-75-7" name="__codelineno-75-7" href="#__codelineno-75-7"></a><span class="p">}</span>
+<a id="__codelineno-75-8" name="__codelineno-75-8" href="#__codelineno-75-8"></a>
+<a id="__codelineno-75-9" name="__codelineno-75-9" href="#__codelineno-75-9"></a><span class="kt">short</span><span class="w"> </span><span class="nf">narrow</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-75-10" name="__codelineno-75-10" href="#__codelineno-75-10"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">short</span><span class="p">)</span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-75-11" name="__codelineno-75-11" href="#__codelineno-75-11"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Corresponding LLVM IR, assuming a 16-bit <code>short</code> and a 32-bit <code>int</code>:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@signedWiden</span><span class="p">(</span><span class="kt">i16</span><span class="w"> </span><span class="nv">%x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-76-2" name="__codelineno-76-2" href="#__codelineno-76-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-76-3" name="__codelineno-76-3" href="#__codelineno-76-3"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">sext</span><span class="w"> </span><span class="kt">i16</span><span class="w"> </span><span class="nv">%x</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-76-4" name="__codelineno-76-4" href="#__codelineno-76-4"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-76-5" name="__codelineno-76-5" href="#__codelineno-76-5"></a><span class="p">}</span>
+<a id="__codelineno-76-6" name="__codelineno-76-6" href="#__codelineno-76-6"></a>
+<a id="__codelineno-76-7" name="__codelineno-76-7" href="#__codelineno-76-7"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@unsignedWiden</span><span class="p">(</span><span class="kt">i16</span><span class="w"> </span><span class="nv">%x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-76-8" name="__codelineno-76-8" href="#__codelineno-76-8"></a><span class="nl">entry:</span>
+<a id="__codelineno-76-9" name="__codelineno-76-9" href="#__codelineno-76-9"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">zext</span><span class="w"> </span><span class="kt">i16</span><span class="w"> </span><span class="nv">%x</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i32</span>
+<a id="__codelineno-76-10" name="__codelineno-76-10" href="#__codelineno-76-10"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-76-11" name="__codelineno-76-11" href="#__codelineno-76-11"></a><span class="p">}</span>
+<a id="__codelineno-76-12" name="__codelineno-76-12" href="#__codelineno-76-12"></a>
+<a id="__codelineno-76-13" name="__codelineno-76-13" href="#__codelineno-76-13"></a><span class="k">define</span><span class="w"> </span><span class="kt">i16</span><span class="w"> </span><span class="vg">@narrow</span><span class="p">(</span><span class="kt">i32</span><span class="w"> </span><span class="nv">%x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-76-14" name="__codelineno-76-14" href="#__codelineno-76-14"></a><span class="nl">entry:</span>
+<a id="__codelineno-76-15" name="__codelineno-76-15" href="#__codelineno-76-15"></a><span class="w">    </span><span class="nv">%result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">trunc</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%x</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="kt">i16</span>
+<a id="__codelineno-76-16" name="__codelineno-76-16" href="#__codelineno-76-16"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i16</span><span class="w"> </span><span class="nv">%result</span>
+<a id="__codelineno-76-17" name="__codelineno-76-17" href="#__codelineno-76-17"></a><span class="p">}</span>
+</code></pre></div>
+<p>These conversion instructions share a common form:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a>%result-name = &lt;conversion-opcode&gt; &lt;source-type&gt; &lt;value&gt; to &lt;destination-type&gt;
+</code></pre></div>
+<p>The opcode may be <code>sext</code>, <code>zext</code>, or <code>trunc</code>:</p>
+<ul>
+<li><code>sext</code> performs sign extension.</li>
+<li><code>zext</code> fills the added high-order bits with zeros.</li>
+<li><code>trunc</code> discards high-order bits.</li>
+</ul>
+<p>These instructions show how explicit LLVM IR is about integer widths: do not expect implicit conversions between different widths.</p>
+<h2 id="g-void-functions-without-a-return-value">G. <code>void</code>: Functions Without a Return Value<a class="headerlink" href="#g-void-functions-without-a-return-value" title="Permanent link">&para;</a></h2>
+<p><strong>C source, since the current SPL function type specification does not include a <code>void</code> return type:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">doNothing</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-78-2" name="__codelineno-78-2" href="#__codelineno-78-2"></a><span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<a id="__codelineno-78-3" name="__codelineno-78-3" href="#__codelineno-78-3"></a><span class="p">}</span>
+<a id="__codelineno-78-4" name="__codelineno-78-4" href="#__codelineno-78-4"></a>
+<a id="__codelineno-78-5" name="__codelineno-78-5" href="#__codelineno-78-5"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-78-6" name="__codelineno-78-6" href="#__codelineno-78-6"></a><span class="w">    </span><span class="n">doNothing</span><span class="p">();</span>
+<a id="__codelineno-78-7" name="__codelineno-78-7" href="#__codelineno-78-7"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-78-8" name="__codelineno-78-8" href="#__codelineno-78-8"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Corresponding LLVM IR:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a><span class="k">define</span><span class="w"> </span><span class="k">void</span><span class="w"> </span><span class="vg">@doNothing</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-79-2" name="__codelineno-79-2" href="#__codelineno-79-2"></a><span class="nl">entry:</span>
+<a id="__codelineno-79-3" name="__codelineno-79-3" href="#__codelineno-79-3"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="k">void</span>
+<a id="__codelineno-79-4" name="__codelineno-79-4" href="#__codelineno-79-4"></a><span class="p">}</span>
+<a id="__codelineno-79-5" name="__codelineno-79-5" href="#__codelineno-79-5"></a>
+<a id="__codelineno-79-6" name="__codelineno-79-6" href="#__codelineno-79-6"></a><span class="k">define</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-79-7" name="__codelineno-79-7" href="#__codelineno-79-7"></a><span class="nl">entry:</span>
+<a id="__codelineno-79-8" name="__codelineno-79-8" href="#__codelineno-79-8"></a><span class="w">    </span><span class="k">call</span><span class="w"> </span><span class="k">void</span><span class="w"> </span><span class="vg">@doNothing</span><span class="p">()</span>
+<a id="__codelineno-79-9" name="__codelineno-79-9" href="#__codelineno-79-9"></a><span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-79-10" name="__codelineno-79-10" href="#__codelineno-79-10"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>void</code> is a special LLVM IR type indicating the absence of a return value. <code>call void</code> produces no return value to receive, and <code>ret void</code> carries no value.</p>
+<h2 id="h-syntax-quick-reference">H. Syntax Quick Reference<a class="headerlink" href="#h-syntax-quick-reference" title="Permanent link">&para;</a></h2>
+<p>This table collects <strong>the general forms already introduced through source and IR examples this week</strong>. Use it as an index to the main text and appendix. Angle brackets still mark placeholders; these patterns cannot themselves be compiled as <code>.ll</code> files.</p>
+<table>
+<thead>
+<tr>
+<th>Purpose</th>
+<th>Common form, omitting optional attributes</th>
+<th>First complete example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Function definition</td>
+<td><code>define &lt;return-type&gt; @&lt;function-name&gt;(&lt;type&gt; %&lt;parameter&gt;, ...) { ... }</code></td>
+<td>§2.1</td>
+</tr>
+<tr>
+<td>Binary integer operation</td>
+<td><code>%r = &lt;add/sub/mul/sdiv/srem&gt; iN &lt;x&gt;, &lt;y&gt;</code></td>
+<td>§2.2, Appendix A</td>
+</tr>
+<tr>
+<td>Allocate local storage</td>
+<td><code>%p = alloca &lt;object-type&gt;</code></td>
+<td>§4.2</td>
+</tr>
+<tr>
+<td>Write memory</td>
+<td><code>store &lt;type&gt; &lt;value&gt;, ptr &lt;address&gt;</code></td>
+<td>§4.2</td>
+</tr>
+<tr>
+<td>Read memory</td>
+<td><code>%v = load &lt;type&gt;, ptr &lt;address&gt;</code></td>
+<td>§4.2</td>
+</tr>
+<tr>
+<td>Call a function with a return value</td>
+<td><code>%r = call &lt;return-type&gt; @&lt;function-name&gt;(&lt;type&gt; &lt;argument&gt;, ...)</code></td>
+<td>§5.3, Appendix C</td>
+</tr>
+<tr>
+<td>Return from a function</td>
+<td><code>ret &lt;type&gt; &lt;value&gt;</code> or <code>ret void</code></td>
+<td>§2.1, Appendix G</td>
+</tr>
+<tr>
+<td>Function declaration</td>
+<td><code>declare &lt;return-type&gt; @&lt;function-name&gt;(&lt;param-type&gt;, ...)</code></td>
+<td>Appendix C</td>
+</tr>
+<tr>
+<td>Integer comparison</td>
+<td><code>%r = icmp &lt;predicate&gt; &lt;type&gt; &lt;x&gt;, &lt;y&gt;</code></td>
+<td>Appendix D</td>
+</tr>
+<tr>
+<td>Global variable</td>
+<td><code>@&lt;name&gt; = global &lt;type&gt; &lt;initial-value&gt;</code></td>
+<td>Appendix E</td>
+</tr>
+<tr>
+<td>Integer type conversion</td>
+<td><code>%r = &lt;sext/zext/trunc&gt; &lt;source-type&gt; &lt;value&gt; to &lt;destination-type&gt;</code></td>
+<td>Appendix F</td>
+</tr>
+</tbody>
+</table>
+<p>Remember that <strong>not every instruction has the form <code>%result = ...</code></strong>. For example, <code>store</code> and <code>ret</code> produce no new result value. Also, <code>define</code>, <code>declare</code>, and <code>global</code> are not ordinary computation instructions. Read each construct in terms of its result, operands, and type requirements.</p>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://llvm.org/docs/LangRef.html">LLVM Language Reference Manual</a>: Formal definitions of IR syntax, types, instructions, and memory operations.</li>
+<li><a href="https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl07.html">LLVM Tutorial — Mutable Variables</a>: The relationship between mutable variables, SSA, and <code>alloca</code>.</li>
+<li><a href="https://clang.llvm.org/docs/ClangCommandLineReference.html">Clang Command Line Reference</a>: Command-line options such as <code>-S</code>, <code>-emit-llvm</code>, <code>-c</code>, and <code>-o</code>.</li>
+<li><a href="https://llvm.org/docs/Passes.html#mem2reg-promote-memory-to-register">LLVM Passes — Promote Memory to Register</a>: The <code>mem2reg</code> optimization pass.</li>
+<li><a href="https://godbolt.org/">Compiler Explorer</a>: Compare source code with the LLVM IR generated by Clang.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-copyright">
+    <div class="md-copyright__highlight">
+        commit: 
+        <a href="/commit/c89f2484, 2026-11-21 16:03:25+08:00" target="_blank" rel="noopener">
+            c89f2484, 2026-11-21 16:03:25+08:00
+        </a>
+    </div>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.path", "navigation.tabs", "navigation.tabs.sticky"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>
